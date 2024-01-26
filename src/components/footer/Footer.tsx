@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import { Link, Typography } from '@mui/material';
 
-import { ReactComponent as Logo } from 'assets/logo.svg';
+import logoPath from 'assets/DeFi_Saint_only_logo.png';
 import { ReactComponent as GithubLogo } from 'assets/social/github.svg';
 import { ReactComponent as MediumLogo } from 'assets/social/medium.svg';
 import { ReactComponent as TwitterLogo } from 'assets/social/twitter.svg';
@@ -94,7 +94,7 @@ export const Footer = memo(() => {
             underline="none"
             className={styles.footerLogoWrapper}
           >
-            <Logo className={styles.footerLogo} />
+            <img src={logoPath} className={styles.footerLogo} alt="logo" />
           </Link>
         </div>
         <div className={styles.copyrightHolder}>

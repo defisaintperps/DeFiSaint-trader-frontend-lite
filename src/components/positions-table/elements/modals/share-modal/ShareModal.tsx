@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DownloadOutlined } from '@mui/icons-material';
 import { Button, DialogActions, DialogContent } from '@mui/material';
 
-import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
+import logoWithTextPath from 'assets/DeFi_Saint_logo.png';
 import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
@@ -60,7 +60,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
       <DialogContent className={styles.contentBlock}>
         <div ref={statsRef} className={styles.statsContainer}>
           <Background />
-          <LogoWithText width={129} height={30} />
+          <img src={logoWithTextPath} alt="logo" />
           <div className={styles.titleBlock}>
             <span
               className={classnames({

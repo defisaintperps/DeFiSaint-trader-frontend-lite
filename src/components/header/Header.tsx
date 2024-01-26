@@ -8,7 +8,7 @@ import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wa
 import { Close, Menu } from '@mui/icons-material';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
-import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
+import logoWithTextPath from 'assets/DeFi_Saint_logo.png';
 import { Container } from 'components/container/Container';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
@@ -190,7 +190,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         onClick={handleDrawerToggle}
         className={styles.drawerLogoHolder}
       >
-        <LogoWithText width={86} height={20} />
+        <img src={logoWithTextPath} alt="logo" />
         <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
       </Typography>
       <Divider />
@@ -237,7 +237,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               <Box className={styles.leftSide}>
                 <Typography variant="h6" component="div" className={styles.mainLogoHolder}>
                   <a href="/" className={styles.logoLink}>
-                    <LogoWithText width={86} height={20} />
+                    <img src={logoWithTextPath} alt="logo" />
                   </a>
                   <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
                 </Typography>
