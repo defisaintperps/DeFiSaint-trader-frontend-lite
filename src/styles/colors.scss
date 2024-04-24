@@ -1,40 +1,43 @@
 @mixin colors {
-  --d8x-color-action: #8957FA;
+  --d8x-color-action: #8957fa;
   --d8x-color-action-rgb: 137, 100, 255;
-  --d8x-color-action-secondary: #ECE1FF;
-  --d8x-color-text-main: #1B2745;
+  --d8x-color-action-secondary: #ece1ff;
+  --d8x-color-text-main: #1b2745;
   --d8x-color-text-highlight: #101729;
-  --d8x-color-text-secondary: #FFF;
-  --d8x-color-text-label-one: #7C7D7F;
+  --d8x-color-text-secondary: #fff;
+  --d8x-color-text-label-one: #7c7d7f;
   --d8x-color-text-label-two: #101729;
-  --d8x-color-text-primarytab-inactive: #B4A8CC;
-  --d8x-color-text-buy: #00C9A3;
-  --d8x-color-text-sell: #A23C55;
-  --d8x-color-background: #E1E9FF;
+  --d8x-color-text-primarytab-inactive: #b4a8cc;
+  --d8x-color-text-buy: #00c9a3;
+  --d8x-color-text-sell: #a23c55;
+  --d8x-color-background: #e1e9ff;
   --d8x-color-background-page-rgb: 69, 221, 193;
-  --d8x-color-background-items: #F9FAFF;
-  --d8x-color-background-items-second: #DCE1F9;
+  --d8x-color-background-items: #f9faff;
+  --d8x-color-background-items-second: #dce1f9;
   --d8x-color-background-items-selected: rgba(102, 74, 223, 0.8);
-  --d8x-color-background-items-inactive: #E2DEFF;
-  --d8x-color-background-table-row: #F0F3FF;
-  --d8x-color-background-table: #7582D0;
+  --d8x-color-background-items-inactive: #e2deff;
+  --d8x-color-background-table-row: #f0f3ff;
+  --d8x-color-background-table: #7582d0;
   --d8x-color-background-loader: rgba(102, 74, 223, 0.1);
   --d8x-color-background-buy-rgb: 0, 201, 163;
   --d8x-color-background-sell-rgb: 162, 60, 85;
   --d8x-color-background-buy-inactive-rgb: 124, 128, 166;
-  --d8x-color-border: #C6CEF6;
-  --d8x-color-icon: #DCE1F9;
-  --d8x-color-icon-second: #DCE1F9;
-  --d8x-color-separator-border: #F0F3FF;
-  --d8x-color-input-border: #C6CEF6;
-  --d8x-color-logo-second: #1B2745;
-  --d8x-color-warning-main: #FFDA9F;
-  --d8x-color-warning-secondary: #FFBDBD;
+  --d8x-color-border: #c6cef6;
+  --d8x-color-icon: #dce1f9;
+  --d8x-color-icon-second: #dce1f9;
+  --d8x-color-separator-border: #f0f3ff;
+  --d8x-color-input-border: #c6cef6;
+  --d8x-color-logo-second: #1b2745;
+  --d8x-color-warning-main: #ffda9f;
+  --d8x-color-warning-secondary: #ffbdbd;
+  --d8x-meter-color-border: #664adf;
+  --d8x-meter-background-division: rgba(28, 28, 28, 1);
+  --d8x-meter-background-division-done: rgba(8, 153, 129, 1);
 
-  // Additional colors
+  //--Additional colors
   --d8x-color-background-header: var(--d8x-color-background-items);
   --d8x-color-background-icon: var(--d8x-color-background-items);
-  --d8x-color-background-order-block: var(--d8x-color-background);
+  --d8x-color-background-order-block: var(--d8x-color-background-items);
   --d8x-color-background-card-content: var(--d8x-color-background-items);
   --d8x-color-background-order-block-bottom: var(--d8x-color-background);
   --d8x-color-background-table-holder: var(--d8x-color-background-items);
@@ -61,11 +64,18 @@
   --d8x-color-text-order-option: var(--d8x-color-text-primarytab-inactive);
   --d8x-color-text-order-option-hover: var(--d8x-color-action);
   --d8x-color-text-order-option-selected: var(--d8x-color-text-secondary);
+  --d8x-color-background-modal: var(--d8x-color-background);
+  --d8x-color-background-order-block-info: var(--d8x-color-background);
+  --d8x-color-text-order-block-info: var(--d8x-color-text-main);
+  --d8x-color-text-market-icon: var(--d8x-color-action);
+  --d8x-color-background-pumpstation-overview: var(--d8x-color-action);
+  --d8x-color-text-pumpstation-overview: #fff;
+  --d8x-color-text-warning: #1c1c1c;
 
-  // Override colors for toastify
-  --toastify-color-progress-success: #7582D0;
-  --toastify-color-progress-error: #FFBDBD;
-  --toastify-color-progress-warning: #FFBDBD;
-  --toastify-color-progress-info: #FFBDBD;
-  --toastify-color-progress-light: linear-gradient(to right, #FFDA9F, #FFBDBD, #000);
+  //--Override colors for toastify
+  --toastify-color-progress-success: #7582d0;
+  --toastify-color-progress-error: #ffbdbd;
+  --toastify-color-progress-warning: #ffbdbd;
+  --toastify-color-progress-info: #ffbdbd;
+  --toastify-color-progress-light: linear-gradient(to right, #ffda9f, #ffbdbd, #000);
 }

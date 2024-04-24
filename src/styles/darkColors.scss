@@ -1,40 +1,43 @@
 @mixin dark-colors {
-  --d8x-color-action: #8957FA;
+  --d8x-color-action: #8957fa;
   --d8x-color-action-rgb: 227, 227, 255;
   --d8x-color-action-secondary: #111242;
-  --d8x-color-text-main: #FFF;
-  --d8x-color-text-highlight: #B4A8CC;
-  --d8x-color-text-secondary: #F3F2F2;
-  --d8x-color-text-label-one: #E2E2DE;
-  --d8x-color-text-label-two: #F9F9F8;
-  --d8x-color-text-primarytab-inactive: #B4A8CC;
-  --d8x-color-text-buy: #00C9A3;
-  --d8x-color-text-sell: #A23C55;
+  --d8x-color-text-main: #fff;
+  --d8x-color-text-highlight: #b4a8cc;
+  --d8x-color-text-secondary: #f3f2f2;
+  --d8x-color-text-label-one: #e2e2de;
+  --d8x-color-text-label-two: #f9f9f8;
+  --d8x-color-text-primarytab-inactive: #b4a8cc;
+  --d8x-color-text-buy: #00c9a3;
+  --d8x-color-text-sell: #a23c55;
   --d8x-color-background: #111242;
   --d8x-color-background-page-rgb: 69, 221, 193;
   --d8x-color-background-items: #130330;
-  --d8x-color-background-items-second: #002F5F;
+  --d8x-color-background-items-second: #002f5f;
   --d8x-color-background-items-selected: rgba(102, 74, 223, 0.8);
-  --d8x-color-background-items-inactive: #E2D2FF;
-  --d8x-color-background-table-row: #2A1C44;
-  --d8x-color-background-table: #7582D0;
+  --d8x-color-background-items-inactive: #e2d2ff;
+  --d8x-color-background-table-row: #2a1c44;
+  --d8x-color-background-table: #7582d0;
   --d8x-color-background-loader: rgba(102, 74, 223, 0.1);
   --d8x-color-background-buy-rgb: 0, 201, 163;
   --d8x-color-background-sell-rgb: 162, 60, 85;
   --d8x-color-background-buy-inactive-rgb: 124, 128, 166;
-  --d8x-color-border: #7582D0;
-  --d8x-color-icon: #002F5F;
-  --d8x-color-icon-second: #002F5F;
-  --d8x-color-separator-border: #3F315E;
-  --d8x-color-input-border: #7582D0;
+  --d8x-color-border: #7582d0;
+  --d8x-color-icon: #002f5f;
+  --d8x-color-icon-second: #002f5f;
+  --d8x-color-separator-border: #3f315e;
+  --d8x-color-input-border: #7582d0;
   --d8x-color-logo-second: white;
-  --d8x-color-warning-main: #FFDA9F;
-  --d8x-color-warning-secondary: #FFBDBD;
+  --d8x-color-warning-main: #ffda9f;
+  --d8x-color-warning-secondary: #ffbdbd;
+  --d8x-meter-color-border: #7860e3;
+  --d8x-meter-background-division: rgba(255, 255, 255, 1);
+  --d8x-meter-background-division-done: rgba(8, 153, 129, 1);
 
-  // Additional colors
+  //--Additional colors
   --d8x-color-background-header: var(--d8x-color-background-items);
   --d8x-color-background-icon: var(--d8x-color-background-items);
-  --d8x-color-background-order-block: var(--d8x-color-background);
+  --d8x-color-background-order-block: var(--d8x-color-background-items);
   --d8x-color-background-card-content: var(--d8x-color-background-items);
   --d8x-color-background-order-block-bottom: var(--d8x-color-background);
   --d8x-color-background-table-holder: var(--d8x-color-background-items);
@@ -61,11 +64,18 @@
   --d8x-color-text-order-option: var(--d8x-color-text-primarytab-inactive);
   --d8x-color-text-order-option-hover: var(--d8x-color-action);
   --d8x-color-text-order-option-selected: var(--d8x-color-text-secondary);
+  --d8x-color-background-modal: var(--d8x-color-background);
+  --d8x-color-background-order-block-info: var(--d8x-color-background);
+  --d8x-color-text-order-block-info: var(--d8x-color-text-main);
+  --d8x-color-text-market-icon: var(--d8x-color-action);
+  --d8x-color-background-pumpstation-overview: var(--d8x-color-action);
+  --d8x-color-text-pumpstation-overview: #fff;
+  --d8x-color-text-warning: #1c1c1c;
 
-  // Override colors for toastify
-  --toastify-color-progress-success: #7582D0;
-  --toastify-color-progress-error: #FFBDBD;
-  --toastify-color-progress-warning: #FFBDBD;
-  --toastify-color-progress-info: #FFBDBD;
-  --toastify-color-progress-light: linear-gradient(to right, #FFDA9F, #FFBDBD, #000);
+  //--Override colors for toastify
+  --toastify-color-progress-success: #7582d0;
+  --toastify-color-progress-error: #ffbdbd;
+  --toastify-color-progress-warning: #ffbdbd;
+  --toastify-color-progress-info: #ffbdbd;
+  --toastify-color-progress-light: linear-gradient(to right, #ffda9f, #ffbdbd, #000);
 }
