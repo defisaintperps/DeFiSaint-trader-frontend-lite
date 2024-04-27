@@ -334,7 +334,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                   <a href="/" className={styles.logoLink}>
                     <img src={logoWithTextPath} alt="logo" />
                   </a>
-                  <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
+                  {!isMobileScreen && <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>}
                 </Typography>
                 {!isSmallScreen && (
                   <nav className={styles.navWrapper}>
