@@ -283,7 +283,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         <img src={logoWithTextPath} alt="logo" />
         <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
       </Typography>
-      <Divider />
+      <Divider className={styles.divider} />
       <nav className={styles.navMobileWrapper} onClick={handleDrawerToggle}>
         {availablePages.map((page) => (
           <NavLink
@@ -298,7 +298,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       </nav>
       {isTabletScreen && (
         <>
-          <Divider />
+          <Divider className={styles.divider} />
           <Box className={styles.settings}>
             <SettingsBlock />
           </Box>

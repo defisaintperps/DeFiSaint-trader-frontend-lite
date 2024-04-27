@@ -19,8 +19,7 @@
   flex-direction: column;
 }
 
-.mainLogoHolder,
-.drawerLogoHolder {
+.mainLogoHolder {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
@@ -28,6 +27,20 @@
   gap: 3 * $d8x-spacing;
   margin-top: -20px;
   margin-bottom: -15px;
+}
+
+.drawerLogoHolder {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 3 * $d8x-spacing;
+  margin-top: 16px;
+  margin-bottom:16px;
+}
+
+.divider {
+  background-color: var(--d8x-color-background-items-inactive);
 }
 
 .betaTag {
