@@ -8,21 +8,32 @@ import { getGasPrice } from './getGasPrice';
 import { wagmiConfig } from './wagmi/wagmiClient';
 import { getGasLimit } from 'blockchain-api/getGasLimit';
 import { MethodE } from 'types/enums';
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from './constants';
 
-export async function approveMarginToken(
-  walletClient: WalletClient,
-  marginTokenAddr: string,
-  proxyAddr: string,
-  minAmount: number,
-  decimals: number
-) {
+interface ApproveMarginTokenPropsI {
+  walletClient: WalletClient;
+  settleTokenAddr: string;
+  isMultisigAddress: boolean | null;
+  proxyAddr: string;
+  minAmount: number;
+  decimals: number;
+}
+
+export async function approveMarginToken({
+  walletClient,
+  settleTokenAddr,
+  isMultisigAddress,
+  proxyAddr,
+  minAmount,
+  decimals,
+}: ApproveMarginTokenPropsI) {
   if (!walletClient.account?.address) {
     throw new Error('Account not connected');
   }
   const minAmountBN = parseUnits((1.05 * minAmount).toFixed(decimals), decimals);
 
   const allowance = await readContract(wagmiConfig, {
-    address: marginTokenAddr as Address,
+    address: settleTokenAddr as Address,
     abi: erc20Abi,
     functionName: 'allowance',
     args: [walletClient.account.address, proxyAddr as Address],
@@ -38,7 +49,7 @@ export async function approveMarginToken(
     const gasPrice = await getGasPrice(walletClient.chain?.id);
     const params: WriteContractParameters = {
       chain: walletClient.chain,
-      address: marginTokenAddr as Address,
+      address: settleTokenAddr as Address,
       abi: erc20Abi,
       functionName: 'approve',
       args: [proxyAddr as Address, BigInt(MaxUint256)],
@@ -53,7 +64,7 @@ export async function approveMarginToken(
     return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => {
       return waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
-        timeout: 30_000,
+        timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
       }).then(() => ({ hash: tx }));
     });
   }

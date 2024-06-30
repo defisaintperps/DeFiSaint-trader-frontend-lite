@@ -52,6 +52,7 @@ export interface PerpetualDataI {
 
 export interface SymbolDataI {
   symbol: string;
+  settleSymbol: string;
   perpetual: PerpetualDataI | null;
 }
 
@@ -71,7 +72,9 @@ export interface PerpetualStatisticsI {
 export interface PoolI {
   isRunning: boolean;
   poolSymbol: string;
+  settleSymbol: string;
   marginTokenAddr: string;
+  settleTokenAddr: string;
   poolShareTokenAddr: string;
   defaultFundCashCC: number;
   pnlParticipantCashCC: number;
@@ -426,7 +429,7 @@ export interface ReferralDataI {
 
 export interface OverviewPoolItemI {
   value: number | string;
-  symbol: PoolI['poolSymbol'];
+  symbol: PoolI['settleSymbol'];
 }
 
 export interface OverviewItemI {
@@ -460,6 +463,7 @@ export interface HedgeConfigI {
   chainId: number; //42161 | 421614;
   symbol: string; // 'ETH-USD-WEETH';
   walletClient: WalletClient;
+  isMultisigAddress: boolean | null;
   traderAPI: TraderInterface;
   amount?: number; // only used to open
   feeRate?: number; // only used to open
@@ -479,4 +483,10 @@ export interface WrapOKBConfigI {
   wrappedTokenDecimals: number;
   amountWrap?: number;
   amountUnwrap?: number;
+}
+
+export interface CollToSettleInfoI {
+  poolSymbol: string;
+  settleSymbol: string;
+  value: number;
 }
