@@ -1,11 +1,10 @@
 @import '~styles/theme/theme.scss';
 
 .root {
-  margin-top: 4 * $d8x-spacing;
   margin-bottom: 8 * $d8x-spacing;
 
   :global(.MuiPaper-root) {
-    height: 48px;
+    height: 80px;
   }
 
   :global(.MuiOutlinedInput-root) {
@@ -49,37 +48,10 @@
   font-size: 14px;
 }
 
-.betaInfoLine {
-  display: flex;
-  align-items: center;
-  padding: 8px 32px;
-  background-color: var(--d8x-color-background-items-second);
-
-  &.hideBetaText {
-    display: none;
-  }
-
-  .textBlock {
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-
-  .closeButton {
-    cursor: pointer;
-
-    .closeIcon {
-      width: 20px;
-      height: 20px;
-    }
-  }
-}
-
 .toolbar {
   align-items: center;
   padding: 0 32px;
-  margin: -16px -32px 0;
+  margin: 0 -32px;
   min-height: 80px;
   background-color: var(--d8x-color-background-header);
 }
@@ -206,17 +178,13 @@
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
-  .betaInfoLine {
-    padding: 8px 16px;
-  }
-
   .buttonsHolder {
     gap: $d8x-spacing * 2;
   }
 
   .toolbar {
     padding: 0 16px;
-    margin: -16px -16px 0;
+    margin: 0 -16px;
   }
 
   .modalButton {
@@ -239,14 +207,10 @@
     width: auto;
   }
 
-  .betaInfoLine {
-    padding: 4px 40px;
-  }
-
   .toolbar {
     min-height: 80px;
     padding: 0 40px;
-    margin: -16px -40px 0;
+    margin: 0 -40px;
   }
 
   .menuButton {
@@ -255,14 +219,10 @@
 }
 
 @media screen and ($d8x-breakpoint-max-sm) {
-  .betaInfoLine {
-    padding: 4px 24px;
-  }
-
   .toolbar {
     min-height: 80px;
     padding: 0 24px;
-    margin: -16px -24px 0;
+    margin: 0 -24px;
   }
 
   .mobileButtonsBlock {
@@ -301,7 +261,7 @@
 
   .toolbar {
     padding: 0 12px;
-    margin: -16px -12px 0;
+    margin: 0 -12px;
     min-height: 72px;
     background-color: var(--d8x-color-background-items);
   }
