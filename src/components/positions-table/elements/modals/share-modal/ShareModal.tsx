@@ -7,7 +7,6 @@ import { DownloadOutlined } from '@mui/icons-material';
 import { Button, Dialog as MuiDialog, DialogActions, DialogContent } from '@mui/material';
 
 import logoWithTextPath from 'assets/DeFi_Saint_logo.png';
-import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
