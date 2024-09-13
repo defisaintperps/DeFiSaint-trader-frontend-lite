@@ -4,7 +4,7 @@ import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DownloadOutlined } from '@mui/icons-material';
-import { Button, DialogActions, DialogContent } from '@mui/material';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent } from '@mui/material';
 
 import logoWithTextPath from 'assets/DeFi_Saint_logo.png';
 import { Dialog } from 'components/dialog/Dialog';
@@ -63,7 +63,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
     (selectedPosition.unrealizedPnlQuoteCCY / (selectedPosition.collateralCC * selectedPosition.collToQuoteConversion));
 
   return (
-    <Dialog open={isOpen} onClose={closeModal} className={styles.dialog}>
+    <MuiDialog open={isOpen} onClose={closeModal} className={styles.dialog}>
       <DialogContent className={styles.contentBlock}>
         <div ref={statsRef} className={styles.statsContainer}>
           <Background />
@@ -116,6 +116,6 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
           {t('common.info-modal.close')}
         </Button>
       </DialogActions>
-    </Dialog>
+    </MuiDialog>
   );
 });
