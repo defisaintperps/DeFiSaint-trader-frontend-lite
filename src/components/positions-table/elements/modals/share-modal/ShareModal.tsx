@@ -91,7 +91,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
       <DialogContent className={styles.contentBlock}>
         <div ref={statsRef} className={styles.statsContainer}>
           <Background />
-          <img src={logoWithTextPath} alt="logo" />
+          <img src={logoWithTextPath} alt="logo" width={200} />
           <div className={styles.titleBlock}>
             <span
               className={classnames({
