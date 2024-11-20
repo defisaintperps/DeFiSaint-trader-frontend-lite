@@ -1,16 +1,20 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
 
 import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
 import ArrowUpIcon from 'assets/icons/new/arrowUp.svg?react';
+import { config } from 'config';
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
+import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
 import type { StatDataI } from 'components/stats-line/types';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { createSymbol } from 'helpers/createSymbol';
@@ -27,28 +31,26 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
-
-import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './MarketSelect.module.scss';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
 
+  const navigate = useNavigate();
   const location = useLocation();
 
+  const { chainId } = useAccount();
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
-  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
-  const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
+  const [perpetualStatistics, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
 
   const urlChangesAppliedRef = useRef(false);
@@ -56,38 +58,88 @@ export const MarketSelect = memo(() => {
   const markets = useMarkets();
 
   useEffect(() => {
-    if (!location.hash || urlChangesAppliedRef.current || !pools.length) {
+    if (!location.hash) {
+      urlChangesAppliedRef.current = false;
+    }
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (urlChangesAppliedRef.current || !pools.length) {
       return;
     }
 
-    let symbolHash = location.hash.slice(1);
-    // Handle `=` in the URL, which magically appears there...
-    if (symbolHash.indexOf('=')) {
-      symbolHash = symbolHash.replaceAll('=', '');
-    }
-    const result = parseSymbol(symbolHash);
+    if (location.hash) {
+      let symbolHash = location.hash.slice(1);
+      // Handle `=` in the URL, which magically appears there...
+      if (symbolHash.indexOf('=')) {
+        symbolHash = symbolHash.replaceAll('=', '');
+      }
+      const result = parseSymbol(symbolHash);
 
-    if (result) {
-      setSelectedPool(result.poolSymbol);
+      if (result) {
+        setSelectedPool(result.poolSymbol);
 
-      const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
-      if (!foundPool) {
-        if (pools.length > 0) {
-          urlChangesAppliedRef.current = true;
+        const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
+        if (!foundPool) {
+          if (pools.length > 0) {
+            urlChangesAppliedRef.current = true;
+          }
+          return;
         }
+
+        const foundPerpetual = foundPool.perpetuals.find(
+          ({ baseCurrency, quoteCurrency }) =>
+            baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
+        );
+        if (foundPerpetual) {
+          setSelectedPerpetual(foundPerpetual.id);
+        }
+        urlChangesAppliedRef.current = true;
         return;
       }
-
-      const foundPerpetual = foundPool.perpetuals.find(
-        ({ baseCurrency, quoteCurrency }) =>
-          baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
-      );
-      if (foundPerpetual) {
-        setSelectedPerpetual(foundPerpetual.id);
-      }
-      urlChangesAppliedRef.current = true;
     }
-  }, [location.hash, selectedPool, setSelectedPool, setSelectedPerpetual, pools]);
+
+    let chainIdForMarket: number;
+    if (!isEnabledChain(chainId)) {
+      chainIdForMarket = config.enabledChains[0];
+    } else {
+      chainIdForMarket = chainId;
+    }
+
+    if (config.defaultMarket[chainIdForMarket] && config.defaultMarket[chainIdForMarket] !== '') {
+      const result = parseSymbol(config.defaultMarket[chainIdForMarket]);
+      if (result) {
+        const foundPool = pools.find(({ poolSymbol: ps }) => ps === result.poolSymbol);
+        if (foundPool) {
+          setSelectedPool(result.poolSymbol);
+
+          const foundPerpetual = foundPool.perpetuals.find(
+            ({ baseCurrency, quoteCurrency }) =>
+              baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
+          );
+
+          if (foundPerpetual) {
+            setSelectedPerpetual(foundPerpetual.id);
+
+            navigate(
+              `${location.pathname}${location.search}#${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`
+            );
+          }
+        }
+      }
+    }
+
+    urlChangesAppliedRef.current = true;
+  }, [
+    location.hash,
+    location.pathname,
+    location.search,
+    navigate,
+    pools,
+    setSelectedPool,
+    setSelectedPerpetual,
+    chainId,
+  ]);
 
   useEffect(() => {
     if (selectedPool && selectedPerpetual) {
@@ -105,14 +157,6 @@ export const MarketSelect = memo(() => {
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
-  const BaseIconComponent = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.baseCurrency]);
-
-  const QuoteIconComponent = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.quoteCurrency]);
-
   let midPriceClass = styles.positive;
   if (perpetualStatistics?.midPriceDiff != null) {
     midPriceClass = perpetualStatistics?.midPriceDiff >= 0 ? styles.positive : styles.negative;
@@ -127,6 +171,7 @@ export const MarketSelect = memo(() => {
         // skip
       }
       const px = perpetualStatistics.midPrice;
+
       return isPredictionMarket
         ? [calculateProbability(px, orderBlock === OrderBlockE.Short), perpetualStatistics.quoteCurrency]
         : [px, perpetualStatistics.quoteCurrency];
@@ -175,14 +220,10 @@ export const MarketSelect = memo(() => {
     <div className={styles.holderRoot} onClick={() => setMarketSelectModalOpen(true)}>
       <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
         <div className={styles.baseIcon}>
-          <Suspense fallback={null}>
-            <BaseIconComponent />
-          </Suspense>
+          <DynamicLogo logoName={selectedPerpetual?.baseCurrency.toLowerCase() || ''} width={60} height={60} />
         </div>
         <div className={styles.quoteIcon}>
-          <Suspense fallback={null}>
-            <QuoteIconComponent />
-          </Suspense>
+          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} width={60} height={60} />
         </div>
       </div>
       <Button className={styles.marketSelectButton} variant="outlined">
