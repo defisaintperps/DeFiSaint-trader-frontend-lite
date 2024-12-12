@@ -1,7 +1,7 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
@@ -34,6 +34,8 @@ import { OrderBlockE } from 'types/enums';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
+import { getEnabledChainId } from 'utils/getEnabledChainId';
+import { switchChain } from 'utils/switchChain';
 
 import styles from './MarketSelect.module.scss';
 
@@ -43,7 +45,7 @@ export const MarketSelect = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { chainId } = useAccount();
+  const { isConnected, chainId } = useAccount();
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
@@ -52,8 +54,10 @@ export const MarketSelect = memo(() => {
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [perpetualStatistics, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
+  const [isUrlTriggered, setIsUrlTriggered] = useState(false);
 
   const urlChangesAppliedRef = useRef(false);
+  const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
 
   const markets = useMarkets();
 
@@ -62,6 +66,23 @@ export const MarketSelect = memo(() => {
       urlChangesAppliedRef.current = false;
     }
   }, [location.hash]);
+
+  useEffect(() => {
+    if (chainIdFromUrl && !isUrlTriggered) {
+      if (isConnected) {
+        if (chainId !== chainIdFromUrl) {
+          switchChain(chainIdFromUrl)
+            .then(() => {
+              console.log(`Switched to chain ID ${chainIdFromUrl}`);
+              setIsUrlTriggered(true);
+            })
+            .catch((error) => {
+              console.error('Error switching chains:', error);
+            });
+        }
+      }
+    }
+  }, [chainIdFromUrl, isConnected, chainId, isUrlTriggered]);
 
   useEffect(() => {
     if (urlChangesAppliedRef.current || !pools.length) {
@@ -101,7 +122,11 @@ export const MarketSelect = memo(() => {
 
     let chainIdForMarket: number;
     if (!isEnabledChain(chainId)) {
-      chainIdForMarket = config.enabledChains[0];
+      if (chainIdFromUrl && isEnabledChain(chainIdFromUrl)) {
+        chainIdForMarket = chainIdFromUrl;
+      } else {
+        chainIdForMarket = config.enabledChains[0];
+      }
     } else {
       chainIdForMarket = chainId;
     }
@@ -121,7 +146,9 @@ export const MarketSelect = memo(() => {
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
             const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
-            navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainId}`);
+            console.log(hash);
+            const chainIdForThisURL = getEnabledChainId(chainId, location);
+            navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
           }
         }
       }
@@ -132,11 +159,13 @@ export const MarketSelect = memo(() => {
     location.hash,
     location.pathname,
     location.search,
+    location,
     navigate,
     pools,
     setSelectedPool,
     setSelectedPerpetual,
     chainId,
+    chainIdFromUrl,
   ]);
 
   useEffect(() => {

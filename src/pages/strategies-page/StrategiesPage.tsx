@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
+import { useLocation } from 'react-router-dom';
 
 import { STRATEGY_BASE_CURRENCY, STRATEGY_POOL_SYMBOL, STRATEGY_QUOTE_CURRENCY, STRATEGY_SYMBOL } from 'appConstants';
 import { Container } from 'components/container/Container';
@@ -26,6 +27,7 @@ import styles from './StrategiesPage.module.scss';
 
 export const StrategiesPage = () => {
   const { address, chainId } = useAccount();
+  const location = useLocation();
 
   const pools = useAtomValue(poolsAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
@@ -83,7 +85,7 @@ export const StrategiesPage = () => {
 
     requestSentRef.current = true;
 
-    getPerpetualStaticInfo(getEnabledChainId(chainId), traderAPI, STRATEGY_SYMBOL)
+    getPerpetualStaticInfo(getEnabledChainId(chainId, location), traderAPI, STRATEGY_SYMBOL)
       .then(({ data }) => {
         if (data.error) {
           throw new Error(data.error);
@@ -102,7 +104,7 @@ export const StrategiesPage = () => {
     return () => {
       requestSentRef.current = false;
     };
-  }, [chainId, setStrategyPerpetualStaticInfo, traderAPI]);
+  }, [chainId, setStrategyPerpetualStaticInfo, traderAPI, location]);
 
   return (
     <>

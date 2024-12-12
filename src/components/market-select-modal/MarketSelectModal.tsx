@@ -8,6 +8,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { marketSelectModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { getEnabledChainId } from 'utils/getEnabledChainId';
 
 import { OptionsHeader } from './elements/options-header/OptionsHeader';
 import { MarketOption } from './elements/market-option/MarketOption';
@@ -41,7 +42,9 @@ export const MarketSelectModal = () => {
     setSelectedPerpetual(newItem.id);
 
     const hash = `${newItem.baseCurrency}-${newItem.quoteCurrency}-${newItem.poolSymbol}`;
-    navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainId}`);
+    const chainIdForThisURL = getEnabledChainId(chainId, location);
+
+    navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
     clearInputsData();
     setMarketSelectModalOpen(false);
   };

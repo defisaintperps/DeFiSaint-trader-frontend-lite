@@ -2,6 +2,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { useLocation } from 'react-router-dom';
 
 import { Button } from '@mui/material';
 
@@ -34,6 +35,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   const { t } = useTranslation();
 
   const { chainId } = useAccount();
+  const location = useLocation();
 
   const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
@@ -56,7 +58,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     }
 
     weeklyAPYRequestSentRef.current = true;
-    getWeeklyAPY(getEnabledChainId(chainId), pool.poolSymbol)
+    getWeeklyAPY(getEnabledChainId(chainId, location), pool.poolSymbol)
       .then((data) => {
         setWeeklyAPY(data.allTimeAPY * 100);
       })
@@ -71,7 +73,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     return () => {
       weeklyAPYRequestSentRef.current = false;
     };
-  }, [chainId, pool.poolSymbol, triggerUserStatsUpdate]);
+  }, [chainId, pool.poolSymbol, triggerUserStatsUpdate, location]);
 
   useEffect(() => {
     if (stUsdAPYRequestSentRef.current || pool.poolSymbol !== 'STUSD') {

@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo, useRef } from 'react';
 import { useAccount } from 'wagmi';
+import { useLocation } from 'react-router-dom';
 
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
@@ -9,6 +10,7 @@ import { getEnabledChainId } from 'utils/getEnabledChainId';
 
 export const PerpetualInfoFetcher = () => {
   const { chainId } = useAccount();
+  const location = useLocation();
 
   const setPerpetualStaticInfo = useSetAtom(perpetualStaticInfoAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
@@ -40,7 +42,7 @@ export const PerpetualInfoFetcher = () => {
 
     requestSentRef.current = true;
 
-    getPerpetualStaticInfo(getEnabledChainId(chainId), traderAPI, symbol)
+    getPerpetualStaticInfo(getEnabledChainId(chainId, location), traderAPI, symbol)
       .then(({ data }) => {
         if (data.error) {
           throw new Error(data.error);
@@ -59,7 +61,7 @@ export const PerpetualInfoFetcher = () => {
     return () => {
       requestSentRef.current = false;
     };
-  }, [chainId, symbol, setPerpetualStaticInfo, traderAPI]);
+  }, [chainId, symbol, setPerpetualStaticInfo, traderAPI, location]);
 
   return null;
 };
