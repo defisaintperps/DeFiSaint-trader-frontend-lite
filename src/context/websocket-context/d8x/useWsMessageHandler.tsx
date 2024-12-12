@@ -204,7 +204,7 @@ export function useWsMessageHandler() {
           return;
         }
         // refresh open orders
-        getOpenOrders(getEnabledChainId(chainId, location), traderAPI, address)
+        getOpenOrders(getEnabledChainId(chainId, location.hash), traderAPI, address)
           .then(({ data }) => {
             if (data?.length > 0) {
               data.map(setOpenOrders);

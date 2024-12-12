@@ -58,7 +58,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     }
 
     weeklyAPYRequestSentRef.current = true;
-    getWeeklyAPY(getEnabledChainId(chainId, location), pool.poolSymbol)
+    getWeeklyAPY(getEnabledChainId(chainId, location.hash), pool.poolSymbol)
       .then((data) => {
         setWeeklyAPY(data.allTimeAPY * 100);
       })

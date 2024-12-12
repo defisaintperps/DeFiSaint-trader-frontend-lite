@@ -85,7 +85,7 @@ export const StrategiesPage = () => {
 
     requestSentRef.current = true;
 
-    getPerpetualStaticInfo(getEnabledChainId(chainId, location), traderAPI, STRATEGY_SYMBOL)
+    getPerpetualStaticInfo(getEnabledChainId(chainId, location.hash), traderAPI, STRATEGY_SYMBOL)
       .then(({ data }) => {
         if (data.error) {
           throw new Error(data.error);

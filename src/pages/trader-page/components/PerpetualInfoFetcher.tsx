@@ -42,7 +42,7 @@ export const PerpetualInfoFetcher = () => {
 
     requestSentRef.current = true;
 
-    getPerpetualStaticInfo(getEnabledChainId(chainId, location), traderAPI, symbol)
+    getPerpetualStaticInfo(getEnabledChainId(chainId, location.hash), traderAPI, symbol)
       .then(({ data }) => {
         if (data.error) {
           throw new Error(data.error);

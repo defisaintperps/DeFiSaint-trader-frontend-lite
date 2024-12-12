@@ -207,7 +207,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId, location)) {
+    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId, location.hash)) {
       traderAPIRef.current = traderAPI;
     }
   }, [traderAPI, chainId, location]);
@@ -226,7 +226,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       while (retries < MAX_RETRIES) {
         try {
           let currentTraderAPI = null;
-          const enabledChainId = getEnabledChainId(chainId, location);
+          const enabledChainId = getEnabledChainId(chainId, location.hash);
           if (retries > 0 && traderAPIRef.current && Number(traderAPIRef.current?.chainId) === enabledChainId) {
             currentTraderAPI = traderAPIRef.current;
           }

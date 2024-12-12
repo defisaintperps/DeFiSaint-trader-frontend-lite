@@ -59,7 +59,7 @@ export const WebSocketContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     wsRef.current?.close();
 
-    const wsUrl = config.wsUrl[getEnabledChainId(chainId, location)] || config.wsUrl.default;
+    const wsUrl = config.wsUrl[getEnabledChainId(chainId, location.hash)] || config.wsUrl.default;
     wsRef.current = createWebSocketWithReconnect(wsUrl);
     wsRef.current.onStateChange(setIsConnected);
 

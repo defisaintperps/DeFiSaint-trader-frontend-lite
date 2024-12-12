@@ -48,7 +48,7 @@ export const GlobalStats = () => {
     }
 
     weeklyApiRequestSentRef.current = true;
-    getWeeklyAPY(getEnabledChainId(chainId, location), selectedPool.poolSymbol)
+    getWeeklyAPY(getEnabledChainId(chainId, location.hash), selectedPool.poolSymbol)
       .then((data) => {
         setWeeklyAPI(data.allTimeAPY * 100);
       })

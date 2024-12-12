@@ -42,7 +42,7 @@ export const MarketSelectModal = () => {
     setSelectedPerpetual(newItem.id);
 
     const hash = `${newItem.baseCurrency}-${newItem.quoteCurrency}-${newItem.poolSymbol}`;
-    const chainIdForThisURL = getEnabledChainId(chainId, location);
+    const chainIdForThisURL = getEnabledChainId(chainId, location.hash);
 
     navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
     clearInputsData();

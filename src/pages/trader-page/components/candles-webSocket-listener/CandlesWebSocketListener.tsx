@@ -59,7 +59,7 @@ export const CandlesWebSocketListener = memo(() => {
   useEffect(() => {
     wsRef.current?.close();
 
-    const candlesWsUrl = config.candlesWsUrl[getEnabledChainId(chainId, location)] || config.candlesWsUrl.default;
+    const candlesWsUrl = config.candlesWsUrl[getEnabledChainId(chainId, location.hash)] || config.candlesWsUrl.default;
     wsRef.current = createWebSocketWithReconnect(candlesWsUrl);
     wsRef.current.onStateChange(setIsConnected);
 

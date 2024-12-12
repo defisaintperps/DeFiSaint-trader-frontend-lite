@@ -73,7 +73,7 @@ export const MarketSelect = memo(() => {
         if (chainId !== chainIdFromUrl) {
           switchChain(chainIdFromUrl)
             .then(() => {
-              console.log(`Switched to chain ID ${chainIdFromUrl}`);
+              //console.log(`Switched to chain ID ${chainIdFromUrl}`);
               setIsUrlTriggered(true);
             })
             .catch((error) => {
@@ -93,7 +93,6 @@ export const MarketSelect = memo(() => {
       const symbolHash = location.hash.slice(1);
 
       const [marketPart] = symbolHash.split('__'); // Split by the new separator
-      console.log('Parsed market part:', marketPart); // Debugging log
 
       const result = parseSymbol(marketPart);
 
@@ -146,8 +145,7 @@ export const MarketSelect = memo(() => {
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
             const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
-            console.log(hash);
-            const chainIdForThisURL = getEnabledChainId(chainId, location);
+            const chainIdForThisURL = getEnabledChainId(chainId, location.hash);
             navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
           }
         }
