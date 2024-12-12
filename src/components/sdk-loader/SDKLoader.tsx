@@ -9,6 +9,7 @@ import { collateralToSettleConversionAtom, poolsAtom, traderAPIAtom, traderAPIBu
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
+import { useLocation } from 'react-router-dom';
 
 export const SDKLoader = memo(() => {
   const { isConnected, chainId } = useAccount();
@@ -27,6 +28,9 @@ export const SDKLoader = memo(() => {
   const setCollToSettleConversion = useSetAtom(collateralToSettleConversionAtom);
 
   const loadingAPIRef = useRef(false);
+  const location = useLocation();
+
+  const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
 
   useEffect(() => {
     if (walletClient && isSuccess && !activatedOneClickTrading) {
@@ -89,7 +93,11 @@ export const SDKLoader = memo(() => {
 
     let chainIdForSDK: number;
     if (!isEnabledChain(chainId)) {
-      chainIdForSDK = config.enabledChains[0];
+      if (chainIdFromUrl && isEnabledChain(chainIdFromUrl)) {
+        chainIdForSDK = chainIdFromUrl;
+      } else {
+        chainIdForSDK = config.enabledChains[0];
+      }
     } else {
       chainIdForSDK = chainId;
     }
@@ -105,7 +113,7 @@ export const SDKLoader = memo(() => {
     return () => {
       loadingAPIRef.current = false;
     };
-  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
+  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy, chainIdFromUrl]);
 
   useEffect(() => {
     if (isConnected && traderAPI && pools.length > 0) {
