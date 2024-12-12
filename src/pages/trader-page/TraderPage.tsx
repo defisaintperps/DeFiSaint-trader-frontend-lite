@@ -184,10 +184,9 @@ export const TraderPage = () => {
     }
 
     isPageUrlAppliedRef.current = true;
-    navigate(
-      `${location.pathname}${location.search}#${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`
-    );
-  }, [selectedPool, selectedPerpetual, location.hash, location.pathname, location.search, navigate]);
+    const hash = `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`;
+    navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainId}`);
+  }, [selectedPool, selectedPerpetual, location.hash, location.pathname, location.search, navigate, chainId]);
 
   useEffect(() => {
     if (!address || !isEnabledChain(chainId)) {

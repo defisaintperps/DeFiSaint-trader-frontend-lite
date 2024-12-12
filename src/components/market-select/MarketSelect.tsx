@@ -69,12 +69,12 @@ export const MarketSelect = memo(() => {
     }
 
     if (location.hash) {
-      let symbolHash = location.hash.slice(1);
-      // Handle `=` in the URL, which magically appears there...
-      if (symbolHash.indexOf('=')) {
-        symbolHash = symbolHash.replaceAll('=', '');
-      }
-      const result = parseSymbol(symbolHash);
+      const symbolHash = location.hash.slice(1);
+
+      const [marketPart] = symbolHash.split('__'); // Split by the new separator
+      console.log('Parsed market part:', marketPart); // Debugging log
+
+      const result = parseSymbol(marketPart);
 
       if (result) {
         setSelectedPool(result.poolSymbol);
@@ -120,10 +120,8 @@ export const MarketSelect = memo(() => {
 
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
-
-            navigate(
-              `${location.pathname}${location.search}#${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`
-            );
+            const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
+            navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainId}`);
           }
         }
       }

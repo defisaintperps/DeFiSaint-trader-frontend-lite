@@ -2,6 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { marketSelectModalOpenAtom } from 'store/global-modals.store';
@@ -22,6 +23,7 @@ export const MarketSelectModal = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { chainId } = useAccount();
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
   const setSelectedPool = useSetAtom(selectedPoolAtom);
@@ -38,9 +40,8 @@ export const MarketSelectModal = () => {
     setSelectedPool(newItem.poolSymbol);
     setSelectedPerpetual(newItem.id);
 
-    navigate(
-      `${location.pathname}${location.search}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${newItem.poolSymbol}`
-    );
+    const hash = `${newItem.baseCurrency}-${newItem.quoteCurrency}-${newItem.poolSymbol}`;
+    navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainId}`);
     clearInputsData();
     setMarketSelectModalOpen(false);
   };
