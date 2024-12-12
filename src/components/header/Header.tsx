@@ -2,7 +2,7 @@ import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { type Address, erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContracts } from 'wagmi';
 import { INVALID_PERPETUAL_STATES } from 'appConstants';
@@ -204,11 +204,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     }
   }, [triggerPositionsUpdate, setPositions, chainId, address]);
 
+  const location = useLocation();
+
   useEffect(() => {
-    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId)) {
+    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId, location.hash)) {
       traderAPIRef.current = traderAPI;
     }
-  }, [traderAPI, chainId]);
+  }, [traderAPI, chainId, location]);
 
   useEffect(() => {
     if (exchangeRequestRef.current) {
@@ -224,7 +226,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       while (retries < MAX_RETRIES) {
         try {
           let currentTraderAPI = null;
-          const enabledChainId = getEnabledChainId(chainId);
+          const enabledChainId = getEnabledChainId(chainId, location.hash);
           if (retries > 0 && traderAPIRef.current && Number(traderAPIRef.current?.chainId) === enabledChainId) {
             currentTraderAPI = traderAPIRef.current;
           }
@@ -252,7 +254,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     return () => {
       exchangeRequestRef.current = false;
     };
-  }, [chainId, setExchangeInfo]);
+  }, [chainId, setExchangeInfo, location]);
 
   const {
     data: poolTokenBalance,

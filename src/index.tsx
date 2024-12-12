@@ -44,20 +44,19 @@ if (container) {
               <GeoBlockingProvider>
                 <WagmiProvider config={wagmiConfig}>
                   <QueryClientProvider client={queryClient}>
-                    <RainbowKitProviderWrapper>
-                      <Web3AuthProvider>
-                        <UserWalletProvider>
-                          <WebSocketContextProvider>
-                            <BrowserRouter>
+                    <BrowserRouter>
+                      <RainbowKitProviderWrapper>
+                        <Web3AuthProvider>
+                          <UserWalletProvider>
+                            <WebSocketContextProvider>
                               <StaticBackground />
                               <App />
-                            </BrowserRouter>
-
-                            <LiFiWidgetModal />
-                          </WebSocketContextProvider>
-                        </UserWalletProvider>
-                      </Web3AuthProvider>
-                    </RainbowKitProviderWrapper>
+                              <LiFiWidgetModal />
+                            </WebSocketContextProvider>
+                          </UserWalletProvider>
+                        </Web3AuthProvider>
+                      </RainbowKitProviderWrapper>
+                    </BrowserRouter>
                   </QueryClientProvider>
                 </WagmiProvider>
               </GeoBlockingProvider>
