@@ -1,7 +1,6 @@
 import { config } from 'config';
 
 import { isEnabledChain } from './isEnabledChain';
-import { Location } from 'react-router-dom';
 
 export function getEnabledChainId(chainId: number | undefined, locationHash: string): number {
   const chainIdFromUrl = parseInt(locationHash.split('__')[1]?.split('=')[1], 10);
