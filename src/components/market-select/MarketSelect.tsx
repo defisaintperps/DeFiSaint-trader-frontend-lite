@@ -54,9 +54,10 @@ export const MarketSelect = memo(() => {
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [perpetualStatistics, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
+  const [isChainSwitching, setIsChainSwitching] = useState(false);
   const [isUrlTriggered, setIsUrlTriggered] = useState(false);
-
   const urlChangesAppliedRef = useRef(false);
+  const poolsLoadedRef = useRef(false);
   const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
 
   const markets = useMarkets();
@@ -64,89 +65,91 @@ export const MarketSelect = memo(() => {
   useEffect(() => {
     if (!location.hash) {
       urlChangesAppliedRef.current = false;
+      setIsUrlTriggered(false);
+      setIsChainSwitching(false);
+      poolsLoadedRef.current = false;
     }
   }, [location.hash]);
 
   useEffect(() => {
-    if (chainIdFromUrl && !isUrlTriggered) {
-      if (isConnected) {
-        if (chainId !== chainIdFromUrl) {
-          switchChain(chainIdFromUrl)
-            .then(() => {
-              //console.log(`Switched to chain ID ${chainIdFromUrl}`);
-              setIsUrlTriggered(true);
-            })
-            .catch((error) => {
-              console.error('Error switching chains:', error);
-            });
-        }
-      }
+    if (pools.length > 0) {
+      poolsLoadedRef.current = true;
     }
-  }, [chainIdFromUrl, isConnected, chainId, isUrlTriggered]);
+  }, [pools]);
 
   useEffect(() => {
-    if (urlChangesAppliedRef.current || !pools.length) {
+    if (!chainIdFromUrl || isUrlTriggered || !isConnected) {
+      return;
+    }
+
+    if (chainId !== chainIdFromUrl) {
+      setIsChainSwitching(true);
+      urlChangesAppliedRef.current = false;
+      poolsLoadedRef.current = false;
+
+      switchChain(chainIdFromUrl)
+        .then(() => {
+          setIsUrlTriggered(true);
+          setTimeout(() => {
+            setIsChainSwitching(false);
+          }, 1000);
+        })
+        .catch((error) => {
+          console.error('Error switching chains:', error);
+          setIsChainSwitching(false);
+        });
+    } else {
+      setIsUrlTriggered(true);
+    }
+  }, [chainIdFromUrl, chainId, isConnected, isUrlTriggered]);
+
+  useEffect(() => {
+    if (isChainSwitching || urlChangesAppliedRef.current || !pools.length || !poolsLoadedRef.current) {
       return;
     }
 
     if (location.hash) {
       const symbolHash = location.hash.slice(1);
-
-      const [marketPart] = symbolHash.split('__'); // Split by the new separator
-
+      const [marketPart] = symbolHash.split('__');
       const result = parseSymbol(marketPart);
 
       if (result) {
-        setSelectedPool(result.poolSymbol);
-
         const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
-        if (!foundPool) {
-          if (pools.length > 0) {
-            urlChangesAppliedRef.current = true;
-          }
-          return;
-        }
-
-        const foundPerpetual = foundPool.perpetuals.find(
-          ({ baseCurrency, quoteCurrency }) =>
-            baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
-        );
-        if (foundPerpetual) {
-          setSelectedPerpetual(foundPerpetual.id);
-        }
-        urlChangesAppliedRef.current = true;
-        return;
-      }
-    }
-
-    let chainIdForMarket: number;
-    if (!isEnabledChain(chainId)) {
-      if (chainIdFromUrl && isEnabledChain(chainIdFromUrl)) {
-        chainIdForMarket = chainIdFromUrl;
-      } else {
-        chainIdForMarket = config.enabledChains[0];
-      }
-    } else {
-      chainIdForMarket = chainId;
-    }
-
-    if (config.defaultMarket[chainIdForMarket] && config.defaultMarket[chainIdForMarket] !== '') {
-      const result = parseSymbol(config.defaultMarket[chainIdForMarket]);
-      if (result) {
-        const foundPool = pools.find(({ poolSymbol: ps }) => ps === result.poolSymbol);
         if (foundPool) {
           setSelectedPool(result.poolSymbol);
-
           const foundPerpetual = foundPool.perpetuals.find(
             ({ baseCurrency, quoteCurrency }) =>
               baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
           );
-
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
-            const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
-            const chainIdForThisURL = getEnabledChainId(chainId, location.hash);
-            navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
+            urlChangesAppliedRef.current = true;
+            return;
+          }
+        }
+      }
+    }
+
+    if (!location.hash) {
+      const chainIdForMarket = isEnabledChain(chainId) ? chainId : config.enabledChains[0];
+      const defaultMarket = config.defaultMarket[chainIdForMarket];
+
+      if (defaultMarket) {
+        const result = parseSymbol(defaultMarket);
+        if (result) {
+          const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
+          if (foundPool) {
+            setSelectedPool(result.poolSymbol);
+            const foundPerpetual = foundPool.perpetuals.find(
+              ({ baseCurrency, quoteCurrency }) =>
+                baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
+            );
+            if (foundPerpetual) {
+              setSelectedPerpetual(foundPerpetual.id);
+              const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
+              const chainIdForThisURL = getEnabledChainId(chainId, location.hash);
+              navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
+            }
           }
         }
       }
@@ -154,16 +157,15 @@ export const MarketSelect = memo(() => {
 
     urlChangesAppliedRef.current = true;
   }, [
+    chainId,
+    pools,
     location.hash,
+    isChainSwitching,
     location.pathname,
     location.search,
-    location,
     navigate,
-    pools,
-    setSelectedPool,
     setSelectedPerpetual,
-    chainId,
-    chainIdFromUrl,
+    setSelectedPool,
   ]);
 
   useEffect(() => {
