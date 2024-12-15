@@ -28,7 +28,6 @@ export const ChainSwitchHandler = () => {
   const navigate = useNavigate();
 
   const { isConnected, isReconnecting, chainId } = useAccount();
-
   const chainIdRef = useRef<number | null>();
 
   useEffect(() => {
@@ -37,6 +36,10 @@ export const ChainSwitchHandler = () => {
       return;
     }
 
+    // Check if this is a URL-driven chain switch
+    const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
+    const isUrlDrivenChainSwitch = chainIdFromUrl && chainIdFromUrl === chainId;
+
     if (chainIdRef.current !== chainId) {
       if (chainIdRef.current !== null) {
         setPools([]);
@@ -44,12 +47,14 @@ export const ChainSwitchHandler = () => {
         clearOpenOrders();
         setFundingList([]);
         setTradesHistory([]);
-        setSelectedPool('');
-        setSelectedPerpetual(0);
         setPerpetualStatistics(null);
 
-        // Clear URL params
-        navigate(`${location.pathname}${location.search}`);
+        // Only clear market selection and URL if this is NOT a URL-driven chain switch
+        if (!isUrlDrivenChainSwitch) {
+          setSelectedPool('');
+          setSelectedPerpetual(0);
+          navigate(`${location.pathname}${location.search}`);
+        }
       }
 
       chainIdRef.current = chainId;
@@ -69,6 +74,7 @@ export const ChainSwitchHandler = () => {
     navigate,
     location.pathname,
     location.search,
+    location.hash,
   ]);
 
   return null;
