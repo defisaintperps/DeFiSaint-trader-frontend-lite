@@ -253,7 +253,7 @@ export const OrderSize = memo(() => {
       maxOrderSizeRetriesCountRef.current = 0;
       maxOrderSizeRequestRef.current = false;
     };
-  }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize]);
+  }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize, chainId]);
 
   const settleSymbol = useMemo(() => {
     if (!selectedPool || !selectedPerpetual) {
