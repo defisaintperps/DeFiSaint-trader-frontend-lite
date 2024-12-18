@@ -92,14 +92,12 @@ export const SDKLoader = memo(() => {
     loadingAPIRef.current = true;
 
     let chainIdForSDK: number;
-    if (!isEnabledChain(chainId)) {
-      if (chainIdFromUrl && isEnabledChain(chainIdFromUrl)) {
-        chainIdForSDK = chainIdFromUrl;
-      } else {
-        chainIdForSDK = config.enabledChains[0];
-      }
-    } else {
+    if (!isNaN(chainIdFromUrl) && isEnabledChain(chainIdFromUrl)) {
+      chainIdForSDK = chainIdFromUrl;
+    } else if (isEnabledChain(chainId)) {
       chainIdForSDK = chainId;
+    } else {
+      chainIdForSDK = config.enabledChains[0];
     }
 
     loadSDK(publicClient, chainIdForSDK)
