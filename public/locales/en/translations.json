@@ -129,6 +129,10 @@
             "title": "Trade executed",
             "body": "Symbol"
           },
+          "trade-failed": {
+            "title": "Trade failed",
+            "body": "Check your slippage settings and wallet balance and try again."
+          },
           "order-failed": {
             "title": "Order failed",
             "body1": "Symbol",
