@@ -108,6 +108,23 @@ export const TableDataFetcher = memo(() => {
                 ]}
               />
             );
+          } else if (!executedOrders.has(order.id)) {
+            setOrderExecuted(order.id);
+            toast.success(
+              <ToastContent
+                title={t('pages.trade.positions-table.toasts.trade-failed.title')}
+                bodyLines={[
+                  {
+                    label: t('pages.trade.positions-table.toasts.trade-executed.body'),
+                    value: order.symbol,
+                  },
+                  {
+                    label: t('pages.trade.positions-table.toasts.trade-failed.body'),
+                    value: '',
+                  },
+                ]}
+              />
+            );
           }
         }
       }

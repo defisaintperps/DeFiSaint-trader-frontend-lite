@@ -129,6 +129,10 @@
             "title": "Orden Ejecutada",
             "body": "Símbolo"
           },
+          "trade-failed": {
+            "title": "Orden Fallida",
+            "body": "Comprueba tus ajustes de deslizamiento y saldo de tu cartera y vuelve a intentarlo."
+          },
           "order-failed": {
             "title": "Orden Fallida",
             "body1": "Símbolo",
