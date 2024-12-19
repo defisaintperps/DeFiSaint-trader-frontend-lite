@@ -1,10 +1,5 @@
 import { LOB_ABI } from '@d8x/perpetuals-sdk';
-import {
-  type Address,
-  type EstimateContractGasParameters,
-  type WalletClient,
-  type WriteContractParameters,
-} from 'viem';
+import type { Address, EstimateContractGasParameters, WalletClient, WriteContractParameters } from 'viem';
 import { estimateContractGas } from 'viem/actions';
 
 import { getGasLimit } from 'blockchain-api/getGasLimit';

@@ -1,11 +1,6 @@
 import { PROXY_ABI, type TraderInterface } from '@d8x/perpetuals-sdk';
 import { getGasPrice } from 'blockchain-api/getGasPrice';
-import {
-  type Address,
-  type EstimateContractGasParameters,
-  type WalletClient,
-  type WriteContractParameters,
-} from 'viem';
+import type { Address, EstimateContractGasParameters, WalletClient, WriteContractParameters } from 'viem';
 import { estimateContractGas } from 'viem/actions';
 import { getGasLimit } from 'blockchain-api/getGasLimit';
 import { MethodE } from 'types/enums';
