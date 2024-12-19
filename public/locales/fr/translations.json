@@ -129,6 +129,10 @@
             "title": "Échange exécuté",
             "body": "Symbole"
           },
+          "trade-failed": {
+            "title": "Échec de l'ordre",
+            "body": "Vérifiez vos paramètres de glissement et votre solde de portefeuille et réessayez."
+          },
           "order-failed": {
             "title": "Échec de l'ordre",
             "body1": "Symbole",
