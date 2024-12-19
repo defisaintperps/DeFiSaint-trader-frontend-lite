@@ -234,9 +234,9 @@ export const ActionBlock = memo(() => {
         }
         if (orderInfo.orderType === OrderTypeE.Market && data.data.ammPrice <= 0) {
           if (orderInfo.orderBlock === OrderBlockE.Long) {
-            maxLong = maxLong * 0.75;
+            maxLong = orderInfo.size * 0.75;
           } else {
-            maxShort = maxShort * 0.75;
+            maxShort = -orderInfo.size * 0.75;
           }
         }
         setMaxOrderSize({ maxBuy: maxLong, maxSell: maxShort });
