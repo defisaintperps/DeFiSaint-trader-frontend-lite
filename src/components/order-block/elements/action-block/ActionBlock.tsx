@@ -232,7 +232,7 @@ export const ActionBlock = memo(() => {
             maxShort = 0;
           }
         }
-        if (data.data.ammPrice <= 0) {
+        if (orderInfo.orderType === OrderTypeE.Market && data.data.ammPrice <= 0) {
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
