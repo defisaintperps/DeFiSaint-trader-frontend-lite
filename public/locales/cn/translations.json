@@ -129,6 +129,10 @@
             "title": "交易已执行",
             "body": "币对"
           },
+          "trade-failed": {
+            "title": "订单失败",
+            "body": "检查您的滑点设置和钱包余额，然后重试。"
+          },
           "order-failed": {
             "title": "订单失败",
             "body1": "币对",

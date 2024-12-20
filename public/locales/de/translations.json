@@ -129,6 +129,10 @@
             "title": "Handel ausgeführt",
             "body": "Symbol"
           },
+          "trade-failed": {
+            "title": "Order fehlgeschlagen",
+            "body": "Überprüf die Slippage Einstellungen und das Wallet Guthaben und versuche es erneut."
+          },
           "order-failed": {
             "title": "Order fehlgeschlagen",
             "body1": "Symbol",

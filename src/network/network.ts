@@ -88,14 +88,14 @@ export async function getPerpetualStaticInfo(
   symbol: string
 ): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
   if (traderAPI) {
+    // console.log('perpStaticInfo via SDK', { chainId, traderAPIChainId: Number(traderAPI.chainId), symbol });
     if (Number(traderAPI.chainId) === chainId) {
-      // console.log('perpStaticInfo via SDK', { chainId, symbol });
       const info = traderAPI.getPerpetualStaticInfo(symbol);
       return { type: 'perpetual-static-info', msg: '', data: info };
     }
     throw new Error('ChainId is not correct.');
   } else {
-    // console.log('perpStaticInfo via BE');
+    // console.log('perpStaticInfo via BE', { chainId, symbol });
     return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
   }
 }
@@ -136,6 +136,7 @@ export function positionRiskOnTrade(
     orderCost: number;
     maxLongTrade: number;
     maxShortTrade: number;
+    ammPrice: number;
   }>
 > {
   return traderAPI
@@ -146,6 +147,7 @@ export function positionRiskOnTrade(
         orderCost: number;
         maxLongTrade: number;
         maxShortTrade: number;
+        ammPrice: number;
       }>;
     });
 }
