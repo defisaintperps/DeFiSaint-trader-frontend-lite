@@ -23,6 +23,7 @@ export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const traderAPIBusyAtom = atom(false);
 export const poolsAtom = atom<PoolWithIdI[]>([]);
 export const perpetualsAtom = atom<PerpetualDataI[]>([]);
+export const allPerpetualsAtom = atom<PerpetualDataI[]>([]);
 export const poolFeeAtom = atom<number | undefined>(undefined);
 export const addr0FeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
