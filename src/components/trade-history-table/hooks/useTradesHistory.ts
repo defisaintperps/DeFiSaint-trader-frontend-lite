@@ -3,7 +3,12 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
 import { getTradesHistory } from 'network/history';
-import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
+import {
+  collateralToSettleConversionAtom,
+  openOrdersAtom,
+  allPerpetualsAtom,
+  tradesHistoryAtom,
+} from 'store/pools.store';
 import type { TradeHistoryWithSymbolDataI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -12,7 +17,7 @@ export const useTradesHistory = () => {
 
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const openOrders = useAtomValue(openOrdersAtom);
-  const perpetuals = useAtomValue(perpetualsAtom);
+  const perpetuals = useAtomValue(allPerpetualsAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const updateTradesHistoryRef = useRef(false);
