@@ -35,6 +35,7 @@ import {
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
   perpetualsAtom,
+  allPerpetualsAtom,
   poolsAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -81,6 +82,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const setPools = useSetAtom(poolsAtom);
   const setCollaterals = useSetAtom(collateralsAtom);
   const setPerpetuals = useSetAtom(perpetualsAtom);
+  const setAllPerpetuals = useSetAtom(allPerpetualsAtom);
   const setPositions = useSetAtom(positionsAtom);
   const setOracleFactoryAddr = useSetAtom(oracleFactoryAddrAtom);
   const setProxyAddr = useSetAtom(proxyAddrAtom);
@@ -170,15 +172,15 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         // Push the valid perpetuals into the perpetuals array
         perpetuals.push(...validPerpetuals);
       });
-
       const filteredPerpetuals = perpetuals.filter(
         (perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket
       );
       setPerpetuals(filteredPerpetuals);
+      setAllPerpetuals(perpetuals);
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },
-    [setPools, setCollaterals, setPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
+    [setPools, setCollaterals, setPerpetuals, setAllPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
   );
 
   useEffect(() => {
