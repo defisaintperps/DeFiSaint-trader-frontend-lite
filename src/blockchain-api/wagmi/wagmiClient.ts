@@ -9,7 +9,7 @@ import {
   walletConnectWallet,
   bybitWallet,
 } from '@rainbow-me/rainbowkit/wallets';
-import { polygonMumbai, polygonZkEvm, arbitrumSepolia, skaleEuropaTestnet, arbitrum } from 'wagmi/chains';
+import { polygonZkEvm, arbitrumSepolia, arbitrum, base } from 'wagmi/chains';
 import { createConfig, http } from 'wagmi';
 import { createClient } from 'viem';
 
@@ -17,19 +17,15 @@ import polygonIcon from 'assets/networks/polygon.webp';
 import arbitrumIcon from 'assets/networks/arbitrum.png';
 import x1Icon from 'assets/networks/x1.png';
 import berachainIcon from 'assets/networks/berachain.png';
-import europaIcon from 'assets/networks/europa.png';
 import { config } from 'config';
 import { x1, cardona, bartio, xlayer } from 'utils/chains';
 
 const chains = [
   { ...polygonZkEvm, iconUrl: polygonIcon, iconBackground: 'transparent' } as Chain,
-  { ...polygonMumbai, iconUrl: polygonIcon, iconBackground: 'transparent' },
   { ...x1, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...xlayer, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...cardona, iconUrl: polygonIcon, iconBackground: 'transparent' },
   { ...bartio, iconUrl: berachainIcon, iconBackground: 'transparent' },
-  { ...skaleEuropaTestnet, iconUrl: europaIcon, iconBackground: 'transparent' },
-  // { ...skaleEuropa, iconUrl: europaIcon, iconBackground: 'transparent' }, // TODO: uncomment when deployed
   {
     ...arbitrumSepolia,
     iconUrl: arbitrumIcon,
@@ -49,6 +45,15 @@ const chains = [
       default: {
         name: 'Arbiscan',
         url: 'https://arbiscan.io/',
+      },
+    },
+  },
+  {
+    ...base,
+    blockExplorers: {
+      default: {
+        name: 'Base Blockscout',
+        url: '	https://base.blockscout.com/',
       },
     },
   },
