@@ -10,7 +10,7 @@
 .manualBlock {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 2 * $d8x-spacing;
   margin-bottom: 2 * $d8x-spacing;
 }

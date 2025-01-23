@@ -74,10 +74,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
       : orderInfo.limitPrice;
 
   if (orderInfo.orderType === OrderTypeE.Market) {
-    limitPrice =
-      isPredictionMarket && orderInfo.maxMinEntryPrice !== null
-        ? calculatePrice(orderInfo.maxMinEntryPrice, isNoVote)
-        : orderInfo.maxMinEntryPrice;
+    limitPrice = null;
   }
 
   const stopPrice =
