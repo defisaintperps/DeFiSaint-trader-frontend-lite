@@ -253,7 +253,9 @@
           "body1": "Determina el tamaño de tu orden.",
           "body2": "Tu tamaño maximo de una orden, dadas tus posiciones abiertas y el estado del comercio, es:",
           "body3": "El tamaño minimo de una posición en este perpetuo es:",
-          "body4": "El tamaño de los incrementos es:"
+          "body4": "El tamaño de los incrementos es:",
+          "body5": "Tamaño máximo:"
+
         },
         "limit-price": {
           "title": "Precio Límite",

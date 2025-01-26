@@ -36,6 +36,7 @@ import {
   inputValueAtom,
   maxTraderOrderSizeAtom,
   orderSizeAtom,
+  maxOrderSizeAtom,
   selectedCurrencyAtom,
   setInputFromOrderSizeAtom,
   setOrderSizeAtom,
@@ -61,6 +62,7 @@ export const OrderSize = memo(() => {
   const [inputValue, setInputValue] = useAtom(inputValueAtom);
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
   const [maxOrderSize, setMaxOrderSize] = useAtom(maxTraderOrderSizeAtom);
+  const maxPersonalOrderSize = useAtomValue(maxOrderSizeAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
@@ -88,6 +90,13 @@ export const OrderSize = memo(() => {
       return maxOrderSize * currencyMultiplier;
     }
   }, [maxOrderSize, currencyMultiplier]);
+
+  const maxPersonalOrderSizeCurrent = useMemo(() => {
+    // max order size given my position, selected leverage, funds & exchange state
+    if (maxPersonalOrderSize !== undefined) {
+      return maxPersonalOrderSize * currencyMultiplier;
+    }
+  }, [maxPersonalOrderSize, currencyMultiplier]);
 
   const onInputChange = useCallback(
     (value: string) => {
@@ -284,6 +293,17 @@ export const OrderSize = memo(() => {
                 {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
               </Typography>
             </TooltipMobile>
+          </div>
+          <div className={styles.walletBalance}>
+            <Typography variant="bodySmallPopup" className={styles.infoText}>
+              {t('pages.trade.order-block.order-size.body5')}
+            </Typography>
+            <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
+              {formatToCurrency(
+                maxPersonalOrderSizeCurrent !== undefined ? roundMaxOrderSize(maxPersonalOrderSizeCurrent) : undefined,
+                selectedCurrency
+              )}
+            </Typography>
           </div>
           <InfoLabelBlock
             title={t('pages.trade.order-block.order-size.title')}

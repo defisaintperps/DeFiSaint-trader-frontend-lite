@@ -253,7 +253,8 @@
           "body1": "Bestimmt die Grösse der Order.",
           "body2": "Ihre maximale Ordergrösse hängt von Ihren offenen Positionen sowie dem Status des Handelsplatzes ab. Die maximale Grösse ist im Moment:",
           "body3": "Die minimale Positionsgrösse für diesen Perpetual ist:",
-          "body4": "Die 'step size' ist:"
+          "body4": "Die 'step size' ist:",
+          "body5": "Max:"
         },
         "limit-price": {
           "title": "Limit Preis",

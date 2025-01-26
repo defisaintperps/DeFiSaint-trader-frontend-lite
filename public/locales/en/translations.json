@@ -131,7 +131,7 @@
           },
           "trade-failed": {
             "title": "Trade failed",
-            "body": "Check your slippage settings and wallet balance and try again."
+            "body": "Check your wallet balance and try again."
           },
           "order-failed": {
             "title": "Order failed",
@@ -251,9 +251,10 @@
         "order-size": {
           "title": "Order size",
           "body1": "Sets the size of your order.",
-          "body2": "Your maximal order size, based on your open positions and the state of the exchange, is:",
+          "body2": "Your maximal order size, based on your open positions and the state of the exchange, independent of your funds and selected leverage, is:",
           "body3": "The minimal position size for this perpetual is:",
-          "body4": "The step size is:"
+          "body4": "The step size is:",
+          "body5": "Max order size:"
         },
         "limit-price": {
           "title": "Limit price",
