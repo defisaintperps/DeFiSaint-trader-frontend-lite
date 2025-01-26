@@ -253,7 +253,9 @@
           "body1": "Définit la taille de votre ordre.",
           "body2": "Votre taille d'ordre maximale, en fonction de vos positions ouvertes et de l'état de la platforme d'échange, est:",
           "body3": "La taille de position minimale pour ce perpétuel est:",
-          "body4": "Étape de quantité:"
+          "body4": "Étape de quantité:",
+          "body5": "Taille maximale:"
+
         },
         "limit-price": {
           "title": "Prix limite",

@@ -3,7 +3,6 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ExpirySelector } from 'components/order-block/elements/expiry-selector/ExpirySelector';
-import { SlippageSelector } from 'components/order-block/elements/slippage-selector/SlippageSelector';
 import { orderTypeAtom } from 'store/order-block.store';
 import { OrderTypeE } from 'types/enums';
 
@@ -16,6 +15,7 @@ export const OrderSettings = memo(() => {
 
   return (
     <div className={styles.root}>
+      {/*
       {orderType === OrderTypeE.Market && (
         <div className={styles.settings}>
           <div className={styles.label}>{t('pages.trade.order-block.slippage.title')}</div>
@@ -24,6 +24,7 @@ export const OrderSettings = memo(() => {
           </div>
         </div>
       )}
+      */}
       {orderType !== OrderTypeE.Market && (
         <div className={styles.settings}>
           <div className={styles.label}>{t('pages.trade.order-block.expiry.title')}</div>
