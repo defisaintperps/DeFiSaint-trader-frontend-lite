@@ -60,8 +60,22 @@ export const bartio = {
     symbol: 'BERA',
   },
   rpcUrls: {
-    public: { http: ['https://bartio.rpc.berachain.com/'] },
-    default: { http: ['https://bartio.rpc.berachain.com/'] },
+    public: {
+      http: [
+        'https://bera-testnet.nodeinfra.com',
+        'https://bartio.rpc.b-harvest.io',
+        'https://bartio.drpc.org',
+        'https://bartio.rpc.berachain.com/',
+      ],
+    },
+    default: {
+      http: [
+        'https://bera-testnet.nodeinfra.com',
+        'https://bartio.rpc.b-harvest.io',
+        'https://bartio.drpc.org',
+        'https://bartio.rpc.berachain.com/',
+      ],
+    },
   },
   blockExplorers: {
     etherscan: { name: 'Beratrail', url: 'https://bartio.beratrail.io/' },

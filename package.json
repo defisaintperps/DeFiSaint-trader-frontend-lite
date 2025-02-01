@@ -74,6 +74,7 @@
     "crypto-js": "4.2.0",
     "cryptocurrency-icons": "0.18.1",
     "date-fns": "4.1.0",
+    "ethers": "^6.13.5",
     "firebase": "11.1.0",
     "geonames.js": "3.0.6",
     "html-to-image": "1.11.11",
