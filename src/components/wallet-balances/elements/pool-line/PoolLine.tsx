@@ -6,6 +6,7 @@ import { REFETCH_BALANCES_INTERVAL } from 'appConstants';
 import { AssetLine } from 'components/asset-line/AssetLine';
 import { PoolWithIdI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
+import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
 
 interface PoolLinePropsI {
   pool: PoolWithIdI;
@@ -17,7 +18,7 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   const { isPending } = useConnect();
 
   const { data: tokenBalanceData, refetch } = useReadContracts({
-    allowFailure: false,
+    allowFailure: true,
     contracts: [
       {
         address: pool.settleTokenAddr as Address,
@@ -29,6 +30,12 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
         address: pool.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
+      },
+      {
+        address: pool.settleTokenAddr as Address,
+        abi: flatTokenAbi,
+        functionName: 'effectiveBalanceOf',
+        args: [address as Address],
       },
     ],
     query: {
@@ -49,15 +56,25 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
     };
   }, [refetch, isConnected]);
 
-  if (!showEmpty && tokenBalanceData?.[0] === 0n) {
+  if (!showEmpty && tokenBalanceData?.[0]?.result === 0n) {
     return null;
   }
-  const unroundedSCValue = tokenBalanceData ? +formatUnits(tokenBalanceData[0], tokenBalanceData[1]) : 1;
+
+  const tokenBalance =
+    tokenBalanceData?.[2].status === 'success' ? tokenBalanceData?.[2].result : tokenBalanceData?.[0].result;
+  const unroundedSCValue =
+    tokenBalanceData?.[1].status === 'success' && tokenBalance !== undefined
+      ? +formatUnits(tokenBalance, tokenBalanceData[1].result)
+      : 1;
   const numberDigits = valueToFractionDigits(unroundedSCValue);
   return (
     <AssetLine
       symbol={pool.settleSymbol}
-      value={tokenBalanceData ? (+formatUnits(tokenBalanceData[0], tokenBalanceData[1])).toFixed(numberDigits) : ''}
+      value={
+        tokenBalance && tokenBalanceData?.[1].status === 'success'
+          ? (+formatUnits(tokenBalance, tokenBalanceData[1].result)).toFixed(numberDigits)
+          : ''
+      }
     />
   );
 });
