@@ -55,6 +55,7 @@ import { isDisabledPool } from 'utils/isDisabledPool';
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
 import { FlatTokenModal } from 'components/flat-token-modal/FlatTokenModal';
+import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
 
 interface HeaderPropsI {
   /**
@@ -256,7 +257,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     isRefetching,
     refetch,
   } = useReadContracts({
-    allowFailure: false,
+    allowFailure: true,
     contracts: [
       {
         address: selectedPool?.settleTokenAddr as Address,
@@ -268,6 +269,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         address: selectedPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
+      },
+      {
+        address: selectedPool?.settleTokenAddr as Address,
+        abi: flatTokenAbi,
+        functionName: 'effectiveBalanceOf',
+        args: [address as Address],
       },
     ],
     query: {
@@ -316,10 +323,15 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }, [address, chain, refetch, triggerUserStatsUpdate, triggerBalancesUpdate]);
 
   useEffect(() => {
-    if (poolTokenBalance && selectedPool && chain && !isError) {
+    if (poolTokenBalance && selectedPool && chain && !isError && poolTokenBalance[1].status === 'success') {
       poolTokenBalanceDefinedRef.current = true;
-      setPoolTokenBalance(+formatUnits(poolTokenBalance[0], poolTokenBalance[1]));
-      setPoolTokenDecimals(poolTokenBalance[1]);
+      setPoolTokenDecimals(poolTokenBalance[1].result);
+      if (poolTokenBalance[0].status === 'success') {
+        setPoolTokenBalance(+formatUnits(poolTokenBalance[0].result, poolTokenBalance[1].result));
+      }
+      if (poolTokenBalance[2].status === 'success') {
+        setPoolTokenBalance(+formatUnits(poolTokenBalance[2].result, poolTokenBalance[1].result));
+      }
     } else {
       poolTokenBalanceDefinedRef.current = false;
       setPoolTokenBalance(undefined);
