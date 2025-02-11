@@ -10,7 +10,7 @@ import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPY } from 'network/history';
 import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom, tvlAtom } from 'store/vault-pools.store';
-import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 
@@ -30,6 +30,7 @@ export const GlobalStats = () => {
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
 
@@ -100,47 +101,50 @@ export const GlobalStats = () => {
     [weeklyAPI, t]
   );
 
-  const items: StatDataI[] = useMemo(
-    () => [
+  const items: StatDataI[] = useMemo(() => {
+    const [userPrice, userSymbol] =
+      !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+        ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+        : [1, selectedPool?.poolSymbol ?? ''];
+    return [
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
         value:
           selectedPool && tvl != null
-            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), selectedPool.settleSymbol, true)
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice, userSymbol, true)
             : '--',
         numberOnly:
           tvl != null && selectedPool
-            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice, '', true)
             : '--',
-        currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
+        currencyOnly: selectedPool && tvl != null ? userSymbol : '',
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.price', { poolSymbol: userSymbol }),
         value:
           dCurrencyPrice != null && selectedPool
             ? formatToCurrency(
-                dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
                 selectedPool.settleSymbol,
                 true
               )
             : '--',
         numberOnly:
           dCurrencyPrice != null && selectedPool
-            ? formatToCurrency(dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            ? formatToCurrency(dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice, '', true)
             : '--',
-        currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
+        currencyOnly: dCurrencyPrice != null ? userSymbol : '',
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.supply', { poolSymbol: userSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
-    ],
-    [selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]
-  );
+    ];
+  }, [flatToken, selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]);
 
   if (isMobileScreen) {
     return (

@@ -12,7 +12,7 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './FlatTokenModal.module.scss';
 import { FlatTokenSelect } from './elements/flat-token-selector/FlatTokenSelect';
-import { flatTokenAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
+import { flatTokenAtom, poolsAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
 import { Address } from 'viem';
 import { fetchFlatTokenInfo } from 'blockchain-api/contract-interactions/fetchFlatTokenInfo';
 import { registerFlatToken } from 'blockchain-api/contract-interactions/registerFlatToken';
@@ -32,6 +32,7 @@ export const FlatTokenModal = () => {
   const [selectedStable, setSelectedStable] = useAtom(selectedStableAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
+  const pools = useAtomValue(poolsAtom);
 
   const [title] = useState('');
   const [txHash, setTxHash] = useState<Address | undefined>();
@@ -122,33 +123,39 @@ export const FlatTokenModal = () => {
   useEffect(() => {
     if (!isBusyRef.current) {
       setFlatToken(undefined);
-      setSelectedStable(undefined);
-      if (selectedPool?.settleTokenAddr && proxyAddr && publicClient && address) {
+      if (pools && proxyAddr && publicClient && address) {
         isBusyRef.current = true;
-        fetchFlatTokenInfo(publicClient, proxyAddr as Address, selectedPool.settleTokenAddr as Address, address)
-          .then((info) => {
-            setFlatToken({ ...info, poolId: selectedPool.poolId });
-            if (info.isFlatToken && !info.registeredToken) {
-              setDepositModalOpen(false);
-              setFlatTokentModalOpen(true);
-            }
-          })
-          .catch()
-          .finally(() => {
-            isBusyRef.current = false;
-          });
+        pools.forEach((pool) => {
+          fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address)
+            .then((info) => {
+              if (info.controller === proxyAddr) {
+                setFlatToken({ ...info, poolId: pool.poolId });
+              }
+            })
+            .catch()
+            .finally(() => {
+              isBusyRef.current = false;
+            });
+        });
       }
     }
-  }, [
-    address,
-    proxyAddr,
-    publicClient,
-    selectedPool,
-    setFlatToken,
-    setDepositModalOpen,
-    setFlatTokentModalOpen,
-    setSelectedStable,
-  ]);
+  }, [address, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
+
+  useEffect(() => {
+    setSelectedStable(undefined);
+    if (flatToken?.isFlatToken && !flatToken?.registeredToken) {
+      setDepositModalOpen(false);
+      setFlatTokentModalOpen(true);
+    }
+  }, [flatToken, setDepositModalOpen, setFlatTokentModalOpen, setSelectedStable]);
+
+  const flatTokenRef = useRef(flatToken);
+
+  useEffect(() => {
+    if (selectedPool && flatTokenRef.current) {
+      setFlatToken({ ...flatTokenRef.current, isFlatToken: flatTokenRef.current.poolId === selectedPool.poolId });
+    }
+  }, [selectedPool, setFlatToken]);
 
   if (!isEnabledChain(chainId)) {
     return null;
