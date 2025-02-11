@@ -25,14 +25,14 @@ export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
     !!flatToken && Math.floor((perpetual?.id ?? 0) / 100_000) === flatToken.poolId
       ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
       : [1, funding.settleSymbol];
-
+  const perpSymbol = `${perpetual?.baseCurrency}/${perpetual?.quoteCurrency}/${userSymbol}`;
   return (
     <TableRow key={funding.transactionHash}>
       <TableCell align={headers[0].align}>
         <Typography variant="cellSmall">{time}</Typography>
       </TableCell>
       <TableCell align={headers[1].align}>
-        <Typography variant="cellSmall">{funding.symbol}</Typography>
+        <Typography variant="cellSmall">{perpSymbol}</Typography>
       </TableCell>
       <TableCell align={headers[2].align}>
         <Typography
