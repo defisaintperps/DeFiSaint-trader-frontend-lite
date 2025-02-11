@@ -45,6 +45,11 @@ export const PositionRow = memo(
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
     const perpetualState = perpetuals.find(({ symbol }) => symbol === position.symbol);
 
+    const [userPrice, userSymbol] =
+      !!flatToken && Math.floor((perpetualState?.id ?? 0) / 100_000) === flatToken.poolId
+        ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+        : [1, collToSettleInfo?.settleSymbol ?? ''];
+
     let isPredictionMarket: boolean | undefined;
     try {
       isPredictionMarket = traderAPI?.isPredictionMarket(position.symbol);
@@ -122,11 +127,7 @@ export const PositionRow = memo(
             <TableCell align="right">
               <Typography variant="cellSmall">
                 {collToSettleInfo
-                  ? formatToCurrency(
-                      position.collateralCC * collToSettleInfo.value * (flatToken?.compositePrice ?? 1),
-                      flatToken?.registeredSymbol ?? collToSettleInfo.settleSymbol,
-                      true
-                    )
+                  ? formatToCurrency(position.collateralCC * collToSettleInfo.value * userPrice, userSymbol, true)
                   : '-'}{' '}
                 ({Math.round(position.leverage * 100) / 100}x)
               </Typography>

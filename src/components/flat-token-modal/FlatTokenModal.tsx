@@ -127,7 +127,7 @@ export const FlatTokenModal = () => {
         isBusyRef.current = true;
         fetchFlatTokenInfo(publicClient, proxyAddr as Address, selectedPool.settleTokenAddr as Address, address)
           .then((info) => {
-            setFlatToken(info);
+            setFlatToken({ ...info, poolId: selectedPool.poolId });
             if (info.isFlatToken && !info.registeredToken) {
               setDepositModalOpen(false);
               setFlatTokentModalOpen(true);

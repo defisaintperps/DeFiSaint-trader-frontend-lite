@@ -27,8 +27,8 @@ export async function fetchFlatTokenInfo(
     });
   const isFlatToken = controller === proxyAddr && !!supportedTokens?.length;
   const tokenSymbols: string[] = [];
-  let userConversion = 1;
-  let userSymbol = symbol;
+  let userConversion: number | undefined;
+  let userSymbol: string | undefined;
   if (isFlatToken) {
     const resp = await publicClient.multicall({
       contracts: [
