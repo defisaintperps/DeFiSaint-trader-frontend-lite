@@ -137,7 +137,7 @@ export const berachain = {
     },
   },
   rpcUrls: {
-    default: { http: ['https://rpc.berachain.com'] },
+    default: { http: ['https://rpc.berachain.com', 'https://berachain.blockpi.network/v1/rpc/public'] },
   },
   blockExplorers: {
     default: {
