@@ -78,7 +78,7 @@ export const PositionRow = memo(
       <TableRow key={position.symbol}>
         <TableCell align="left">
           <Typography variant="cellSmall">
-            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{collToSettleInfo?.settleSymbol ?? ''}
+            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{userSymbol}
           </Typography>
         </TableCell>
         <TableCell align="right">
