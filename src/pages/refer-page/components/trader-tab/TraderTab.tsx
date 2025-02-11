@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { poolsAtom } from 'store/pools.store';
+import { flatTokenAtom, poolsAtom } from 'store/pools.store';
 import type { OverviewItemI, OverviewPoolItemI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -20,6 +20,7 @@ export const TraderTab = () => {
   const { t } = useTranslation();
 
   const pools = useAtomValue(poolsAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const { address, chainId } = useAccount();
 
@@ -45,13 +46,18 @@ export const TraderTab = () => {
         .filter((volume) => volume.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
+      const [userPrice, userSymbol] =
+        !!flatToken && pool.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+          ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+          : [1, pool.poolSymbol];
+
       earnedRebatesByPools.push({
-        symbol: pool.poolSymbol,
-        value: earnedRebatesAmount,
+        symbol: userSymbol,
+        value: earnedRebatesAmount * userPrice,
       });
       openEarningsByPools.push({
-        symbol: pool.poolSymbol,
-        value: openEarningsAmount,
+        symbol: userSymbol,
+        value: openEarningsAmount * userPrice,
       });
     });
 
@@ -65,7 +71,7 @@ export const TraderTab = () => {
         poolsItems: address && isEnabledChain(chainId) ? openEarningsByPools : [],
       },
     ];
-  }, [pools, openRewards, earnedRebates, address, chainId, t]);
+  }, [flatToken, pools, openRewards, earnedRebates, address, chainId, t]);
 
   return (
     <div className={styles.root}>
