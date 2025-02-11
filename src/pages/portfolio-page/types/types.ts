@@ -8,4 +8,5 @@ export interface PoolShareTokenBalanceI {
   symbol: string;
   balance: number;
   settleSymbol: string;
+  poolId: number;
 }

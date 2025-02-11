@@ -11,6 +11,7 @@ interface TokenPoolSharePercentI {
   settleSymbol: string;
   balance: number;
   percent: number;
+  poolId: number;
 }
 
 export const poolShareTokensShareAtom = atom<TokenPoolSharePercentI[]>([]);
@@ -43,6 +44,7 @@ export const fetchPoolShareAtom = atom(null, async (get, set, userAddress: Addre
       symbol: pool.poolSymbol,
       settleSymbol: pool.settleSymbol,
       balance: poolShareBalance * dCurrencyPriceMap[pool.poolSymbol],
+      poolId: pool.poolId,
     });
   }
 
@@ -59,6 +61,7 @@ export const fetchPoolShareAtom = atom(null, async (get, set, userAddress: Addre
       settleSymbol: balance.settleSymbol,
       balance: balance.balance,
       percent: (balance.balance * poolUsdPrice[balance.symbol].collateral) / poolShareTokensUSDBalance || 0,
+      poolId: balance.poolId,
     }))
   );
 });
