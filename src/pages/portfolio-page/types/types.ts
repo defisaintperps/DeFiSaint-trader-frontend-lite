@@ -1,6 +1,7 @@
 export interface PoolValueI {
   value: number;
   poolSymbol: string;
+  poolId: number;
 }
 
 export interface PoolShareTokenBalanceI {

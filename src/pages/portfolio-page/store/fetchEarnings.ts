@@ -24,11 +24,13 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
   const collateralPrices: number[] = [];
   const settleSymbols: string[] = [];
   const poolSymbols: string[] = [];
+  const poolIds: number[] = [];
   for (const pool of pools) {
     earningsPromises.push(getEarnings(chainId, userAddress, pool.poolSymbol));
     collateralPrices.push(poolUsdPrice[pool.poolSymbol].collateral);
     settleSymbols.push(pool.settleSymbol);
     poolSymbols.push(pool.poolSymbol);
+    poolIds.push(pool.poolId);
   }
   const earningsArray = await Promise.all(earningsPromises);
   let totalEstimatedEarnings = 0;
@@ -37,7 +39,7 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
     if (acc[settleSymbols[index]]) {
       acc[settleSymbols[index]].value += curr.earnings;
     } else {
-      acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index] };
+      acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index], poolId: poolIds[index] };
     }
     return acc;
   }, {});
@@ -49,6 +51,7 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
       symbol: earningsList[key].poolSymbol,
       settleSymbol: key,
       value: earningsList[key].value,
+      poolId: earningsList[key].poolId,
     }))
   );
 });
