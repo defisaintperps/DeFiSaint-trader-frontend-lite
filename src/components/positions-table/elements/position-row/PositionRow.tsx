@@ -7,7 +7,7 @@ import { Button, IconButton, TableCell, TableRow, Typography } from '@mui/materi
 
 import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, perpetualsAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, perpetualsAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -39,6 +39,7 @@ export const PositionRow = memo(
     const c2s = useAtomValue(collateralToSettleConversionAtom);
     const traderAPI = useAtomValue(traderAPIAtom);
     const perpetuals = useAtomValue(perpetualsAtom);
+    const flatToken = useAtomValue(flatTokenAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
@@ -122,8 +123,8 @@ export const PositionRow = memo(
               <Typography variant="cellSmall">
                 {collToSettleInfo
                   ? formatToCurrency(
-                      position.collateralCC * collToSettleInfo.value,
-                      collToSettleInfo.settleSymbol,
+                      position.collateralCC * collToSettleInfo.value * (flatToken?.compositePrice ?? 1),
+                      flatToken?.registeredSymbol ?? collToSettleInfo.settleSymbol,
                       true
                     )
                   : '-'}{' '}

@@ -1,5 +1,6 @@
 import { erc20Abi, zeroAddress, type Address, type PublicClient } from 'viem';
 import { flatTokenAbi } from './flatTokenAbi';
+import { decNToFloat } from '@d8x/perpetuals-sdk';
 
 export async function fetchFlatTokenInfo(
   publicClient: PublicClient,
@@ -26,22 +27,59 @@ export async function fetchFlatTokenInfo(
     });
   const isFlatToken = controller === proxyAddr && !!supportedTokens?.length;
   const tokenSymbols: string[] = [];
+  let userConversion = 1;
+  let userSymbol = symbol;
   if (isFlatToken) {
     const resp = await publicClient.multicall({
-      contracts: supportedTokens.map((addr) => ({
-        address: addr,
-        abi: erc20Abi,
-        functionName: 'symbol',
-      })),
+      contracts: [
+        ...supportedTokens.map((addr) => ({
+          address: addr,
+          abi: erc20Abi,
+          functionName: 'symbol',
+        })),
+        {
+          address: registeredToken ?? zeroAddress, // fails if not registered
+          abi: erc20Abi,
+          functionName: 'symbol',
+        },
+        {
+          address: registeredToken ?? zeroAddress, // fails if not registered
+          abi: erc20Abi,
+          functionName: 'decimals',
+        },
+        {
+          address: registeredToken ?? zeroAddress, // fails if not registered
+          abi: erc20Abi,
+          functionName: 'balanceOf',
+          args: [traderAddress],
+        },
+        {
+          address: tokenAddress,
+          abi: flatTokenAbi,
+          functionName: 'effectiveBalanceOf',
+          args: [traderAddress],
+        },
+      ],
       allowFailure: true,
     });
-    resp.forEach(({ status, result }) => {
+    resp.slice(0, -4).forEach(({ status, result }) => {
       if (status === 'success') {
         tokenSymbols.push(result as string);
       } else {
         tokenSymbols.push(''); // or some default?
       }
     });
+    const [registeredSymbol, registeredDecimals, registeredBalance, effectiveBalance] = resp.slice(-4);
+    if (
+      registeredBalance.status === 'success' &&
+      effectiveBalance.status === 'success' &&
+      BigInt(effectiveBalance.result) > 0n
+    ) {
+      userConversion =
+        decNToFloat(registeredBalance.result, Number(registeredDecimals.result)) /
+        decNToFloat(effectiveBalance.result, 6);
+      userSymbol = registeredSymbol.result as string;
+    }
   }
   return {
     isFlatToken,
@@ -59,5 +97,7 @@ export async function fetchFlatTokenInfo(
     supportedSymbols: tokenSymbols,
     controller,
     symbol: symbol ?? '',
+    compositePrice: userConversion,
+    registeredSymbol: userSymbol,
   };
 }

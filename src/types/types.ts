@@ -552,4 +552,6 @@ export interface FlatTokenI {
   symbol: string;
   registeredToken: Address | undefined;
   supportedTokens: SupportedTokenI[];
+  compositePrice: number;
+  registeredSymbol: string | undefined;
 }
