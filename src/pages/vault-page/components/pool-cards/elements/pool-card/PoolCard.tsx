@@ -10,7 +10,7 @@ import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { getWeeklyAPY } from 'network/history';
 import { getAngleAPY, getEtherFiAPY } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
-import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { flatTokenAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { liquidityTypeAtom, triggerAddInputFocusAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
@@ -43,6 +43,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   const setTriggerAddInputFocus = useSetAtom(triggerAddInputFocusAtom);
   const setLiquidityType = useSetAtom(liquidityTypeAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const [weeklyAPY, setWeeklyAPY] = useState<number>();
   const [stUsdAPY, setStUsdAPY] = useState<number>();
@@ -177,6 +178,11 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     clearInputsData();
   };
 
+  const userSymbol =
+    flatToken?.poolId === pool.poolId && flatToken?.supportedTokens.length > 0
+      ? (flatToken?.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
+      : pool.settleSymbol;
+
   return (
     <div className={styles.root}>
       <div className={styles.header}>
@@ -184,7 +190,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
           <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={80} height={80} />
         </div>
         <div className={styles.symbol}>
-          {pool.settleSymbol} {t('pages.vault.pool-card.vault')}
+          {userSymbol} {t('pages.vault.pool-card.vault')}
         </div>
       </div>
       <div className={styles.content}>
