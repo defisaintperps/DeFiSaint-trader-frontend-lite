@@ -394,11 +394,11 @@ export const Add = memo(() => {
             id={ADD_INPUT_FIELD_ID}
             className={styles.inputHolder}
             inputValue={inputValue}
-            setInputValue={handleInputCapture}
-            currency={selectedPool?.settleSymbol}
+            setInputValue={handleInputCapture} // convert from registered to composite
+            currency={selectedPool?.settleSymbol} // userSymbol
             step="1"
             min={0}
-            max={poolTokenBalance ? Number((poolTokenBalance * 0.9999).toFixed(5)) : 999999}
+            max={poolTokenBalance ? Number((poolTokenBalance * 0.9999).toFixed(5)) : 999999} // registered token balance
             disabled={loading}
           />
         </div>

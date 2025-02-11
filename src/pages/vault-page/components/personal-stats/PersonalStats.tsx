@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { getEarnings } from 'network/history';
-import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   sdkConnectedAtom,
   triggerUserStatsUpdateAtom,
@@ -36,11 +36,17 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const hasOpenRequestOnChain = useAtomValue(withdrawalOnChainAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
 
   const [estimatedEarnings, setEstimatedEarnings] = useState<number | null>(null);
 
   const earningsRequestSentRef = useRef(false);
+
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, selectedPool?.poolSymbol ?? ''];
 
   useEffect(() => {
     setUserAmount(null);
@@ -112,9 +118,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             content={
               <>
                 <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
-                <Typography>
-                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.settleSymbol })}
-                </Typography>
+                <Typography>{t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol })}</Typography>
               </>
             }
           />
@@ -122,10 +126,13 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         <Typography variant="bodyMedium" className={styles.statValue}>
           {estimatedEarnings !== null && selectedPool
             ? formatToCurrency(
-                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol,
+                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                userSymbol,
                 true,
-                Math.min(valueToFractionDigits(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1)), 5)
+                Math.min(
+                  valueToFractionDigits(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice),
+                  5
+                )
               )
             : '--'}
         </Typography>
