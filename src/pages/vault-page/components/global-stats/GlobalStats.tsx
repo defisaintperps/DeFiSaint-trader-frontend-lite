@@ -122,7 +122,7 @@ export const GlobalStats = () => {
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: userSymbol }),
+        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
         value:
           dCurrencyPrice != null && selectedPool
             ? formatToCurrency(
@@ -139,7 +139,7 @@ export const GlobalStats = () => {
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: userSymbol }),
+        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
