@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { ButtonSelect } from 'components/button-select/ButtonSelect';
 import { ButtonMenuItem } from 'components/button-select/elements/ButtonMenuItem';
 import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
-import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { flatTokenAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 
 import { selectedCurrencyAtom } from '../../store';
 
@@ -27,6 +27,7 @@ export const TokenSelect = () => {
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -36,11 +37,19 @@ export const TokenSelect = () => {
     }
 
     const currencies = [selectedPerpetual.baseCurrency, selectedPerpetual.quoteCurrency];
-    if (selectedPool.settleSymbol && !currencies.includes(selectedPool.settleSymbol)) {
+    if (
+      selectedPool.settleSymbol &&
+      !currencies.includes(selectedPool.settleSymbol) &&
+      (!flatToken || flatToken.poolId !== selectedPool.poolId)
+    ) {
       currencies.push(selectedPool.settleSymbol);
     }
+    const flatSymbol = flatToken ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol) : undefined;
+    if (flatToken && flatSymbol && selectedPool.poolId === flatToken.poolId && !currencies.includes(flatSymbol)) {
+      currencies.push(flatSymbol);
+    }
     return currencies;
-  }, [selectedPool, selectedPerpetual]);
+  }, [flatToken, selectedPool, selectedPerpetual]);
 
   return (
     <ButtonSelect
