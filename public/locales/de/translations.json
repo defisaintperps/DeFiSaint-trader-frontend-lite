@@ -129,6 +129,10 @@
             "title": "Handel ausgeführt",
             "body": "Symbol"
           },
+          "trade-failed": {
+            "title": "Order fehlgeschlagen",
+            "body": "Überprüf die Slippage Einstellungen und das Wallet Guthaben und versuche es erneut."
+          },
           "order-failed": {
             "title": "Order fehlgeschlagen",
             "body1": "Symbol",
@@ -249,7 +253,8 @@
           "body1": "Bestimmt die Grösse der Order.",
           "body2": "Ihre maximale Ordergrösse hängt von Ihren offenen Positionen sowie dem Status des Handelsplatzes ab. Die maximale Grösse ist im Moment:",
           "body3": "Die minimale Positionsgrösse für diesen Perpetual ist:",
-          "body4": "Die 'step size' ist:"
+          "body4": "Die 'step size' ist:",
+          "body5": "Max:"
         },
         "limit-price": {
           "title": "Limit Preis",
@@ -335,7 +340,7 @@
           "order-too-small": "Order wird scheitern: Ordergrösse ist zu klein",
           "position-too-small": "Order wird scheitern: Die resultierende Position ist zu klein (min.: {{minAmount}})",
           "below-min-position": "Warnung: Ordergrösse ist kleiner als die minimale Positionsgrösse",
-          "slippage-too-large": "Warnung: Slippage ist größer als in Ihren Slippage-Einstellungen zulässig. Die Order wird wahrscheinlich fehlschlagen.",
+          "slippage-too-large": "Warnung: Slippage ist größer als 2%.",
           "insufficient-balance": "Order wird scheitern: Das Walletguthaben ist zu klein",
           "undefined": "Order nicht definiert: Take Profit Einstellungen sind inkompatibel mit der Hebeleinstellung",
           "verify-tp-sl-orders": "Überprüfen Sie Ihre TP/SL - Sie verändern eine Position mit existierenden TP/SL",
@@ -786,11 +791,6 @@
         "1": "Klick",
         "2": "für mehr Informationen."
       }
-    },
-    "li-fi-widget": {
-      "button-title": "LI.FI widget",
-      "header-to": "Bridge in",
-      "header-from": "Bridge out"
     },
     "owlto-bridge": "OWLTO bridge",
     "pagination": {

@@ -36,6 +36,7 @@ import {
   inputValueAtom,
   maxTraderOrderSizeAtom,
   orderSizeAtom,
+  maxOrderSizeAtom,
   selectedCurrencyAtom,
   setInputFromOrderSizeAtom,
   setOrderSizeAtom,
@@ -61,6 +62,7 @@ export const OrderSize = memo(() => {
   const [inputValue, setInputValue] = useAtom(inputValueAtom);
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
   const [maxOrderSize, setMaxOrderSize] = useAtom(maxTraderOrderSizeAtom);
+  const maxPersonalOrderSize = useAtomValue(maxOrderSizeAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
@@ -88,6 +90,13 @@ export const OrderSize = memo(() => {
       return maxOrderSize * currencyMultiplier;
     }
   }, [maxOrderSize, currencyMultiplier]);
+
+  const maxPersonalOrderSizeCurrent = useMemo(() => {
+    // max order size given my position, selected leverage, funds & exchange state
+    if (maxPersonalOrderSize !== undefined) {
+      return maxPersonalOrderSize * currencyMultiplier;
+    }
+  }, [maxPersonalOrderSize, currencyMultiplier]);
 
   const onInputChange = useCallback(
     (value: string) => {
@@ -174,7 +183,7 @@ export const OrderSize = memo(() => {
 
   const refetchMaxOrderSize = useCallback(
     (userAddress: Address, needValueCleanUp: boolean) => {
-      if (maxOrderSizeRequestRef.current) {
+      if (maxOrderSizeRequestRef.current && maxOrderSize !== 0 && maxOrderSize !== undefined) {
         return;
       }
 
@@ -199,7 +208,7 @@ export const OrderSize = memo(() => {
         .then((result) => {
           if (perpetualIdRef.current === perpetualStaticInfo.id) {
             setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
-            maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
+            maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result) && result !== 0; // also refetch if we get a 0, to be sure
           }
         })
         .catch((error) => {
@@ -210,7 +219,7 @@ export const OrderSize = memo(() => {
           maxOrderSizeRequestRef.current = false;
         });
     },
-    [isSDKConnected, chainId, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]
+    [isSDKConnected, chainId, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize, maxOrderSize]
   );
 
   useEffect(() => {
@@ -218,6 +227,8 @@ export const OrderSize = memo(() => {
       setMaxOrderSize(undefined);
       return;
     }
+
+    fetchedMaxSizesRef.current = false; // Reset on address change or chainId change
 
     let needValueCleanUp = true;
     if (triggerBalancesUpdateRef.current !== triggerBalancesUpdate) {
@@ -251,7 +262,7 @@ export const OrderSize = memo(() => {
       maxOrderSizeRetriesCountRef.current = 0;
       maxOrderSizeRequestRef.current = false;
     };
-  }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize]);
+  }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize, chainId]);
 
   const settleSymbol = useMemo(() => {
     if (!selectedPool || !selectedPerpetual) {
@@ -282,6 +293,17 @@ export const OrderSize = memo(() => {
                 {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
               </Typography>
             </TooltipMobile>
+          </div>
+          <div className={styles.walletBalance}>
+            <Typography variant="bodySmallPopup" className={styles.infoText}>
+              {t('pages.trade.order-block.order-size.body5')}
+            </Typography>
+            <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
+              {formatToCurrency(
+                maxPersonalOrderSizeCurrent !== undefined ? roundMaxOrderSize(maxPersonalOrderSizeCurrent) : undefined,
+                selectedCurrency
+              )}
+            </Typography>
           </div>
           <InfoLabelBlock
             title={t('pages.trade.order-block.order-size.title')}

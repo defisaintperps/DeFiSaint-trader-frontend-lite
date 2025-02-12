@@ -3,7 +3,12 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
 import { getTradesHistory } from 'network/history';
-import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
+import {
+  collateralToSettleConversionAtom,
+  openOrdersAtom,
+  allPerpetualsAtom,
+  tradesHistoryAtom,
+} from 'store/pools.store';
 import type { TradeHistoryWithSymbolDataI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -12,7 +17,7 @@ export const useTradesHistory = () => {
 
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const openOrders = useAtomValue(openOrdersAtom);
-  const perpetuals = useAtomValue(perpetualsAtom);
+  const perpetuals = useAtomValue(allPerpetualsAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const updateTradesHistoryRef = useRef(false);
@@ -48,7 +53,7 @@ export const useTradesHistory = () => {
   const tradesHistoryWithSymbol: TradeHistoryWithSymbolDataI[] = useMemo(() => {
     return tradesHistory.map((tradeHistory) => {
       const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
-      const settleSymbol = perpetual?.poolName ? c2s.get(perpetual?.poolName)?.settleSymbol ?? '' : '';
+      const settleSymbol = perpetual?.poolName ? (c2s.get(perpetual?.poolName)?.settleSymbol ?? '') : '';
       return {
         ...tradeHistory,
         symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${settleSymbol}` : '',

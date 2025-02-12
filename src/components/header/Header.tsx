@@ -2,19 +2,17 @@ import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { type Address, erc20Abi, formatUnits } from 'viem';
-import { useAccount, useReadContracts } from 'wagmi';
+import { useAccount, useChainId, useReadContracts } from 'wagmi';
 import { INVALID_PERPETUAL_STATES } from 'appConstants';
 
 import { Menu } from '@mui/icons-material';
 import { Button, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 import CloseIcon from 'assets/icons/new/close.svg?react';
-import { LiFiWidgetButton } from 'components/wallet-connect-button/LiFiWidgetButton';
 import { OneClickTradingButton } from 'components/wallet-connect-button/OneClickTradingButton';
 import { OwltoButton } from 'components/wallet-connect-button/OwltoButton';
 import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
-import { isLifiWidgetEnabled } from 'helpers/isLifiWidgetEnabled';
 import { isOwltoButtonEnabled } from 'helpers/isOwltoButtonEnabled';
 import { web3AuthIdTokenAtom } from 'store/web3-auth.store';
 
@@ -37,6 +35,7 @@ import {
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
   perpetualsAtom,
+  allPerpetualsAtom,
   poolsAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -51,9 +50,11 @@ import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 import { isEnabledChain } from 'utils/isEnabledChain';
+import { isDisabledPool } from 'utils/isDisabledPool';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
+import { FlatTokenModal } from 'components/flat-token-modal/FlatTokenModal';
 
 interface HeaderPropsI {
   /**
@@ -76,13 +77,14 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   const { t } = useTranslation();
 
-  const { chain, chainId, address, isConnected, isReconnecting, isConnecting } = useAccount();
-
+  const { chain, address, isConnected, isReconnecting, isConnecting } = useAccount();
+  const chainId = useChainId();
   const { gasTokenBalance, isGasTokenFetchError } = useUserWallet();
 
   const setPools = useSetAtom(poolsAtom);
   const setCollaterals = useSetAtom(collateralsAtom);
   const setPerpetuals = useSetAtom(perpetualsAtom);
+  const setAllPerpetuals = useSetAtom(allPerpetualsAtom);
   const setPositions = useSetAtom(positionsAtom);
   const setOracleFactoryAddr = useSetAtom(oracleFactoryAddrAtom);
   const setProxyAddr = useSetAtom(proxyAddrAtom);
@@ -107,7 +109,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const web3authIdToken = useAtomValue(web3AuthIdTokenAtom);
   const isBridgeShownOnPage = useBridgeShownOnPage();
   const isOwltoEnabled = isOwltoButtonEnabled(chainId);
-  const isLiFiEnabled = isLifiWidgetEnabled(isOwltoEnabled, chainId);
   const isSignedInSocially = web3AuthConfig.isEnabled && web3authIdToken != '';
 
   // fetch the settle ccy fx -> save to atom
@@ -120,29 +121,22 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       }
 
       const pools = data.pools
-        .filter((pool) => pool.isRunning)
+        .filter((pool) => pool.isRunning && pool.perpetuals.length > 0)
         .map((pool) => {
-          let poolId = 0;
-          if (traderAPI) {
-            try {
-              poolId = traderAPI.getPoolIdFromSymbol(pool.poolSymbol);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-
+          const poolId = Math.floor(pool.perpetuals[0].id / 100_000);
           return {
             ...pool,
             poolId,
           };
-        });
+        })
+        .filter(({ poolId }) => !isDisabledPool(chainId, poolId));
       setPools(pools);
 
       setCollaterals(pools.map((pool) => pool.settleSymbol));
 
       const perpetuals: PerpetualDataI[] = [];
 
-      data.pools.forEach((pool) => {
+      pools.forEach((pool) => {
         // Map over the pool.perpetuals array and filter out INVALID and INITIALIZING perpetuals
         const validPerpetuals = pool.perpetuals
           .filter((perpetual) => !INVALID_PERPETUAL_STATES.includes(perpetual.state))
@@ -173,15 +167,15 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         // Push the valid perpetuals into the perpetuals array
         perpetuals.push(...validPerpetuals);
       });
-
       const filteredPerpetuals = perpetuals.filter(
         (perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket
       );
       setPerpetuals(filteredPerpetuals);
+      setAllPerpetuals(perpetuals);
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },
-    [setPools, setCollaterals, setPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
+    [chainId, setPools, setCollaterals, setPerpetuals, setAllPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
   );
 
   useEffect(() => {
@@ -204,11 +198,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     }
   }, [triggerPositionsUpdate, setPositions, chainId, address]);
 
+  const location = useLocation();
+
   useEffect(() => {
-    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId)) {
+    if (traderAPI && Number(traderAPI.chainId) === getEnabledChainId(chainId, location.hash)) {
       traderAPIRef.current = traderAPI;
     }
-  }, [traderAPI, chainId]);
+  }, [traderAPI, chainId, location]);
 
   useEffect(() => {
     if (exchangeRequestRef.current) {
@@ -224,7 +220,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       while (retries < MAX_RETRIES) {
         try {
           let currentTraderAPI = null;
-          const enabledChainId = getEnabledChainId(chainId);
+          const enabledChainId = getEnabledChainId(chainId, location.hash);
           if (retries > 0 && traderAPIRef.current && Number(traderAPIRef.current?.chainId) === enabledChainId) {
             currentTraderAPI = traderAPIRef.current;
           }
@@ -252,7 +248,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     return () => {
       exchangeRequestRef.current = false;
     };
-  }, [chainId, setExchangeInfo]);
+  }, [chainId, setExchangeInfo, location]);
 
   const {
     data: poolTokenBalance,
@@ -363,7 +359,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         <>
           <div className={styles.settingButtonsHolderMobile}>
             {!isSignedInSocially && <OneClickTradingButton />}
-            {isLiFiEnabled && isBridgeShownOnPage && <LiFiWidgetButton />}
             {isOwltoEnabled && isBridgeShownOnPage && <OwltoButton />}
             <ThemeSwitcher />
             <LanguageSwitcher isMini={true} />
@@ -450,6 +445,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               )}
             </Toolbar>
             {isConnected && <DepositModal />}
+            {isConnected && <FlatTokenModal />}
           </PageAppBar>
           <nav>
             <Drawer

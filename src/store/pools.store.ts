@@ -5,6 +5,7 @@ import { atomWithStorage } from 'jotai/utils';
 import { INVALID_PERPETUAL_STATES } from 'appConstants';
 import type {
   CollToSettleInfoI,
+  FlatTokenI,
   FundingI,
   MarginAccountI,
   OrderI,
@@ -16,6 +17,7 @@ import type {
   PoolWithIdI,
   TradeHistoryI,
 } from 'types/types';
+import { Address } from 'viem';
 
 const SHOW_CHART_FOR_MOBILE_LS_KEY = 'd8x_showChartForMobile';
 
@@ -23,6 +25,7 @@ export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const traderAPIBusyAtom = atom(false);
 export const poolsAtom = atom<PoolWithIdI[]>([]);
 export const perpetualsAtom = atom<PerpetualDataI[]>([]);
+export const allPerpetualsAtom = atom<PerpetualDataI[]>([]);
 export const poolFeeAtom = atom<number | undefined>(undefined);
 export const addr0FeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
@@ -254,6 +257,20 @@ export const failOrderIdAtom = atom(
   }
 );
 
+const cancelledOrderIdsAtom = atom<Set<string>>(new Set<string>());
+
+export const cancelOrderIdAtom = atom(
+  (get) => {
+    return get(cancelledOrderIdsAtom);
+  },
+  (_get, set, orderId: string) => {
+    set(cancelledOrderIdsAtom, (prev) => {
+      prev.add(orderId);
+      return prev;
+    });
+  }
+);
+
 const collateralToSettleConversionsAtom = atom<Map<string, CollToSettleInfoI>>(new Map());
 
 export const collateralToSettleConversionAtom = atom(
@@ -268,3 +285,6 @@ export const collateralToSettleConversionAtom = atom(
     });
   }
 );
+
+export const flatTokenAtom = atom<FlatTokenI | undefined>(undefined);
+export const selectedStableAtom = atom<Address | undefined>(undefined);

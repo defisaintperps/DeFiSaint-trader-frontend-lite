@@ -26,7 +26,7 @@ import { calculatePrice } from 'helpers/calculatePrice';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
-import { getPerpetualPrice, orderDigest, positionRiskOnTrade } from 'network/network';
+import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
@@ -45,6 +45,7 @@ import {
   selectedPerpetualDataAtom,
   selectedPoolAtom,
   traderAPIAtom,
+  flatTokenAtom,
 } from 'store/pools.store';
 import { MethodE, OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import type { OrderI, OrderInfoI } from 'types/types';
@@ -73,10 +74,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
       : orderInfo.limitPrice;
 
   if (orderInfo.orderType === OrderTypeE.Market) {
-    limitPrice =
-      isPredictionMarket && orderInfo.maxMinEntryPrice !== null
-        ? calculatePrice(orderInfo.maxMinEntryPrice, isNoVote)
-        : orderInfo.maxMinEntryPrice;
+    limitPrice = null;
   }
 
   const stopPrice =
@@ -123,7 +121,6 @@ const orderTypeMap: Record<OrderTypeE, string> = {
 enum ValidityCheckE {
   Empty = '-',
   Closed = 'closed',
-  OrderTooLarge = 'order-too-large',
   OrderTooSmall = 'order-too-small',
   PositionTooSmall = 'position-too-small',
   BelowMinPosition = 'below-min-position',
@@ -162,6 +159,7 @@ export const ActionBlock = memo(() => {
   const selectedPool = useAtomValue(selectedPoolAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const positions = useAtomValue(positionsAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
@@ -224,8 +222,7 @@ export const ActionBlock = memo(() => {
         const initialMarginRate = orderInfo.isPredictionMarket
           ? pmInitialMarginRate(orderInfo.orderBlock === OrderBlockE.Long ? 1 : -1, data.data.newPositionRisk.markPrice)
           : perpetualStaticInfo?.initialMarginRate;
-
-        if (initialMarginRate && data.data.newPositionRisk.leverage > 1 / initialMarginRate) {
+        if (initialMarginRate && data.data.newPositionRisk.leverage > Math.floor(1 / initialMarginRate)) {
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
@@ -233,20 +230,11 @@ export const ActionBlock = memo(() => {
           }
         }
         setMaxOrderSize({ maxBuy: maxLong, maxSell: maxShort });
+        setPerpetualPrice(data.data.ammPrice);
       })
       .catch(console.error);
 
-    const getPerpetualPricePromise = getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
-      .then((data) => {
-        const perpPrice =
-          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
-            ? calculateProbability(data.data.price, orderInfo.orderBlock === OrderBlockE.Short)
-            : data.data.price;
-        setPerpetualPrice(perpPrice);
-      })
-      .catch(console.error);
-
-    Promise.all([positionRiskOnTradePromise, getPerpetualPricePromise]).finally(() => {
+    Promise.all([positionRiskOnTradePromise]).finally(() => {
       setValidityCheck(false);
     });
   };
@@ -264,7 +252,13 @@ export const ActionBlock = memo(() => {
   };
 
   const isBuySellButtonActive = useMemo(() => {
-    if (!orderInfo || !address || !isEnabledChain(chainId) || selectedPerpetual?.state !== 'NORMAL') {
+    if (
+      !orderInfo ||
+      !address ||
+      !isEnabledChain(chainId) ||
+      selectedPerpetual?.state !== 'NORMAL' ||
+      poolFee === undefined
+    ) {
       return false;
     }
     if (!orderInfo.size || !perpetualStaticInfo?.lotSizeBC || orderInfo.size < perpetualStaticInfo.lotSizeBC) {
@@ -274,7 +268,7 @@ export const ActionBlock = memo(() => {
       return false;
     }
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
-  }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC, selectedPerpetual?.state]);
+  }, [orderInfo, poolFee, address, chainId, perpetualStaticInfo?.lotSizeBC, selectedPerpetual?.state]);
 
   const validityCheckButtonType = useMemo(() => {
     if (isPredictionMarket && isMarketClosed) {
@@ -472,6 +466,7 @@ export const ActionBlock = memo(() => {
             proxyAddr,
             minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
             decimals: poolTokenDecimals,
+            registeredToken: flatToken?.registeredToken,
           })
             .then(() => {
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
@@ -559,15 +554,6 @@ export const ActionBlock = memo(() => {
     ) {
       return ValidityCheckE.Empty;
     }
-    let isTooLarge;
-    if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxBuy);
-    } else {
-      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxSell);
-    }
-    if (isTooLarge) {
-      return ValidityCheckE.OrderTooLarge;
-    }
     const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < perpetualStaticInfo.lotSizeBC;
     if (isOrderTooSmall) {
       return ValidityCheckE.OrderTooSmall;
@@ -589,6 +575,15 @@ export const ActionBlock = memo(() => {
     if (isMarketClosed && !isPredictionMarket) {
       return ValidityCheckE.Closed;
     }
+    // slippage check 1 (sign of perp price)
+    let isInvalidPrice = false;
+    if (orderInfo.orderType === OrderTypeE.Market && perpetualPrice !== undefined) {
+      isInvalidPrice = perpetualPrice < 0;
+    }
+    if (isInvalidPrice) {
+      return ValidityCheckE.SlippageTooLarge;
+    }
+    // slippage check 2 (max/min price)
     if (
       orderInfo.orderType === OrderTypeE.Market &&
       orderInfo.maxMinEntryPrice !== null &&
@@ -674,7 +669,7 @@ export const ActionBlock = memo(() => {
   const liqPrice =
     newPositionRisk?.liquidationPrice?.[0] && isPredictionMarket
       ? calculateProbability(newPositionRisk.liquidationPrice[0], orderInfo?.orderBlock === OrderBlockE.Short)
-      : newPositionRisk?.liquidationPrice?.[0] ?? 0;
+      : (newPositionRisk?.liquidationPrice?.[0] ?? 0);
 
   const isValiditySuccess = [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType);
 

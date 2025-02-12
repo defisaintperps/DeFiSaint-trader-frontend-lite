@@ -129,6 +129,10 @@
             "title": "交易已执行",
             "body": "币对"
           },
+          "trade-failed": {
+            "title": "订单失败",
+            "body": "检查您的滑点设置和钱包余额，然后重试。"
+          },
           "order-failed": {
             "title": "订单失败",
             "body1": "币对",
@@ -249,7 +253,9 @@
           "body1": "设置订单仓位",
           "body2": "根据您的持仓情况和交易所的状态，您的最大仓位为：",
           "body3": "永续的最小仓位为：",
-          "body4": "最小数量为"
+          "body4": "最小数量为",
+          "body5": "最大订单量："
+
         },
         "limit-price": {
           "title": "限价",
@@ -335,7 +341,7 @@
           "order-too-small": "订单过小，导致订单失败",
           "position-too-small": "仓位过小，导致订单失败 (min.: {{minAmount}})",
           "below-min-position": "警告：订单小于仓位",
-          "slippage-too-large": "警告：滑点大于您的滑点设置允许的范围。订单可能会失败。",
+          "slippage-too-large": "警告：滑点超过2%。",
           "insufficient-balance": "钱包余额不足，导致订单失败",
           "undefined": "止盈与杠杆不兼容，订单未执行",
           "verify-tp-sl-orders": "验证您现有的止盈/止损订单 - 您正在修改已有止盈/止损订单的仓位",
@@ -786,11 +792,6 @@
         "1": "点击",
         "2": "f了解更多信息。"
       }
-    },
-    "li-fi-widget": {
-      "button-title": "LI.FI widget",
-      "header-to": "跨链转入",
-      "header-from": "跨链转出"
     },
     "owlto-bridge": "OWLTO bridge",
     "pagination": {

@@ -129,6 +129,10 @@
             "title": "Échange exécuté",
             "body": "Symbole"
           },
+          "trade-failed": {
+            "title": "Échec de l'ordre",
+            "body": "Vérifiez vos paramètres de glissement et votre solde de portefeuille et réessayez."
+          },
           "order-failed": {
             "title": "Échec de l'ordre",
             "body1": "Symbole",
@@ -249,7 +253,9 @@
           "body1": "Définit la taille de votre ordre.",
           "body2": "Votre taille d'ordre maximale, en fonction de vos positions ouvertes et de l'état de la platforme d'échange, est:",
           "body3": "La taille de position minimale pour ce perpétuel est:",
-          "body4": "Étape de quantité:"
+          "body4": "Étape de quantité:",
+          "body5": "Taille maximale:"
+
         },
         "limit-price": {
           "title": "Prix limite",
@@ -335,7 +341,7 @@
           "order-too-small": "L'ordre échouera: la taille de l'ordre est trop petite",
           "position-too-small": "L'ordre échouera: la position résultante est trop petite (min.: {{minAmount}})",
           "below-min-position": "Attention: taille de l'ordre en dessous de la taille de position minimale",
-          "slippage-too-large": "Attention: le glissement est supérieur à ce que vos paramètres de glissement autorisent. L'ordre échouera probablement.",
+          "slippage-too-large": "Attention: le glissement est supérieur à 2%.",
           "insufficient-balance": "L'ordre échouera: solde de portefeuille insuffisant",
           "undefined": "Ordre indéfini: la prise de profit est incompatible avec l'effet de levier",
           "verify-tp-sl-orders": "Vérifiez vos TP/SL existantes - vous modifiez une position qui contient déjà des TP/SL",
@@ -786,11 +792,6 @@
         "1": "Visitez",
         "2": "pour plus d'informations."
       }
-    },
-    "li-fi-widget": {
-      "button-title": "LI.FI widget",
-      "header-to": "Bridge in",
-      "header-from": "Bridge out"
     },
     "owlto-bridge": "OWLTO bridge",
     "pagination": {

@@ -129,6 +129,10 @@
             "title": "Orden Ejecutada",
             "body": "Símbolo"
           },
+          "trade-failed": {
+            "title": "Orden Fallida",
+            "body": "Comprueba tus ajustes de deslizamiento y saldo de tu cartera y vuelve a intentarlo."
+          },
           "order-failed": {
             "title": "Orden Fallida",
             "body1": "Símbolo",
@@ -249,7 +253,9 @@
           "body1": "Determina el tamaño de tu orden.",
           "body2": "Tu tamaño maximo de una orden, dadas tus posiciones abiertas y el estado del comercio, es:",
           "body3": "El tamaño minimo de una posición en este perpetuo es:",
-          "body4": "El tamaño de los incrementos es:"
+          "body4": "El tamaño de los incrementos es:",
+          "body5": "Tamaño máximo:"
+
         },
         "limit-price": {
           "title": "Precio Límite",
@@ -335,7 +341,7 @@
           "order-too-small": "El tamaño de la orden es muy pequeno",
           "position-too-small": "El tamaño de la posicion es muy pequeno (min.: {{minAmount}})",
           "below-min-position": "Cuidado: El tamaño de la orden esta debajo del tamaño minimo para una posición",
-          "slippage-too-large": "Cuidado: el deslizamiento es mayor de lo que permite su configuración de deslizamiento. Es probable que la orden falle",
+          "slippage-too-large": "Cuidado: el deslizamiento es mayor de 2%.",
           "insufficient-balance": "Insuficiente saldo en tu cartera",
           "undefined": "El valor de tomar ganancias es incompatible con el apalancamiento",
           "verify-tp-sl-orders": "Verifique sus TP/SL existentes: está modificando una posición que tiene TP/SL",
@@ -786,11 +792,6 @@
         "1": "Visita",
         "2": "para más información."
       }
-    },
-    "li-fi-widget": {
-      "button-title": "LI.FI widget",
-      "header-to": "Bridge in",
-      "header-from": "Bridge out"
     },
     "owlto-bridge": "OWLTO bridge",
     "pagination": {

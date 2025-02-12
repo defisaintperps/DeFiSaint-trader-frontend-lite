@@ -129,6 +129,10 @@
             "title": "Trade executed",
             "body": "Symbol"
           },
+          "trade-failed": {
+            "title": "Trade failed",
+            "body": "Check your wallet balance and try again."
+          },
           "order-failed": {
             "title": "Order failed",
             "body1": "Symbol",
@@ -247,9 +251,10 @@
         "order-size": {
           "title": "Order size",
           "body1": "Sets the size of your order.",
-          "body2": "Your maximal order size, based on your open positions and the state of the exchange, is:",
+          "body2": "Your maximal order size, based on your open positions and the state of the exchange, independent of your funds and selected leverage, is:",
           "body3": "The minimal position size for this perpetual is:",
-          "body4": "The step size is:"
+          "body4": "The step size is:",
+          "body5": "Max order size:"
         },
         "limit-price": {
           "title": "Limit price",
@@ -335,7 +340,7 @@
           "order-too-small": "Order will fail: order size is too small",
           "position-too-small": "Order will fail: resulting position too small (min.: {{minAmount}})",
           "below-min-position": "Warning: order size below minimal position size",
-          "slippage-too-large": "Warning: slippage is larger than what your slippage settings allow. Order will likely fail.",
+          "slippage-too-large": "Warning: slippage is larger than 2%.",
           "insufficient-balance": "Order will fail: insufficient wallet balance",
           "undefined": "Order undefined: take profit is incompatible with leverage",
           "verify-tp-sl-orders": "Verify your existing TP/SL orders - you modify a position that has TP/SL orders",
@@ -786,11 +791,6 @@
         "1": "Visit",
         "2": "for more information."
       }
-    },
-    "li-fi-widget": {
-      "button-title": "LI.FI widget",
-      "header-to": "Bridge in",
-      "header-from": "Bridge out"
     },
     "owlto-bridge": "OWLTO bridge",
     "pagination": {

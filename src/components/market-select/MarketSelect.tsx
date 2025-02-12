@@ -1,7 +1,7 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
@@ -34,6 +34,8 @@ import { OrderBlockE } from 'types/enums';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
+import { getEnabledChainId } from 'utils/getEnabledChainId';
+import { switchChain } from 'utils/switchChain';
 
 import styles from './MarketSelect.module.scss';
 
@@ -43,7 +45,7 @@ export const MarketSelect = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { chainId } = useAccount();
+  const { isConnected, chainId } = useAccount();
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
@@ -52,78 +54,102 @@ export const MarketSelect = memo(() => {
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [perpetualStatistics, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
-
+  const [isChainSwitching, setIsChainSwitching] = useState(false);
+  const [isUrlTriggered, setIsUrlTriggered] = useState(false);
   const urlChangesAppliedRef = useRef(false);
+  const poolsLoadedRef = useRef(false);
+  const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
 
   const markets = useMarkets();
 
   useEffect(() => {
     if (!location.hash) {
       urlChangesAppliedRef.current = false;
+      setIsUrlTriggered(false);
+      setIsChainSwitching(false);
+      poolsLoadedRef.current = false;
     }
   }, [location.hash]);
 
   useEffect(() => {
-    if (urlChangesAppliedRef.current || !pools.length) {
+    if (pools.length > 0) {
+      poolsLoadedRef.current = true;
+    }
+  }, [pools]);
+
+  useEffect(() => {
+    if (!chainIdFromUrl || isUrlTriggered || !isConnected) {
+      return;
+    }
+
+    if (chainId !== chainIdFromUrl) {
+      setIsChainSwitching(true);
+      urlChangesAppliedRef.current = false;
+      poolsLoadedRef.current = false;
+
+      switchChain(chainIdFromUrl)
+        .then(() => {
+          setIsUrlTriggered(true);
+          setTimeout(() => {
+            setIsChainSwitching(false);
+          }, 1000);
+        })
+        .catch((error) => {
+          console.error('Error switching chains:', error);
+          setIsChainSwitching(false);
+        });
+    } else {
+      setIsUrlTriggered(true);
+    }
+  }, [chainIdFromUrl, chainId, isConnected, isUrlTriggered]);
+
+  useEffect(() => {
+    if (isChainSwitching || urlChangesAppliedRef.current || !pools.length || !poolsLoadedRef.current) {
       return;
     }
 
     if (location.hash) {
-      let symbolHash = location.hash.slice(1);
-      // Handle `=` in the URL, which magically appears there...
-      if (symbolHash.indexOf('=')) {
-        symbolHash = symbolHash.replaceAll('=', '');
-      }
-      const result = parseSymbol(symbolHash);
+      const symbolHash = location.hash.slice(1);
+      const [marketPart] = symbolHash.split('__');
+      const result = parseSymbol(marketPart);
 
       if (result) {
-        setSelectedPool(result.poolSymbol);
-
         const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
-        if (!foundPool) {
-          if (pools.length > 0) {
-            urlChangesAppliedRef.current = true;
-          }
-          return;
-        }
-
-        const foundPerpetual = foundPool.perpetuals.find(
-          ({ baseCurrency, quoteCurrency }) =>
-            baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
-        );
-        if (foundPerpetual) {
-          setSelectedPerpetual(foundPerpetual.id);
-        }
-        urlChangesAppliedRef.current = true;
-        return;
-      }
-    }
-
-    let chainIdForMarket: number;
-    if (!isEnabledChain(chainId)) {
-      chainIdForMarket = config.enabledChains[0];
-    } else {
-      chainIdForMarket = chainId;
-    }
-
-    if (config.defaultMarket[chainIdForMarket] && config.defaultMarket[chainIdForMarket] !== '') {
-      const result = parseSymbol(config.defaultMarket[chainIdForMarket]);
-      if (result) {
-        const foundPool = pools.find(({ poolSymbol: ps }) => ps === result.poolSymbol);
         if (foundPool) {
           setSelectedPool(result.poolSymbol);
-
           const foundPerpetual = foundPool.perpetuals.find(
             ({ baseCurrency, quoteCurrency }) =>
               baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
           );
-
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
+            urlChangesAppliedRef.current = true;
+            return;
+          }
+        }
+      }
+    }
 
-            navigate(
-              `${location.pathname}${location.search}#${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`
+    if (!location.hash) {
+      const chainIdForMarket = isEnabledChain(chainId) ? chainId : config.enabledChains[0];
+      const defaultMarket = config.defaultMarket[chainIdForMarket];
+
+      if (defaultMarket) {
+        const result = parseSymbol(defaultMarket);
+        if (result) {
+          const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
+          if (foundPool) {
+            setSelectedPool(result.poolSymbol);
+            const foundPerpetual = foundPool.perpetuals.find(
+              ({ baseCurrency, quoteCurrency }) =>
+                baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
             );
+            if (foundPerpetual) {
+              setSelectedPerpetual(foundPerpetual.id);
+              const hash = `${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`;
+              const chainIdForThisURL = getEnabledChainId(chainId, location.hash);
+              navigate(`${location.pathname}${location.search}#${hash}__chainId=${chainIdForThisURL}`);
+            }
           }
         }
       }
@@ -131,14 +157,15 @@ export const MarketSelect = memo(() => {
 
     urlChangesAppliedRef.current = true;
   }, [
+    chainId,
+    pools,
     location.hash,
+    isChainSwitching,
     location.pathname,
     location.search,
     navigate,
-    pools,
-    setSelectedPool,
     setSelectedPerpetual,
-    chainId,
+    setSelectedPool,
   ]);
 
   useEffect(() => {

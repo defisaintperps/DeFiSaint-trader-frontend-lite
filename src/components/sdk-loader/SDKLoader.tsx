@@ -1,14 +1,17 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
-import { type Client } from 'viem';
+import { Chain, Transport, type Client } from 'viem';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { JsonRpcProvider, FallbackProvider } from 'ethers';
 
 import { config } from 'config';
 import { collateralToSettleConversionAtom, poolsAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
+import { useLocation } from 'react-router-dom';
+import { clientToProvider } from 'hooks/useEthersProvider';
 
 export const SDKLoader = memo(() => {
   const { isConnected, chainId } = useAccount();
@@ -27,6 +30,9 @@ export const SDKLoader = memo(() => {
   const setCollToSettleConversion = useSetAtom(collateralToSettleConversionAtom);
 
   const loadingAPIRef = useRef(false);
+  const location = useLocation();
+
+  const chainIdFromUrl = parseInt(location.hash.split('__')[1]?.split('=')[1], 10);
 
   useEffect(() => {
     if (walletClient && isSuccess && !activatedOneClickTrading) {
@@ -36,7 +42,7 @@ export const SDKLoader = memo(() => {
   }, [isSuccess, walletClient, activatedOneClickTrading, setTradingClient]);
 
   const loadSDK = useCallback(
-    async (_publicClient: Client, _chainId: number) => {
+    async (_publicClient: Client<Transport, Chain>, _chainId: number) => {
       setTraderAPI(null);
       setSDKConnected(false);
 
@@ -53,13 +59,19 @@ export const SDKLoader = memo(() => {
         }
       }
 
+      let provider: JsonRpcProvider | FallbackProvider;
       if (config.httpRPC[_chainId] && config.httpRPC[_chainId] !== '') {
         configSDK.nodeURL = config.httpRPC[_chainId];
+        provider = new JsonRpcProvider(configSDK.nodeURL);
+        // console.log('config rpc');
+      } else {
+        provider = clientToProvider(_publicClient);
+        // console.log('user rpc');
       }
 
       const newTraderAPI = new TraderInterface(configSDK);
       return newTraderAPI
-        .createProxyInstance()
+        .createProxyInstance(provider)
         .then(() => {
           setSDKConnected(true);
           setTraderAPI(newTraderAPI);
@@ -88,10 +100,12 @@ export const SDKLoader = memo(() => {
     loadingAPIRef.current = true;
 
     let chainIdForSDK: number;
-    if (!isEnabledChain(chainId)) {
-      chainIdForSDK = config.enabledChains[0];
-    } else {
+    if (!isNaN(chainIdFromUrl) && isEnabledChain(chainIdFromUrl) && chainId === undefined) {
+      chainIdForSDK = chainIdFromUrl;
+    } else if (isEnabledChain(chainId)) {
       chainIdForSDK = chainId;
+    } else {
+      chainIdForSDK = config.enabledChains[0];
     }
 
     loadSDK(publicClient, chainIdForSDK)
@@ -105,7 +119,7 @@ export const SDKLoader = memo(() => {
     return () => {
       loadingAPIRef.current = false;
     };
-  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
+  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy, chainIdFromUrl]);
 
   useEffect(() => {
     if (isConnected && traderAPI && pools.length > 0) {

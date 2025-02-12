@@ -29,6 +29,7 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
   triggerBalancesUpdateAtom,
+  flatTokenAtom,
 } from 'store/pools.store';
 import type { MarginAccountI, PoolWithIdI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
@@ -54,6 +55,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const traderAPI = useAtomValue(traderAPIAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setTriggerBalancesUpdate = useSetAtom(triggerBalancesUpdateAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
@@ -332,7 +334,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const calculatedMargin = useMemo(() => {
     let margin;
-    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
+    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) : 1;
     if (selectedPosition) {
       switch (modifyType) {
         case ModifyTypeE.Add:
@@ -419,7 +421,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     ) {
       return;
     }
-    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
+    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) : 1;
 
     if (modifyType === ModifyTypeE.Add) {
       requestSentRef.current = true;
@@ -432,6 +434,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
         proxyAddr,
         minAmount: +addCollateral / px,
         decimals: settleTokenDecimals,
+        registeredToken: flatToken?.registeredToken,
       })
         .then(() => {
           deposit(tradingClient, traderAPI, {
