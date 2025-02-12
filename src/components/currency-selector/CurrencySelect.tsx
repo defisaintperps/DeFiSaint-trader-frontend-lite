@@ -41,11 +41,20 @@ export const CurrencySelect = () => {
     if (pools.length) {
       const activePools = pools.filter((pool) => pool.isRunning);
       activePools.forEach((pool) => {
-        if (!flatToken || pool.poolId !== flatToken.poolId || !flatToken?.registeredToken) {
+        if (!flatToken || pool.poolId !== flatToken.poolId) {
           currencies.push({
             id: `${pool.poolId}-${pool.settleTokenAddr}`,
             name: pool.poolSymbol,
             settleToken: pool.settleSymbol,
+            isGasToken: false,
+            isActiveToken: true,
+            contractAddress: pool.settleTokenAddr as Address,
+          });
+        } else if (flatToken && pool.poolId === flatToken.poolId && flatToken.registeredSymbol) {
+          currencies.push({
+            id: `${pool.poolId}-${pool.settleTokenAddr}`,
+            name: pool.poolSymbol,
+            settleToken: flatToken.registeredSymbol,
             isGasToken: false,
             isActiveToken: true,
             contractAddress: pool.settleTokenAddr as Address,
@@ -66,7 +75,7 @@ export const CurrencySelect = () => {
       );
     }
 
-    if (flatToken?.supportedTokens) {
+    if (flatToken?.supportedTokens && !flatToken.registeredToken) {
       flatToken.supportedTokens.forEach((token) => {
         currencies.push({
           id: `${token.address}`,
