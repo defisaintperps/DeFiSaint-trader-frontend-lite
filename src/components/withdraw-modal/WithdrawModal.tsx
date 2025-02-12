@@ -26,6 +26,7 @@ import { useTransferGasToken } from './hooks/useTransferGasToken';
 import { useTransferTokens } from './hooks/useTransferTokens';
 
 import styles from './WithdrawModal.module.scss';
+import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
 
 export const WithdrawModal = () => {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ export const WithdrawModal = () => {
   }, [isPending]);
 
   const { data: selectedTokenBalanceData } = useReadContracts({
-    allowFailure: false,
+    allowFailure: true,
     contracts: [
       {
         address: selectedCurrency?.contractAddress,
@@ -87,6 +88,12 @@ export const WithdrawModal = () => {
         address: selectedCurrency?.contractAddress,
         abi: erc20Abi,
         functionName: 'decimals',
+      },
+      {
+        address: selectedCurrency?.contractAddress,
+        abi: flatTokenAbi,
+        functionName: 'effectiveBalanceOf',
+        args: [address as Address],
       },
     ],
     query: { enabled: address && !!selectedCurrency && isConnected },
@@ -111,6 +118,11 @@ export const WithdrawModal = () => {
 
   const handleOnClose = () => setWithdrawModalOpen(false);
 
+  const tokenBalance =
+    selectedTokenBalanceData?.[2].status === 'success'
+      ? selectedTokenBalanceData[2].result
+      : selectedTokenBalanceData?.[0].result;
+
   const maxTokenValue = useMemo(() => {
     if (!selectedCurrency) {
       return undefined;
@@ -121,19 +133,22 @@ export const WithdrawModal = () => {
         ? +formatUnits(gasTokenBalance.value - gasFee, gasTokenBalance.decimals)
         : 0;
     }
-    return selectedTokenBalanceData ? +formatUnits(selectedTokenBalanceData[0], selectedTokenBalanceData[1]) : 0;
-  }, [selectedCurrency, selectedTokenBalanceData, gasTokenBalance, calculateGasForFee]);
+    if (tokenBalance && selectedTokenBalanceData?.[1].status === 'success') {
+      return +formatUnits(tokenBalance, selectedTokenBalanceData[1].result);
+    }
+    return 0;
+  }, [selectedCurrency, tokenBalance, selectedTokenBalanceData, gasTokenBalance, calculateGasForFee]);
 
   const handleWithdraw = useCallback(() => {
     if (selectedCurrency && walletClient && isAddressValid && amountValue) {
-      if (selectedCurrency.contractAddress && selectedTokenBalanceData) {
+      if (selectedCurrency.contractAddress && selectedTokenBalanceData?.[1].status === 'success') {
         setLoading(true);
         writeContract(wagmiConfig, {
           account: walletClient.account,
           abi: ERC20_ABI,
           address: selectedCurrency.contractAddress,
           functionName: 'transfer',
-          args: [addressValue, parseUnits(amountValue, selectedTokenBalanceData[1])],
+          args: [addressValue, parseUnits(amountValue, selectedTokenBalanceData[1].result)],
         })
           .then((tx) => {
             setTxHashForTokensTransfer(tx);
