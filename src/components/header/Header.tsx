@@ -1,5 +1,5 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -45,6 +45,7 @@ import {
   traderAPIAtom,
   triggerBalancesUpdateAtom,
   triggerPositionsUpdateAtom,
+  flatTokenAtom,
 } from 'store/pools.store';
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
@@ -82,7 +83,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const chainId = useChainId();
   const { gasTokenBalance, isGasTokenFetchError } = useUserWallet();
 
-  const setPools = useSetAtom(poolsAtom);
+  const [liqPools, setPools] = useAtom(poolsAtom);
   const setCollaterals = useSetAtom(collateralsAtom);
   const setPerpetuals = useSetAtom(perpetualsAtom);
   const setAllPerpetuals = useSetAtom(allPerpetualsAtom);
@@ -98,6 +99,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -132,8 +134,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         })
         .filter(({ poolId }) => !isDisabledPool(chainId, poolId));
       setPools(pools);
-
-      setCollaterals(pools.map((pool) => pool.settleSymbol));
 
       const perpetuals: PerpetualDataI[] = [];
 
@@ -176,8 +176,20 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },
-    [chainId, setPools, setCollaterals, setPerpetuals, setAllPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
+    [chainId, setPools, setPerpetuals, setAllPerpetuals, setOracleFactoryAddr, setProxyAddr, traderAPI]
   );
+
+  useEffect(() => {
+    if (liqPools && flatToken) {
+      setCollaterals(
+        liqPools.map((pool) =>
+          flatToken.poolId === pool.poolId
+            ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
+            : pool.settleSymbol
+        )
+      );
+    }
+  }, [liqPools, flatToken, setCollaterals]);
 
   useEffect(() => {
     if (positionsRequestRef.current) {
