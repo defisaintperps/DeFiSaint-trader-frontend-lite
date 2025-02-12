@@ -54,7 +54,7 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           </div>
           <div className={styles.dataHolder}>
             <Typography variant="cellSmall" className={styles.pair}>
-              {tradeHistory.symbol}
+              {`${perpetual?.baseCurrency}/${perpetual?.quoteCurrency}/${userSymbol}`}
             </Typography>
             <Typography variant="cellSmall" className={styles.date}>
               {time}
@@ -88,8 +88,8 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           <Typography variant="cellSmall" className={styles.fee}>
             {perpetual
               ? formatToCurrency(
-                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
-                  tradeHistory.settleSymbol,
+                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1) * userPrice,
+                  userSymbol,
                   true
                 )
               : ''}
