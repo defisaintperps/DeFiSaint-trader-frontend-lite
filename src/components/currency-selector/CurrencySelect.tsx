@@ -7,7 +7,7 @@ import { DropDownMenuItem } from 'components/dropdown-select/components/DropDown
 import { DropDownSelect } from 'components/dropdown-select/DropDownSelect';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { modalSelectedCurrencyAtom } from 'store/global-modals.store';
-import { gasTokenSymbolAtom, poolsAtom } from 'store/pools.store';
+import { flatTokenAtom, gasTokenSymbolAtom, poolsAtom } from 'store/pools.store';
 
 import { CurrencyItemI } from './types';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -21,6 +21,7 @@ export const CurrencySelect = () => {
   const [selectedCurrency, setSelectedCurrency] = useAtom(modalSelectedCurrencyAtom);
   const pools = useAtomValue(poolsAtom);
   const gasTokenSymbol = useAtomValue(gasTokenSymbolAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -39,16 +40,18 @@ export const CurrencySelect = () => {
 
     if (pools.length) {
       const activePools = pools.filter((pool) => pool.isRunning);
-      activePools.forEach((pool) =>
-        currencies.push({
-          id: `${pool.poolId}-${pool.settleTokenAddr}`,
-          name: pool.poolSymbol,
-          settleToken: pool.settleSymbol,
-          isGasToken: false,
-          isActiveToken: true,
-          contractAddress: pool.settleTokenAddr as Address,
-        })
-      );
+      activePools.forEach((pool) => {
+        if (!flatToken || pool.poolId !== flatToken.poolId || !flatToken?.registeredToken) {
+          currencies.push({
+            id: `${pool.poolId}-${pool.settleTokenAddr}`,
+            name: pool.poolSymbol,
+            settleToken: pool.settleSymbol,
+            isGasToken: false,
+            isActiveToken: true,
+            contractAddress: pool.settleTokenAddr as Address,
+          });
+        }
+      });
 
       const inactivePools = pools.filter((pool) => !pool.isRunning);
       inactivePools.forEach((pool) =>
@@ -63,8 +66,21 @@ export const CurrencySelect = () => {
       );
     }
 
+    if (flatToken?.supportedTokens) {
+      flatToken.supportedTokens.forEach((token) => {
+        currencies.push({
+          id: `${token.address}`,
+          name: token.symbol,
+          settleToken: token.symbol,
+          isGasToken: false,
+          isActiveToken: true,
+          contractAddress: token.address,
+        });
+      });
+    }
+
     return currencies;
-  }, [gasTokenSymbol, pools]);
+  }, [flatToken, gasTokenSymbol, pools]);
 
   useEffect(() => {
     if (currencyItems.length > 1 && hasEnoughGasForFee(MethodE.Interact, 1n)) {
