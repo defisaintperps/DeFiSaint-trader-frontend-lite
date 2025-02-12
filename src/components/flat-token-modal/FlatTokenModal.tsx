@@ -121,23 +121,21 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (!isBusyRef.current) {
+    if (!isBusyRef.current && pools && proxyAddr && publicClient && address) {
+      isBusyRef.current = true;
       setFlatToken(undefined);
-      if (pools && proxyAddr && publicClient && address) {
-        isBusyRef.current = true;
-        pools.forEach((pool) => {
-          fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address)
-            .then((info) => {
-              if (info.controller === proxyAddr) {
-                setFlatToken({ ...info, poolId: pool.poolId });
-              }
-            })
-            .catch()
-            .finally(() => {
-              isBusyRef.current = false;
-            });
-        });
-      }
+      pools.forEach((pool) => {
+        fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address)
+          .then((info) => {
+            if (info.controller === proxyAddr) {
+              setFlatToken({ ...info, poolId: pool.poolId });
+            }
+          })
+          .catch()
+          .finally(() => {
+            isBusyRef.current = false;
+          });
+      });
     }
   }, [address, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
 
