@@ -84,8 +84,8 @@ export const Add = memo(() => {
   const triggerFocusStateRef = useRef(true);
 
   const [userPrice, userSymbol] =
-    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
       : [1, selectedPool?.poolSymbol ?? ''];
 
   const handleInputCapture = useCallback((orderSizeValue: string) => {
@@ -382,7 +382,7 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.settleSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: userSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
           {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
@@ -392,8 +392,8 @@ export const Add = memo(() => {
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
             <InfoLabelBlock
-              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.settleSymbol })}
-              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.settleSymbol })}
+              title={t('pages.vault.add.amount.title', { poolSymbol: userSymbol })}
+              content={t('pages.vault.add.amount.info1', { poolSymbol: userSymbol })}
             />
           </div>
           <ResponsiveInput
@@ -426,7 +426,9 @@ export const Add = memo(() => {
           <SwitchIcon />
         </div>
         <div className={styles.inputLine}>
-          <div className={styles.labelHolder}>{t('pages.vault.add.receive', { poolSymbol: userSymbol })}</div>
+          <div className={styles.labelHolder}>
+            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
+          </div>
           <div className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"

@@ -16,7 +16,7 @@ import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { getTxnLink } from 'helpers/getTxnLink';
-import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
   triggerUserStatsUpdateAtom,
@@ -57,6 +57,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const userAmount = useAtomValue(userAmountAtom);
   const withdrawals = useAtomValue(withdrawalsAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const [hasOpenRequestOnChain, setWithrawalOnChain] = useAtom(withdrawalOnChainAtom);
@@ -66,6 +67,11 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [loading, setLoading] = useState(false);
 
   const requestSentRef = useRef(false);
+
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, selectedPool?.poolSymbol ?? ''];
 
   const { data: openRequests, refetch: refetchOnChainStatus } = useReadContract({
     address: liqProvTool?.getProxyAddress() as Address,
@@ -274,8 +280,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           <InfoLabelBlock
             title={
               <>
-                {!withdrawals.length && '2.'}{' '}
-                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.settleSymbol })}
+                {!withdrawals.length && '2.'} {t('pages.vault.withdraw.action.title', { poolSymbol: userSymbol })}
                 {chain?.id === 42161 && selectedPool?.poolSymbol === 'STUSD' && (
                   <>
                     {' '}
@@ -297,11 +302,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
                 )}
               </>
             }
-            content={
-              <Typography>
-                {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
-            }
+            content={<Typography>{t('pages.vault.withdraw.action.info1', { poolSymbol: userSymbol })}</Typography>}
           />
         </Box>
         <Box className={styles.summaryBlock}>
@@ -318,8 +319,8 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
                 {predictedAmount === undefined || !selectedPool
                   ? '-'
                   : formatToCurrency(
-                      predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                      selectedPool.settleSymbol
+                      predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                      userSymbol
                     )}
               </strong>
             </Typography>
