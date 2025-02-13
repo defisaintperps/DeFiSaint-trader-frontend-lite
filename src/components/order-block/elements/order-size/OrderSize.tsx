@@ -283,8 +283,8 @@ export const OrderSize = memo(() => {
   }, [selectedPool, selectedPerpetual]);
 
   const [userPrice, userSymbol] =
-    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
       : [1, selectedPool?.poolSymbol];
 
   return (
