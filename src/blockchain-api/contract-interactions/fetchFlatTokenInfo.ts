@@ -70,14 +70,12 @@ export async function fetchFlatTokenInfo(
       }
     });
     const [registeredSymbol, registeredDecimals, registeredBalance, effectiveBalance] = resp.slice(-4);
-    if (
-      registeredBalance.status === 'success' &&
-      effectiveBalance.status === 'success' &&
-      BigInt(effectiveBalance.result) > 0n
-    ) {
+    if (registeredBalance.status === 'success' && effectiveBalance.status === 'success') {
       userConversion =
-        decNToFloat(registeredBalance.result, Number(registeredDecimals.result)) /
-        decNToFloat(effectiveBalance.result, 6);
+        BigInt(effectiveBalance.result) > 0n
+          ? decNToFloat(registeredBalance.result, Number(registeredDecimals.result)) /
+            decNToFloat(effectiveBalance.result, 6)
+          : 1;
       userSymbol = registeredSymbol.result as string;
     }
   }

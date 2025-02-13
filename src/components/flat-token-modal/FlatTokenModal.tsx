@@ -38,6 +38,7 @@ export const FlatTokenModal = () => {
   const [txHash, setTxHash] = useState<Address | undefined>();
 
   const isBusyRef = useRef(false);
+  const flatTokenRef = useRef(flatToken);
 
   const handleOnClose = useCallback(() => {
     setFlatTokentModalOpen(false);
@@ -80,7 +81,7 @@ export const FlatTokenModal = () => {
     }
   };
 
-  const { isSuccess, isError } = useWaitForTransactionReceipt({
+  const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
     query: { enabled: !!txHash },
   });
@@ -121,7 +122,14 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (!isBusyRef.current && pools && proxyAddr && publicClient && address) {
+    if (
+      !isBusyRef.current &&
+      pools &&
+      proxyAddr &&
+      publicClient &&
+      address &&
+      (flatTokenRef.current === undefined || isFetched)
+    ) {
       isBusyRef.current = true;
       setFlatToken(undefined);
       pools.forEach((pool) => {
@@ -137,17 +145,15 @@ export const FlatTokenModal = () => {
           });
       });
     }
-  }, [address, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
+  }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
 
   useEffect(() => {
     setSelectedStable(undefined);
-    if (flatToken?.isFlatToken && !flatToken?.registeredToken) {
+    if (flatToken?.isFlatToken && !flatToken?.registeredToken && selectedPool?.poolId === flatToken.poolId) {
       setDepositModalOpen(false);
       setFlatTokentModalOpen(true);
     }
-  }, [flatToken, setDepositModalOpen, setFlatTokentModalOpen, setSelectedStable]);
-
-  const flatTokenRef = useRef(flatToken);
+  }, [flatToken, selectedPool, setDepositModalOpen, setFlatTokentModalOpen, setSelectedStable]);
 
   useEffect(() => {
     if (selectedPool && flatTokenRef.current) {
