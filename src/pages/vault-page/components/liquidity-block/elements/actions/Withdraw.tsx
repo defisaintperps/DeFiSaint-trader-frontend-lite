@@ -73,6 +73,8 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
       ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
       : [1, selectedPool?.poolSymbol ?? ''];
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   const { data: openRequests, refetch: refetchOnChainStatus } = useReadContract({
     address: liqProvTool?.getProxyAddress() as Address,
     abi: PROXY_ABI,
@@ -266,7 +268,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           {t('pages.vault.withdraw.info1')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.settleSymbol })}
+          {t('pages.vault.withdraw.info2', { poolSymbol: userSymbol, shareSymbol })}
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>

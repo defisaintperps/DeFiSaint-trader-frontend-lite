@@ -336,7 +336,7 @@ export const Add = memo(() => {
     } else if (validityCheckAddType === ValidityCheckAddE.AmountBelowMinimum) {
       return `${t(
         'pages.vault.add.validity-amount-below-min'
-      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.settleSymbol})`;
+      )} (${(selectedPool?.brokerCollateralLotSize ?? 1) * userPrice} ${userSymbol})`;
     } else if (validityCheckAddType === ValidityCheckAddE.NoAmount) {
       return `${t('pages.vault.add.validity-no-amount')}`;
     }
@@ -349,8 +349,9 @@ export const Add = memo(() => {
     isMultisigAddress,
     validityCheckAddType,
     selectedPool?.brokerCollateralLotSize,
-    selectedPool?.settleSymbol,
     approvalCompleted,
+    userPrice,
+    userSymbol,
   ]);
 
   useEffect(() => {
@@ -375,6 +376,8 @@ export const Add = memo(() => {
     }
   };
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   return (
     <div className={styles.root}>
       <div className={styles.infoBlock}>
@@ -382,10 +385,10 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: userSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: userSymbol, shareSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
+          {t('pages.vault.add.info2', { shareSymbol })}
         </Typography>
       </div>
       <div className={styles.contentBlock}>
@@ -426,9 +429,7 @@ export const Add = memo(() => {
           <SwitchIcon />
         </div>
         <div className={styles.inputLine}>
-          <div className={styles.labelHolder}>
-            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
-          </div>
+          <div className={styles.labelHolder}>{t('pages.vault.add.receive', { shareSymbol })}</div>
           <div className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"

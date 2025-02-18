@@ -66,6 +66,8 @@ export const Initiate = memo(() => {
       ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
       : selectedPool?.poolSymbol;
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   const handleInputCapture = useCallback((orderSizeValue: string) => {
     if (orderSizeValue) {
       setInitiateAmount(+orderSizeValue);
@@ -251,14 +253,14 @@ export const Initiate = memo(() => {
       const numberDigits = valueToFractionDigits(minAmount);
       return `${t('pages.vault.withdraw.initiate.validity-amount-below-min')} (${minAmount?.toFixed(
         numberDigits
-      )} d${selectedPool?.settleSymbol})`;
+      )} ${shareSymbol})`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.NoAmount) {
       return `${t('pages.vault.withdraw.initiate.validity-no-amount')}`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.AmountTooBig) {
       return `${t('pages.vault.withdraw.initiate.validity-amount-too-big')}`;
     }
     return t('pages.vault.withdraw.initiate.button');
-  }, [t, validityCheckInitiateType, minAmount, selectedPool?.settleSymbol]);
+  }, [t, validityCheckInitiateType, minAmount, shareSymbol]);
 
   return (
     <>
@@ -268,7 +270,7 @@ export const Initiate = memo(() => {
           content={
             <>
               <Typography>
-                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: selectedPool?.settleSymbol })}
+                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: userSymbol, shareSymbol })}
               </Typography>
               <Typography>{t('pages.vault.withdraw.initiate.info2', { poolSymbol: userSymbol })}</Typography>
             </>
@@ -280,7 +282,7 @@ export const Initiate = memo(() => {
         className={styles.initiateInputHolder}
         inputValue={inputValue}
         setInputValue={handleInputCapture}
-        currency={`d${selectedPool?.settleSymbol ?? '--'}`}
+        currency={`${shareSymbol ?? '--'}`}
         step="1"
         min={0}
         disabled={loading}
@@ -295,7 +297,7 @@ export const Initiate = memo(() => {
               }
             }}
           >
-            {formatToCurrency(userAmount, `d${selectedPool?.settleSymbol}`)}
+            {formatToCurrency(userAmount, shareSymbol)}
           </Link>
         </Typography>
       ) : null}

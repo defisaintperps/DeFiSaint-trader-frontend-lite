@@ -255,7 +255,6 @@
           "body3": "La taille de position minimale pour ce perpétuel est:",
           "body4": "Étape de quantité:",
           "body5": "Taille maximale:"
-
         },
         "limit-price": {
           "title": "Prix limite",
@@ -521,12 +520,12 @@
         "title": "Vos statistiques",
         "amount": {
           "title": "Montant",
-          "info": "Montant de d{{poolSymbol}} que vous possédez."
+          "info": "Montant de {{shareSymbol}} que vous possédez."
         },
         "earnings": {
           "title": "Gains estimés",
           "info1": "Les gains estimés sont une approximation de combien vous avez gagné.",
-          "info2": "Gains estimés = solde de d{{poolSymbol}} à la valeur marchande + total {{poolSymbol}} retiré - total {{poolSymbol}} déposé"
+          "info2": "Gains estimés = solde de {{shareSymbol}} à la valeur marchande + total {{poolSymbol}} retiré - total {{poolSymbol}} déposé"
         },
         "initiated": {
           "title": "Retrait initié?",
@@ -534,7 +533,7 @@
         },
         "withdrawal-amount": {
           "title": "Montant du retrait",
-          "info1": "Le montant de d{{poolSymbol}} que vous avez initié à retirer.",
+          "info1": "Le montant de {{shareSymbol}} que vous avez initié à retirer.",
           "info2": "Votre liquidité continue de participer au PnL et aux revenus des frais du pool jusqu'à ce que vous retiriez."
         },
         "date": {
@@ -564,18 +563,18 @@
       "global-stats": {
         "apy": "Trading APY",
         "tvl": "TVL",
-        "price": "Prix de d{{poolSymbol}}",
-        "supply": "Approvisionnement de d{{poolSymbol}}"
+        "price": "Prix de {{shareSymbol}}",
+        "supply": "Approvisionnement de {{shareSymbol}}"
       },
       "add": {
         "title": "Ajouter de la Liquidité",
-        "info1": "Ajoutez de la liquidité {{poolSymbol}} au pool et recevez d{{poolSymbol}}, un token ERC-20 qui représente votre propriété dans le pool de liquidité.",
-        "info2": "En tant que fournisseur de liquidité, vous gagnerez des frais de transaction et des paiements de taux de financement. Vous participerez également au PnL du pool. d{{poolSymbol}} accumule les frais, les paiements de taux de financement et le PnL en temps réel.",
+        "info1": "Ajoutez de la liquidité {{poolSymbol}} au pool et recevez {{shareSymbol}}, un token ERC-20 qui représente votre propriété dans le pool de liquidité.",
+        "info2": "En tant que fournisseur de liquidité, vous gagnerez des frais de transaction et des paiements de taux de financement. Vous participerez également au PnL du pool. {{shareSymbol}} accumule les frais, les paiements de taux de financement et le PnL en temps réel.",
         "amount": {
           "title": "Montant de {{poolSymbol}}",
           "info1": "Indiquez le montant de {{poolSymbol}} que vous souhaitez ajouter au pool."
         },
-        "receive": "Vous recevez d{{poolSymbol}}",
+        "receive": "Vous recevez {{shareSymbol}}",
         "button": "Ajouter",
         "approve-button": "Apprécier",
         "validity-empty": "-",
@@ -588,10 +587,10 @@
       "withdraw": {
         "title": "Retirer la Liquidité",
         "info1": "Pour retirer la liquidité, vous devez d'abord initier votre retrait. Gardez à l'esprit que cela prend 24 heures pour traiter votre demande et vous ne pouvez avoir qu'une demande de retrait à la fois.",
-        "info2": "Après 24 heures, un montant retirable de d{{poolSymbol}} peut être échangé contre {{poolSymbol}} au prix de d{{poolSymbol}}.",
+        "info2": "Après 24 heures, un montant retirable de {{shareSymbol}} peut être échangé contre {{poolSymbol}} au prix de {{shareSymbol}}.",
         "initiate": {
           "title": "1. Initier le retrait de {{poolSymbol}}",
-          "info1": "Indiquez le montant de d{{poolSymbol}} que vous souhaitez échanger contre {{poolSymbol}}.",
+          "info1": "Indiquez le montant de {{shareSymbol}} que vous souhaitez échanger contre {{poolSymbol}}.",
           "info2": "Après 24 heures, ce montant peut être converti en {{poolSymbol}} et peut être retiré du pool.",
           "button": "Initier le retrait",
           "validity-empty": "-",

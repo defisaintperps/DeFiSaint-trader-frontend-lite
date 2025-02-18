@@ -84,6 +84,8 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
     };
   }, [chainId, address, selectedPool?.poolSymbol, triggerUserStatsUpdate]);
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   return (
     <Box className={styles.root}>
       <Typography variant="h5" className={styles.heading}>
@@ -93,21 +95,12 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         <Box className={styles.statLabel}>
           <InfoLabelBlock
             title={t('pages.vault.personal-stats.amount.title')}
-            content={
-              <Typography>
-                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
-            }
+            content={<Typography>{t('pages.vault.personal-stats.amount.info', { shareSymbol })}</Typography>}
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {userAmount !== null
-            ? formatToCurrency(
-                userAmount,
-                `d${selectedPool?.settleSymbol}`,
-                true,
-                Math.min(valueToFractionDigits(userAmount), 5)
-              )
+            ? formatToCurrency(userAmount, shareSymbol, true, Math.min(valueToFractionDigits(userAmount), 5))
             : '--'}
         </Typography>
       </Box>
@@ -118,7 +111,9 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             content={
               <>
                 <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
-                <Typography>{t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol })}</Typography>
+                <Typography>
+                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol, shareSymbol })}
+                </Typography>
               </>
             }
           />
@@ -142,9 +137,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           <InfoLabelBlock
             title={t('pages.vault.personal-stats.initiated.title')}
             content={
-              <Typography>
-                {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
+              <Typography>{t('pages.vault.personal-stats.initiated.info1', { poolSymbol: userSymbol })}</Typography>
             }
           />
         </Box>
@@ -160,19 +153,17 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
               <>
                 <Typography>
                   {t('pages.vault.personal-stats.withdrawal-amount.info1', {
-                    poolSymbol: selectedPool?.settleSymbol,
+                    shareSymbol,
                   })}
                 </Typography>
-                <Typography>
-                  {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.settleSymbol })}
-                </Typography>
+                <Typography>{t('pages.vault.personal-stats.withdrawal-amount.info2')}</Typography>
               </>
             }
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {withdrawals && withdrawals.length > 0
-            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.settleSymbol}`)
+            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, shareSymbol)
             : 'N/A'}
         </Typography>
       </Box>

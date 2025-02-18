@@ -38,6 +38,11 @@ export const GlobalStats = () => {
 
   const weeklyApiRequestSentRef = useRef(false);
 
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, selectedPool?.poolSymbol ?? ''];
+
   useEffect(() => {
     if (!selectedPool?.poolSymbol) {
       setWeeklyAPI(undefined);
@@ -101,11 +106,9 @@ export const GlobalStats = () => {
     [weeklyAPI, t]
   );
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   const items: StatDataI[] = useMemo(() => {
-    const [userPrice, userSymbol] =
-      !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-        ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
-        : [1, selectedPool?.poolSymbol ?? ''];
     return [
       {
         id: 'tvl',
@@ -122,12 +125,12 @@ export const GlobalStats = () => {
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.price', { shareSymbol }),
         value:
           dCurrencyPrice != null && selectedPool
             ? formatToCurrency(
                 dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
-                selectedPool.settleSymbol,
+                userSymbol,
                 true
               )
             : '--',
@@ -139,12 +142,12 @@ export const GlobalStats = () => {
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.supply', { shareSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
     ];
-  }, [flatToken, selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]);
+  }, [userPrice, userSymbol, shareSymbol, selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]);
 
   if (isMobileScreen) {
     return (
