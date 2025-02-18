@@ -371,7 +371,7 @@ export const OrderSize = memo(() => {
           )}
           {selectedPool && selectedCurrency !== selectedPool.settleSymbol && (
             <DynamicLogo
-              logoName={settleSymbol.toLowerCase()}
+              logoName={(userSymbol ?? settleSymbol).toLowerCase()}
               width={24}
               height={24}
               className={styles.currencyIcon}

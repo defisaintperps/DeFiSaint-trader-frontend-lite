@@ -37,7 +37,7 @@ const MenuOption = ({ pool, userSymbol }: MenuOptionPropsI) => {
   return (
     <Box className={styles.optionHolder}>
       <Box className={styles.label}>
-        <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={16} height={16} />
+        <DynamicLogo logoName={userSymbol.toLowerCase()} width={16} height={16} />
         <span>{userSymbol}</span>
       </Box>
       <Box className={styles.value}>{pool.perpetuals.filter(({ state }) => state === 'NORMAL').length}</Box>
@@ -98,7 +98,7 @@ export const CollateralsSelect = memo(() => {
   return (
     <Box className={styles.holderRoot}>
       <Box className={styles.iconsWrapper}>
-        <DynamicLogo logoName={selectedPool?.settleSymbol.toLowerCase() ?? ''} width={52} height={52} />
+        <DynamicLogo logoName={userSymbol.toLowerCase() ?? ''} width={52} height={52} />
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
