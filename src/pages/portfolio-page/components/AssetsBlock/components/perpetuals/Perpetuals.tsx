@@ -7,7 +7,7 @@ import { unrealizedPnLListAtom } from 'pages/portfolio-page/store/fetchUnrealize
 import { formatCurrency } from 'utils/formatCurrency';
 
 import styles from './Perpetuals.module.scss';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom } from 'store/pools.store';
 
 export const Perpetuals = () => {
   const { t } = useTranslation();
@@ -15,6 +15,7 @@ export const Perpetuals = () => {
   const c2s = useAtomValue(collateralToSettleConversionAtom);
   const unrealizedPnLList = useAtomValue(unrealizedPnLListAtom);
   const realizedPnLList = useAtomValue(realizedPnLListAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   return (
     <>
@@ -22,13 +23,19 @@ export const Perpetuals = () => {
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.realized')}</div>
         <div className={styles.assetsList}>
           {realizedPnLList.length
-            ? realizedPnLList.map((token) => (
-                <AssetLine
-                  key={token.symbol}
-                  symbol={token.settleSymbol}
-                  value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1))}
-                />
-              ))
+            ? realizedPnLList.map((token) => {
+                const [userPrice, userSymbol] =
+                  !!flatToken && token.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+                    ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+                    : [1, token.settleSymbol];
+                return (
+                  <AssetLine
+                    key={token.symbol}
+                    symbol={userSymbol}
+                    value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1) * userPrice)}
+                  />
+                );
+              })
             : 'No data'}
         </div>
       </div>
@@ -36,13 +43,19 @@ export const Perpetuals = () => {
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.unrealized')}</div>
         <div className={styles.assetsList}>
           {unrealizedPnLList.length
-            ? unrealizedPnLList.map((token) => (
-                <AssetLine
-                  key={token.symbol}
-                  symbol={token.settleSymbol}
-                  value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1))}
-                />
-              ))
+            ? unrealizedPnLList.map((token) => {
+                const [userPrice, userSymbol] =
+                  !!flatToken && token.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+                    ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+                    : [1, token.settleSymbol];
+                return (
+                  <AssetLine
+                    key={token.symbol}
+                    symbol={userSymbol}
+                    value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1) * userPrice)}
+                  />
+                );
+              })
             : 'No data'}
         </div>
       </div>

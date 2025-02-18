@@ -13,7 +13,7 @@ import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { flatTokenAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
   triggerUserStatsUpdateAtom,
@@ -48,6 +48,7 @@ export const Initiate = memo(() => {
   const userAmount = useAtomValue(userAmountAtom);
   const withdrawals = useAtomValue(withdrawalsAtom);
   const dCurrencyPrice = useAtomValue(dCurrencyPriceAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
 
@@ -59,6 +60,13 @@ export const Initiate = memo(() => {
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
+
+  const userSymbol =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
+      : selectedPool?.poolSymbol;
+
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
 
   const handleInputCapture = useCallback((orderSizeValue: string) => {
     if (orderSizeValue) {
@@ -245,28 +253,26 @@ export const Initiate = memo(() => {
       const numberDigits = valueToFractionDigits(minAmount);
       return `${t('pages.vault.withdraw.initiate.validity-amount-below-min')} (${minAmount?.toFixed(
         numberDigits
-      )} d${selectedPool?.settleSymbol})`;
+      )} ${shareSymbol})`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.NoAmount) {
       return `${t('pages.vault.withdraw.initiate.validity-no-amount')}`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.AmountTooBig) {
       return `${t('pages.vault.withdraw.initiate.validity-amount-too-big')}`;
     }
     return t('pages.vault.withdraw.initiate.button');
-  }, [t, validityCheckInitiateType, minAmount, selectedPool?.settleSymbol]);
+  }, [t, validityCheckInitiateType, minAmount, shareSymbol]);
 
   return (
     <>
       <div className={styles.withdrawLabel}>
         <InfoLabelBlock
-          title={t('pages.vault.withdraw.initiate.title', { poolSymbol: selectedPool?.settleSymbol })}
+          title={t('pages.vault.withdraw.initiate.title', { poolSymbol: userSymbol })}
           content={
             <>
               <Typography>
-                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: selectedPool?.settleSymbol })}
+                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: userSymbol, shareSymbol })}
               </Typography>
-              <Typography>
-                {t('pages.vault.withdraw.initiate.info2', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
+              <Typography>{t('pages.vault.withdraw.initiate.info2', { poolSymbol: userSymbol })}</Typography>
             </>
           }
         />
@@ -276,7 +282,7 @@ export const Initiate = memo(() => {
         className={styles.initiateInputHolder}
         inputValue={inputValue}
         setInputValue={handleInputCapture}
-        currency={`d${selectedPool?.settleSymbol ?? '--'}`}
+        currency={`${shareSymbol ?? '--'}`}
         step="1"
         min={0}
         disabled={loading}
@@ -291,7 +297,7 @@ export const Initiate = memo(() => {
               }
             }}
           >
-            {formatToCurrency(userAmount, `d${selectedPool?.settleSymbol}`)}
+            {formatToCurrency(userAmount, shareSymbol)}
           </Link>
         </Typography>
       ) : null}

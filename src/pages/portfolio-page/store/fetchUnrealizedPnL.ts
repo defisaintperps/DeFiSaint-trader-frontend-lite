@@ -11,6 +11,7 @@ export interface UnrealizedPnLListAtomI {
   symbol: string;
   settleSymbol: string;
   value: number;
+  poolId: number;
 }
 
 export const leverageAtom = atom(0);
@@ -49,10 +50,13 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
     totalUnrealizedPnl += positionUnrealizedPnl;
     totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
     totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
-
     const unrealizedPnl = positionUnrealizedPnl / poolUsdPrice[poolSymbol].collateral;
     if (!unrealizedPnLReduced[settleSymbol]) {
-      unrealizedPnLReduced[settleSymbol] = { poolSymbol: poolSymbol, value: unrealizedPnl };
+      unrealizedPnLReduced[settleSymbol] = {
+        poolSymbol: poolSymbol,
+        value: unrealizedPnl,
+        poolId: traderAPI?.getPoolIdFromSymbol(position.symbol) ?? 1,
+      };
     } else {
       unrealizedPnLReduced[settleSymbol].value += unrealizedPnl;
     }
@@ -69,6 +73,7 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
       symbol: unrealizedPnLReduced[key].poolSymbol,
       settleSymbol: key,
       value: unrealizedPnLReduced[key].value,
+      poolId: unrealizedPnLReduced[key].poolId,
     }))
   );
 });

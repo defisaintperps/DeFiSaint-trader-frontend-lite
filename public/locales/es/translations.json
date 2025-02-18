@@ -255,7 +255,6 @@
           "body3": "El tamaño minimo de una posición en este perpetuo es:",
           "body4": "El tamaño de los incrementos es:",
           "body5": "Tamaño máximo:"
-
         },
         "limit-price": {
           "title": "Precio Límite",
@@ -521,12 +520,12 @@
         "title": "Tus Datos",
         "amount": {
           "title": "Cantidad",
-          "info": "Cantidad de d{{poolSymbol}} que te pertenece."
+          "info": "Cantidad de {{shareSymbol} que te pertenece."
         },
         "earnings": {
           "title": "Ganancias aproximadas",
           "info1": "Las ganancias aproximadas son una aproximacion de tus verdaderas ganancias.",
-          "info2": "Ganancias aproximadas = d{{poolSymbol}} al precio de mercado + {{poolSymbol}} retirado - total {{poolSymbol}} depositado"
+          "info2": "Ganancias aproximadas = {{shareSymbol} al precio de mercado + {{poolSymbol}} retirado - total {{poolSymbol}} depositado"
         },
         "initiated": {
           "title": "¿Retiro Iniciado?",
@@ -534,7 +533,7 @@
         },
         "withdrawal-amount": {
           "title": "Cantidad Retirada",
-          "info1": "Cantidad de d{{poolSymbol}} que vas a retirar.",
+          "info1": "Cantidad de {{shareSymbol} que vas a retirar.",
           "info2": "Tus fondos continuan participando del PyG y comisiones hasta que ejecutes su retiro."
         },
         "date": {
@@ -564,18 +563,18 @@
       "global-stats": {
         "apy": "TAE de negociación",
         "tvl": "Reservas Totales",
-        "price": "Precio de d{{poolSymbol}}",
-        "supply": "Suministro total de d{{poolSymbol}}"
+        "price": "Precio de {{shareSymbol}",
+        "supply": "Suministro total de {{shareSymbol}"
       },
       "add": {
         "title": "Proveer Liquidez",
-        "info1": "Añade {{poolSymbol}} a las reservas y recibe a cambio d{{poolSymbol}}, una críptomoneda ERC-20 que representa la porcion de las reservas que te pertenece.",
-        "info2": "Como proveedor de liquidez, ganarás parte de las comisiones y financiamiento en todas las transacciones cuyo margen haga uso de las reservas correspondientes. Tambien participarás en el PyG. d{{poolSymbol}} acumula constantement comisiones, pagos de financiamiento y PyG, en tiempo real.",
+        "info1": "Añade {{poolSymbol}} a las reservas y recibe a cambio {{shareSymbol}}, una críptomoneda ERC-20 que representa la porcion de las reservas que te pertenece.",
+        "info2": "Como proveedor de liquidez, ganarás parte de las comisiones y financiamiento en todas las transacciones cuyo margen haga uso de las reservas correspondientes. Tambien participarás en el PyG. {{shareSymbol}} acumula constantement comisiones, pagos de financiamiento y PyG, en tiempo real.",
         "amount": {
           "title": "Cantidad de {{poolSymbol}}",
           "info1": "Especifica la cantidad de {{poolSymbol}} que quieres añadir a las reservas."
         },
-        "receive": "d{{poolSymbol}} que recibes",
+        "receive": "{{shareSymbol} que recibes",
         "button": "Añadir",
         "approve-button": "Aprobarse",
         "validity-empty": "-",
@@ -588,10 +587,10 @@
       "withdraw": {
         "title": "Remover Liquidez",
         "info1": "Para remover liquidez primero tienes que iniciar un retiro. Ten en mente que tu retiro solo se puede ejecutar 24 horas despues de ser iniciado, y no puedes tener más que una solicitud de retiro abierta al mismo tiempo.",
-        "info2": "Despues de 24 horas, el monto de d{{poolSymbol}} que hayas ingresado podra ser intercambiado por {{poolSymbol}} al precio de d{{poolSymbol}} en ese momento.",
+        "info2": "Despues de 24 horas, el monto de {{shareSymbol} que hayas ingresado podra ser intercambiado por {{poolSymbol}} al precio de {{shareSymbol} en ese momento.",
         "initiate": {
           "title": "1. Iniciar retiro de {{poolSymbol}}",
-          "info1": "Ingresa el monto de d{{poolSymbol}} que quieres intercambiar por {{poolSymbol}}.",
+          "info1": "Ingresa el monto de {{shareSymbol} que quieres intercambiar por {{poolSymbol}}.",
           "info2": "Despues de 24 horas, este monto puede ser convertido a {{poolSymbol}} y removido de las reservas.",
           "button": "Iniciar Retiro",
           "validity-empty": "-",

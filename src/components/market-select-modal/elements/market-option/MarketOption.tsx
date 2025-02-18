@@ -12,6 +12,8 @@ import type { PerpetualWithPoolAndMarketI } from 'components/market-select-modal
 import { AssetTypeE } from 'types/enums';
 
 import styles from './MarketOption.module.scss';
+import { useAtomValue } from 'jotai';
+import { flatTokenAtom } from 'store/pools.store';
 
 interface MarketOptionPropsI {
   isSelected: boolean;
@@ -22,7 +24,13 @@ interface MarketOptionPropsI {
 export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionPropsI) => {
   const { t } = useTranslation();
 
+  const flatToken = useAtomValue(flatTokenAtom);
+
   const marketData = option.item.marketData;
+  const userSymbol =
+    flatToken && flatToken.poolId === Math.floor(option.item.id / 100_000)
+      ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
+      : option.item.settleSymbol;
 
   return (
     <MenuItem
@@ -49,7 +57,7 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
           </div>
           <div className={styles.currencyData}>
             <Typography variant="bodySmall" className={styles.label}>
-              {option.item.baseCurrency}/{option.item.quoteCurrency}/{option.item.settleSymbol}
+              {option.item.baseCurrency}/{option.item.quoteCurrency}/{userSymbol}
             </Typography>
             <div>
               <CurrencyBadge

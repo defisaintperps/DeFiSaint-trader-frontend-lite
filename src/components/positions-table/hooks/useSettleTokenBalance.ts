@@ -5,6 +5,7 @@ import { useAccount, useReadContracts } from 'wagmi';
 
 import { traderAPIAtom } from 'store/pools.store';
 import { PoolWithIdI } from 'types/types';
+import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
 
 interface SettleTokenBalancePropsI {
   poolByPosition?: PoolWithIdI | null;
@@ -23,7 +24,7 @@ export const useSettleTokenBalance = ({ poolByPosition }: SettleTokenBalanceProp
     isError,
     refetch,
   } = useReadContracts({
-    allowFailure: false,
+    allowFailure: true,
     contracts: [
       {
         address: poolByPosition?.settleTokenAddr as Address,
@@ -35,6 +36,12 @@ export const useSettleTokenBalance = ({ poolByPosition }: SettleTokenBalanceProp
         address: poolByPosition?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
+      },
+      {
+        address: poolByPosition?.settleTokenAddr as Address,
+        abi: flatTokenAbi,
+        functionName: 'effectiveBalanceOf',
+        args: [address as Address],
       },
     ],
     query: {
@@ -49,9 +56,14 @@ export const useSettleTokenBalance = ({ poolByPosition }: SettleTokenBalanceProp
   }, [address, chain, refetch]);
 
   useEffect(() => {
-    if (settleTokenBalanceData && chain && !isError) {
-      setSettleTokenBalance(+formatUnits(settleTokenBalanceData[0], settleTokenBalanceData[1]));
-      setSettleTokenDecimals(settleTokenBalanceData[1]);
+    if (settleTokenBalanceData && chain && !isError && settleTokenBalanceData[1].status === 'success') {
+      if (settleTokenBalanceData[0].status === 'success') {
+        setSettleTokenBalance(+formatUnits(settleTokenBalanceData[0].result, settleTokenBalanceData[1].result));
+      }
+      if (settleTokenBalanceData[2].status === 'success') {
+        setSettleTokenBalance(+formatUnits(settleTokenBalanceData[2].result, settleTokenBalanceData[1].result));
+      }
+      setSettleTokenDecimals(settleTokenBalanceData[1].result);
     } else {
       setSettleTokenBalance(undefined);
       setSettleTokenDecimals(undefined);

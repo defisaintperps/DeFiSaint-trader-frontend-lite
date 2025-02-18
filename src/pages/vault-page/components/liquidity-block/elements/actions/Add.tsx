@@ -83,6 +83,11 @@ export const Add = memo(() => {
   const inputValueChangedRef = useRef(false);
   const triggerFocusStateRef = useRef(true);
 
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
+      : [1, selectedPool?.poolSymbol ?? ''];
+
   const handleInputCapture = useCallback((orderSizeValue: string) => {
     if (orderSizeValue) {
       setAddAmount(+orderSizeValue);
@@ -181,7 +186,7 @@ export const Add = memo(() => {
       settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
-      minAmount: addAmount / 1.05,
+      minAmount: addAmount / 1.05 / userPrice,
       decimals: poolTokenDecimals,
       registeredToken: flatToken?.registeredToken,
     })
@@ -229,13 +234,13 @@ export const Add = memo(() => {
       settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
-      minAmount: addAmount / 1.05,
+      minAmount: addAmount / 1.05 / userPrice,
       decimals: poolTokenDecimals,
       registeredToken: flatToken?.registeredToken,
     })
       .then(() => {
         setApprovalCompleted(false);
-        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount);
+        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount / userPrice);
       })
       .then((tx) => {
         setTxHash(tx.hash);
@@ -261,10 +266,10 @@ export const Add = memo(() => {
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null && c2s.has(selectedPool.poolSymbol)) {
-      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice;
+      return addAmount / userPrice / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice;
     }
     return 0;
-  }, [addAmount, c2s, selectedPool, dCurrencyPrice]);
+  }, [addAmount, c2s, selectedPool, dCurrencyPrice, userPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (
@@ -277,8 +282,8 @@ export const Add = memo(() => {
     ) {
       return true;
     }
-    return addAmount > poolTokenBalance || addAmount < selectedPool.brokerCollateralLotSize;
-  }, [addAmount, loading, requestSent, isSDKConnected, selectedPool, poolTokenBalance]);
+    return addAmount > poolTokenBalance * userPrice || addAmount < selectedPool.brokerCollateralLotSize * userPrice;
+  }, [addAmount, loading, requestSent, isSDKConnected, selectedPool, poolTokenBalance, userPrice]);
 
   const validityCheckAddType = useMemo(() => {
     if (!address || !isConnected) {
@@ -296,11 +301,11 @@ export const Add = memo(() => {
     if (!addAmount) {
       return ValidityCheckAddE.NoAmount;
     }
-    const isAmountTooBig = addAmount > poolTokenBalance;
+    const isAmountTooBig = addAmount > poolTokenBalance * userPrice;
     if (isAmountTooBig) {
       return ValidityCheckAddE.AmountTooBig;
     }
-    const isAmountBelowMinimum = addAmount < selectedPool.brokerCollateralLotSize;
+    const isAmountBelowMinimum = addAmount < selectedPool.brokerCollateralLotSize * userPrice;
     if (isAmountBelowMinimum) {
       return ValidityCheckAddE.AmountBelowMinimum;
     }
@@ -314,6 +319,7 @@ export const Add = memo(() => {
     isSDKConnected,
     selectedPool?.brokerCollateralLotSize,
     poolTokenBalance,
+    userPrice,
   ]);
 
   const validityCheckAddText = useMemo(() => {
@@ -330,7 +336,7 @@ export const Add = memo(() => {
     } else if (validityCheckAddType === ValidityCheckAddE.AmountBelowMinimum) {
       return `${t(
         'pages.vault.add.validity-amount-below-min'
-      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.settleSymbol})`;
+      )} (${(selectedPool?.brokerCollateralLotSize ?? 1) * userPrice} ${userSymbol})`;
     } else if (validityCheckAddType === ValidityCheckAddE.NoAmount) {
       return `${t('pages.vault.add.validity-no-amount')}`;
     }
@@ -343,8 +349,9 @@ export const Add = memo(() => {
     isMultisigAddress,
     validityCheckAddType,
     selectedPool?.brokerCollateralLotSize,
-    selectedPool?.settleSymbol,
     approvalCompleted,
+    userPrice,
+    userSymbol,
   ]);
 
   useEffect(() => {
@@ -369,6 +376,8 @@ export const Add = memo(() => {
     }
   };
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   return (
     <div className={styles.root}>
       <div className={styles.infoBlock}>
@@ -376,18 +385,18 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.settleSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: userSymbol, shareSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
+          {t('pages.vault.add.info2', { shareSymbol })}
         </Typography>
       </div>
       <div className={styles.contentBlock}>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
             <InfoLabelBlock
-              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.settleSymbol })}
-              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.settleSymbol })}
+              title={t('pages.vault.add.amount.title', { poolSymbol: userSymbol })}
+              content={t('pages.vault.add.amount.info1', { poolSymbol: userSymbol })}
             />
           </div>
           <ResponsiveInput
@@ -395,10 +404,10 @@ export const Add = memo(() => {
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={selectedPool?.settleSymbol}
+            currency={userSymbol}
             step="1"
             min={0}
-            max={poolTokenBalance ? Number((poolTokenBalance * 0.9999).toFixed(5)) : 999999}
+            max={poolTokenBalance ? Number((poolTokenBalance * 0.9999 * userPrice).toFixed(5)) : 999999}
             disabled={loading}
           />
         </div>
@@ -408,11 +417,11 @@ export const Add = memo(() => {
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
-                  handleInputCapture(`${Number((poolTokenBalance * 0.9999).toFixed(5))}`);
+                  handleInputCapture(`${Number((poolTokenBalance * 0.9999 * userPrice).toFixed(5))}`);
                 }
               }}
             >
-              {formatToCurrency(0.9999 * poolTokenBalance, selectedPool?.settleSymbol)}
+              {formatToCurrency(0.9999 * poolTokenBalance * userPrice, userSymbol)}
             </Link>
           </Typography>
         ) : null}
@@ -420,9 +429,7 @@ export const Add = memo(() => {
           <SwitchIcon />
         </div>
         <div className={styles.inputLine}>
-          <div className={styles.labelHolder}>
-            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
-          </div>
+          <div className={styles.labelHolder}>{t('pages.vault.add.receive', { shareSymbol })}</div>
           <div className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"

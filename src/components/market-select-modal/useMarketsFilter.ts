@@ -5,18 +5,27 @@ import { SelectItemI } from '../header/elements/header-select/types';
 import { searchFilterAtom } from './elements/search-input/SearchInput';
 import { assetTypeFilterAtom, collateralFilterAtom } from './collaterals.store';
 import { PerpetualWithPoolAndMarketI } from './types';
+import { flatTokenAtom } from 'store/pools.store';
 
 export const useMarketsFilter = (markets: SelectItemI<PerpetualWithPoolAndMarketI>[]) => {
   const collateralFilter = useAtomValue(collateralFilterAtom);
   const searchFilter = useAtomValue(searchFilterAtom);
   const assetTypeFilter = useAtomValue(assetTypeFilterAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const filteredMarkets = useMemo(() => {
     let collateralFiltered;
     if (collateralFilter === null) {
       collateralFiltered = markets;
     } else {
-      collateralFiltered = markets.filter((market) => market.item.settleSymbol === collateralFilter);
+      collateralFiltered = markets.filter((market) => {
+        return (
+          market.item.settleSymbol === collateralFilter ||
+          (flatToken &&
+            flatToken.poolId === Math.floor(market.item.id / 100_000) &&
+            flatToken.registeredSymbol === collateralFilter)
+        );
+      });
     }
 
     if (assetTypeFilter === null) {
@@ -24,7 +33,7 @@ export const useMarketsFilter = (markets: SelectItemI<PerpetualWithPoolAndMarket
     }
 
     return collateralFiltered.filter((market) => assetTypeFilter === market.item.marketData?.assetType);
-  }, [markets, collateralFilter, assetTypeFilter]);
+  }, [markets, collateralFilter, assetTypeFilter, flatToken]);
 
   return useMemo(() => {
     const checkStr = searchFilter.toLowerCase();

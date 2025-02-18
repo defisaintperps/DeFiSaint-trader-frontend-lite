@@ -18,13 +18,14 @@ import arbitrumIcon from 'assets/networks/arbitrum.png';
 import x1Icon from 'assets/networks/x1.png';
 import berachainIcon from 'assets/networks/berachain.png';
 import { config } from 'config';
-import { x1, cardona, bartio, xlayer } from 'utils/chains';
+import { x1, cardona, bartio, xlayer, berachain } from 'utils/chains';
 
 const chains = [
   { ...polygonZkEvm, iconUrl: polygonIcon, iconBackground: 'transparent' } as Chain,
   { ...x1, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...xlayer, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...cardona, iconUrl: polygonIcon, iconBackground: 'transparent' },
+  { ...berachain, iconUrl: berachainIcon, iconBackground: 'transparent' },
   { ...bartio, iconUrl: berachainIcon, iconBackground: 'transparent' },
   {
     ...arbitrumSepolia,

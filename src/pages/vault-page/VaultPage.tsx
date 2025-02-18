@@ -12,7 +12,7 @@ import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
 import { PoolCards } from 'pages/vault-page/components/pool-cards/PoolCards';
-import { selectedPoolAtom } from 'store/pools.store';
+import { flatTokenAtom, selectedPoolAtom } from 'store/pools.store';
 import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -26,9 +26,15 @@ export const VaultPage = () => {
 
   const selectedPool = useAtomValue(selectedPoolAtom);
   const triggerWithdrawalsUpdate = useAtomValue(triggerWithdrawalsUpdateAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setWithdrawals = useSetAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
+
+  const userSymbol =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? (flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol)
+      : selectedPool?.settleSymbol;
 
   useEffect(() => {
     if (!selectedPool || !address || !isEnabledChain(chainId)) {
@@ -56,7 +62,7 @@ export const VaultPage = () => {
 
   return (
     <>
-      <Helmet title={`${selectedPool?.settleSymbol} Vault | D8X App`} />
+      <Helmet title={`${userSymbol} Vault | D8X App`} />
       <div className={styles.root}>
         <MaintenanceWrapper>
           <Container className={styles.container}>
