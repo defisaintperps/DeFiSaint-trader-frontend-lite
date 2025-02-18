@@ -88,9 +88,6 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
   return (
     <Box className={styles.root}>
-      <Typography variant="h5" className={styles.heading}>
-        {t('pages.vault.personal-stats.title')}
-      </Typography>
       <Box key="amount" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoLabelBlock

@@ -13,6 +13,7 @@ import styles from './LiquidityTypeSelector.module.scss';
 const mapButtonName: Record<LiquidityTypeE, string> = {
   [LiquidityTypeE.Add]: 'pages.vault.add.button',
   [LiquidityTypeE.Withdraw]: 'pages.vault.withdraw.action.button',
+  [LiquidityTypeE.Info]: 'pages.vault.personal-stats.title',
 };
 
 export const LiquidityTypeSelector = memo(() => {
