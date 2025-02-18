@@ -5,6 +5,7 @@ import { calculateProbability } from 'helpers/calculateProbability';
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
   collateralToSettleConversionAtom,
+  flatTokenAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   positionsAtom,
@@ -101,6 +102,8 @@ export const currencyMultiplierAtom = atom((get) => {
     // skip
   }
 
+  const flatToken = get(flatTokenAtom);
+
   const { collToQuoteIndexPrice, midPrice } = selectedPerpetual;
   if (selectedCurrency === selectedPerpetual.quoteCurrency && midPrice > 0) {
     currencyMultiplier = isPredictionMarket
@@ -111,6 +114,14 @@ export const currencyMultiplierAtom = atom((get) => {
       ? (calculateProbability(midPrice, orderBlock === OrderBlockE.Short) / collToQuoteIndexPrice) *
         (c2s.get(selectedPool.poolSymbol)?.value ?? 1)
       : (midPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
+  } else if (
+    flatToken &&
+    selectedPool.poolId === flatToken.poolId &&
+    selectedCurrency === flatToken.registeredSymbol &&
+    flatToken.compositePrice
+  ) {
+    currencyMultiplier =
+      (midPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * flatToken.compositePrice;
   }
   return currencyMultiplier;
 });

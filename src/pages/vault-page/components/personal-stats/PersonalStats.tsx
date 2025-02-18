@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { getEarnings } from 'network/history';
-import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   sdkConnectedAtom,
   triggerUserStatsUpdateAtom,
@@ -36,11 +36,17 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const hasOpenRequestOnChain = useAtomValue(withdrawalOnChainAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
 
   const [estimatedEarnings, setEstimatedEarnings] = useState<number | null>(null);
 
   const earningsRequestSentRef = useRef(false);
+
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, selectedPool?.poolSymbol ?? ''];
 
   useEffect(() => {
     setUserAmount(null);
@@ -78,6 +84,8 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
     };
   }, [chainId, address, selectedPool?.poolSymbol, triggerUserStatsUpdate]);
 
+  const shareSymbol = `d${selectedPool?.settleSymbol}`;
+
   return (
     <Box className={styles.root}>
       <Typography variant="h5" className={styles.heading}>
@@ -87,21 +95,12 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         <Box className={styles.statLabel}>
           <InfoLabelBlock
             title={t('pages.vault.personal-stats.amount.title')}
-            content={
-              <Typography>
-                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
-            }
+            content={<Typography>{t('pages.vault.personal-stats.amount.info', { shareSymbol })}</Typography>}
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {userAmount !== null
-            ? formatToCurrency(
-                userAmount,
-                `d${selectedPool?.settleSymbol}`,
-                true,
-                Math.min(valueToFractionDigits(userAmount), 5)
-              )
+            ? formatToCurrency(userAmount, shareSymbol, true, Math.min(valueToFractionDigits(userAmount), 5))
             : '--'}
         </Typography>
       </Box>
@@ -113,7 +112,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
               <>
                 <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
                 <Typography>
-                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.settleSymbol })}
+                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol, shareSymbol })}
                 </Typography>
               </>
             }
@@ -122,10 +121,13 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         <Typography variant="bodyMedium" className={styles.statValue}>
           {estimatedEarnings !== null && selectedPool
             ? formatToCurrency(
-                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol,
+                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                userSymbol,
                 true,
-                Math.min(valueToFractionDigits(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1)), 5)
+                Math.min(
+                  valueToFractionDigits(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice),
+                  5
+                )
               )
             : '--'}
         </Typography>
@@ -135,9 +137,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           <InfoLabelBlock
             title={t('pages.vault.personal-stats.initiated.title')}
             content={
-              <Typography>
-                {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.settleSymbol })}
-              </Typography>
+              <Typography>{t('pages.vault.personal-stats.initiated.info1', { poolSymbol: userSymbol })}</Typography>
             }
           />
         </Box>
@@ -153,19 +153,17 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
               <>
                 <Typography>
                   {t('pages.vault.personal-stats.withdrawal-amount.info1', {
-                    poolSymbol: selectedPool?.settleSymbol,
+                    shareSymbol,
                   })}
                 </Typography>
-                <Typography>
-                  {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.settleSymbol })}
-                </Typography>
+                <Typography>{t('pages.vault.personal-stats.withdrawal-amount.info2')}</Typography>
               </>
             }
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {withdrawals && withdrawals.length > 0
-            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.settleSymbol}`)
+            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, shareSymbol)
             : 'N/A'}
         </Typography>
       </Box>

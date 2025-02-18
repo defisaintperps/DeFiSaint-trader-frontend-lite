@@ -550,6 +550,9 @@ export interface SupportedTokenI {
 export interface FlatTokenI {
   isFlatToken: boolean;
   symbol: string;
+  poolId: number;
   registeredToken: Address | undefined;
   supportedTokens: SupportedTokenI[];
+  compositePrice: number | undefined; // price in user-registered token
+  registeredSymbol: string | undefined;
 }

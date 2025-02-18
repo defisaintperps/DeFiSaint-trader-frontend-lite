@@ -520,12 +520,12 @@
         "title": "Your stats",
         "amount": {
           "title": "Amount",
-          "info": "Amount of d{{poolSymbol}} you own."
+          "info": "Amount of {{shareSymbol}} you own."
         },
         "earnings": {
           "title": "Estimated earnings",
           "info1": "Estimated earnings are an approximation of how much you've earned.",
-          "info2": "Estimated earnings = d{{poolSymbol}} balance at market value + total {{poolSymbol}} withdrawn - total {{poolSymbol}} deposited"
+          "info2": "Estimated earnings = {{shareSymbol}} balance at market value + total {{poolSymbol}} withdrawn - total {{poolSymbol}} deposited"
         },
         "initiated": {
           "title": "Withdrawal initiated?",
@@ -533,7 +533,7 @@
         },
         "withdrawal-amount": {
           "title": "Withdrawal amount",
-          "info1": "The amount of d{{poolSymbol}} you initiated to withdraw.",
+          "info1": "The amount of {{shareSymbol}} you initiated to withdraw.",
           "info2": "Your liquidity continues to participate in the PnL and fee revenue of the pool until you withdraw."
         },
         "date": {
@@ -563,18 +563,18 @@
       "global-stats": {
         "apy": "Trading APY",
         "tvl": "TVL",
-        "price": "d{{poolSymbol}} Price",
-        "supply": "d{{poolSymbol}} Supply"
+        "price": "{{shareSymbol}} Price",
+        "supply": "{{shareSymbol}} Supply"
       },
       "add": {
         "title": "Add Liquidity",
-        "info1": "Add {{poolSymbol}} liquidity to the pool and receive d{{poolSymbol}}, an ERC-20 token that represents your ownership in the liquidity pool.",
-        "info2": "As a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized in the collateral currency. You'll also participate in the PnL of the pool. d{{poolSymbol}} accumulates fees, funding rate payments and PnL in real-time.",
+        "info1": "Add {{poolSymbol}} liquidity to the pool and receive {{shareSymbol}}, an ERC-20 token that represents your ownership in the liquidity pool.",
+        "info2": "As a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized in the collateral currency. You'll also participate in the PnL of the pool. {{shareSymbol}} accumulates fees, funding rate payments and PnL in real-time.",
         "amount": {
           "title": "Amount of {{poolSymbol}}",
           "info1": "Specify the amount of {{poolSymbol}} you want to add to the pool."
         },
-        "receive": "You receive d{{poolSymbol}}",
+        "receive": "You receive {{shareSymbol}}",
         "button": "Add",
         "approve-button": "Approve",
         "validity-empty": "-",
@@ -587,10 +587,10 @@
       "withdraw": {
         "title": "Withdraw Liquidity",
         "info1": "To withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 24 hours to process your request and you can only have one withdrawal request at a time.",
-        "info2": "After 24 hours, a withdrawable amount of d{{poolSymbol}} can be exchanged for {{poolSymbol}} at the d{{poolSymbol}} Price.",
+        "info2": "After 24 hours, a withdrawable amount of {{shareSymbol}} can be exchanged for {{poolSymbol}} at the {{shareSymbol}} Price.",
         "initiate": {
           "title": "1. Initiate withdrawal of {{poolSymbol}}",
-          "info1": "Specify the amount of d{{poolSymbol}} you want to exchange for {{poolSymbol}}.",
+          "info1": "Specify the amount of {{shareSymbol}} you want to exchange for {{poolSymbol}}.",
           "info2": "After 24 hours, this amount can be converted to {{poolSymbol}} and can be withdrawn from the pool.",
           "button": "Initiate withdrawal",
           "validity-empty": "-",

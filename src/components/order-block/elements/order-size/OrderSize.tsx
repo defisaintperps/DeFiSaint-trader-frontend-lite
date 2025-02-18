@@ -16,6 +16,7 @@ import { getMaxOrderSizeForTrader } from 'network/network';
 import { defaultCurrencyAtom } from 'store/app.store';
 import { orderBlockAtom } from 'store/order-block.store';
 import {
+  flatTokenAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   selectedPerpetualAtom,
@@ -73,6 +74,7 @@ export const OrderSize = memo(() => {
   const defaultCurrency = useAtomValue(defaultCurrencyAtom);
   const currencyMultiplier = useAtomValue(currencyMultiplierAtom);
   const triggerBalancesUpdate = useAtomValue(triggerBalancesUpdateAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setInputFromOrderSize = useSetAtom(setInputFromOrderSizeAtom);
   const setOrderSize = useSetAtom(setOrderSizeAtom);
 
@@ -280,6 +282,11 @@ export const OrderSize = memo(() => {
     return selectedPool.settleSymbol;
   }, [selectedPool, selectedPerpetual]);
 
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
+      : [1, selectedPool?.poolSymbol];
+
   return (
     <div className={styles.root}>
       <div className={styles.manualBlock}>
@@ -290,7 +297,7 @@ export const OrderSize = memo(() => {
             </Typography>
             <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
               <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
-                {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
+                {poolTokenBalance === undefined ? '-' : formatToCurrency(poolTokenBalance * userPrice, userSymbol)}
               </Typography>
             </TooltipMobile>
           </div>
@@ -364,7 +371,7 @@ export const OrderSize = memo(() => {
           )}
           {selectedPool && selectedCurrency !== selectedPool.settleSymbol && (
             <DynamicLogo
-              logoName={settleSymbol.toLowerCase()}
+              logoName={(userSymbol ?? settleSymbol).toLowerCase()}
               width={24}
               height={24}
               className={styles.currencyIcon}

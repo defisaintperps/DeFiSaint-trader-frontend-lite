@@ -254,6 +254,11 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
 
   const parsedSymbol = parseSymbol(selectedPosition?.symbol);
 
+  const [userPrice, userSymbol] =
+    !!flatToken && poolByPosition?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, poolByPosition?.poolSymbol ?? ''];
+
   return (
     <Dialog
       open={isOpen}
@@ -311,8 +316,8 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           rightSide={`${
             poolByPosition
               ? formatToCurrency(
-                  selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1),
-                  poolByPosition.settleSymbol,
+                  selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) * userPrice,
+                  userSymbol,
                   true
                 )
               : '-'

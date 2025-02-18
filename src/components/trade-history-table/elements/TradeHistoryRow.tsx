@@ -8,7 +8,7 @@ import { TableCell, TableRow, Typography } from '@mui/material';
 import { DATETIME_FORMAT } from 'appConstants';
 import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { calculateProbability } from 'helpers/calculateProbability';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -24,6 +24,7 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
   const { t } = useTranslation();
 
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
@@ -33,6 +34,11 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
     ? calculateProbability(tradeHistory.price, tradeHistory.side === OrderSideE.Sell)
     : tradeHistory.price;
   const displayCcy = perpetual?.isPredictionMarket ? perpetual?.quoteCurrency : perpetual?.quoteCurrency;
+
+  const [userPrice, userSymbol] =
+    !!flatToken && Math.floor((perpetual?.id ?? 0) / 100_000) === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, tradeHistory.settleSymbol];
 
   return (
     <TableRow key={tradeHistory.transactionHash}>
@@ -48,7 +54,7 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           </div>
           <div className={styles.dataHolder}>
             <Typography variant="cellSmall" className={styles.pair}>
-              {tradeHistory.symbol}
+              {`${perpetual?.baseCurrency}/${perpetual?.quoteCurrency}/${userSymbol}`}
             </Typography>
             <Typography variant="cellSmall" className={styles.date}>
               {time}
@@ -82,8 +88,8 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           <Typography variant="cellSmall" className={styles.fee}>
             {perpetual
               ? formatToCurrency(
-                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
-                  tradeHistory.settleSymbol,
+                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1) * userPrice,
+                  userSymbol,
                   true
                 )
               : ''}
@@ -94,8 +100,8 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
         <Typography variant="cellSmall" className={styles.realizedProfit} style={{ color: pnlColor }}>
           {perpetual
             ? formatToCurrency(
-                tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1),
-                tradeHistory.settleSymbol,
+                tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1) * userPrice,
+                userSymbol,
                 true
               )
             : ''}

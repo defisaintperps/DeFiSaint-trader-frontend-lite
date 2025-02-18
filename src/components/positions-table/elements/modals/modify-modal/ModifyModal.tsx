@@ -81,6 +81,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const isAPIBusyRef = useRef(isAPIBusy);
   const requestSentRef = useRef(false);
 
+  const [userPrice, userSymbol] =
+    !!flatToken && poolByPosition?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, poolByPosition?.poolSymbol];
+
   const { settleTokenBalance, settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   const {
@@ -334,7 +339,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const calculatedMargin = useMemo(() => {
     let margin;
-    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) : 1;
+    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) * userPrice : 1;
     if (selectedPosition) {
       switch (modifyType) {
         case ModifyTypeE.Add:
@@ -350,9 +355,9 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       margin = 0;
     }
     return poolByPosition
-      ? formatToCurrency(margin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1), poolByPosition.settleSymbol)
+      ? formatToCurrency(margin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) * userPrice, userSymbol)
       : '-';
-  }, [c2s, selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
+  }, [c2s, userPrice, userSymbol, selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
 
   const calculatedLeverage = useMemo(() => {
     if (!selectedPosition) {
@@ -421,7 +426,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     ) {
       return;
     }
-    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) : 1;
+    const px = poolByPosition ? (c2s.get(poolByPosition.poolSymbol)?.value ?? 1) * userPrice : 1;
 
     if (modifyType === ModifyTypeE.Add) {
       requestSentRef.current = true;
@@ -563,11 +568,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                   id="add-collateral"
                   endAdornment={
                     <InputAdornment position="end">
-                      <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
+                      <Typography variant="adornment">{userSymbol}</Typography>
                     </InputAdornment>
                   }
                   type="number"
-                  inputProps={{ step: 0.01, min: 0, max: settleTokenBalance }}
+                  inputProps={{ step: 0.01, min: 0, max: (settleTokenBalance ?? 0) / userPrice }}
                   value={addCollateral}
                   onChange={(event) => setAddCollateral(event.target.value)}
                 />
@@ -579,8 +584,8 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                 rightSide={
                   <Typography className={styles.helperText} variant="bodyTiny">
                     {t('common.max')}{' '}
-                    <Link onClick={() => setAddCollateral(settleTokenBalance.toFixed(digitsForMaxAdd))}>
-                      {settleTokenBalance.toFixed(digitsForMaxAdd)}
+                    <Link onClick={() => setAddCollateral((settleTokenBalance / userPrice).toFixed(digitsForMaxAdd))}>
+                      {(settleTokenBalance / userPrice).toFixed(digitsForMaxAdd)}
                     </Link>
                   </Typography>
                 }
@@ -598,11 +603,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                     id="remove-collateral"
                     endAdornment={
                       <InputAdornment position="end">
-                        <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
+                        <Typography variant="adornment">{userSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
-                    inputProps={{ step: 0.01, min: 0, max: maxCollateral }}
+                    inputProps={{ step: 0.01, min: 0, max: (maxCollateral ?? 0) / userPrice }}
                     value={removeCollateral}
                     onChange={(event) => setRemoveCollateral(event.target.value)}
                   />
@@ -615,8 +620,8 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                 rightSide={
                   <Typography className={styles.helperText} variant="bodyTiny">
                     {t('common.max')}{' '}
-                    <Link onClick={() => setRemoveCollateral(maxCollateral.toFixed(digitsForMaxRemove))}>
-                      {maxCollateral.toFixed(digitsForMaxRemove)}
+                    <Link onClick={() => setRemoveCollateral((maxCollateral / userPrice).toFixed(digitsForMaxRemove))}>
+                      {(maxCollateral / userPrice).toFixed(digitsForMaxRemove)}
                     </Link>
                   </Typography>
                 }

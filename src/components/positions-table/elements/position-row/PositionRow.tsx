@@ -7,7 +7,7 @@ import { Button, IconButton, TableCell, TableRow, Typography } from '@mui/materi
 
 import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, perpetualsAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, perpetualsAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -39,10 +39,16 @@ export const PositionRow = memo(
     const c2s = useAtomValue(collateralToSettleConversionAtom);
     const traderAPI = useAtomValue(traderAPIAtom);
     const perpetuals = useAtomValue(perpetualsAtom);
+    const flatToken = useAtomValue(flatTokenAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
     const perpetualState = perpetuals.find(({ symbol }) => symbol === position.symbol);
+
+    const [userPrice, userSymbol] =
+      !!flatToken && Math.floor((perpetualState?.id ?? 0) / 100_000) === flatToken.poolId
+        ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+        : [1, collToSettleInfo?.settleSymbol ?? ''];
 
     let isPredictionMarket: boolean | undefined;
     try {
@@ -72,7 +78,7 @@ export const PositionRow = memo(
       <TableRow key={position.symbol}>
         <TableCell align="left">
           <Typography variant="cellSmall">
-            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{collToSettleInfo?.settleSymbol ?? ''}
+            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{userSymbol}
           </Typography>
         </TableCell>
         <TableCell align="right">
@@ -121,11 +127,7 @@ export const PositionRow = memo(
             <TableCell align="right">
               <Typography variant="cellSmall">
                 {collToSettleInfo
-                  ? formatToCurrency(
-                      position.collateralCC * collToSettleInfo.value,
-                      collToSettleInfo.settleSymbol,
-                      true
-                    )
+                  ? formatToCurrency(position.collateralCC * collToSettleInfo.value * userPrice, userSymbol, true)
                   : '-'}{' '}
                 ({Math.round(position.leverage * 100) / 100}x)
               </Typography>

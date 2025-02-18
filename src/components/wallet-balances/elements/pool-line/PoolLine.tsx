@@ -7,6 +7,8 @@ import { AssetLine } from 'components/asset-line/AssetLine';
 import { PoolWithIdI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
+import { useAtomValue } from 'jotai';
+import { flatTokenAtom } from 'store/pools.store';
 
 interface PoolLinePropsI {
   pool: PoolWithIdI;
@@ -16,6 +18,7 @@ interface PoolLinePropsI {
 export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   const { address, isConnected } = useAccount();
   const { isPending } = useConnect();
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const { data: tokenBalanceData, refetch } = useReadContracts({
     allowFailure: true,
@@ -67,12 +70,18 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
       ? +formatUnits(tokenBalance, tokenBalanceData[1].result)
       : 1;
   const numberDigits = valueToFractionDigits(unroundedSCValue);
+
+  const [userPrice, userSymbol] =
+    !!flatToken && pool.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+      : [1, pool.settleSymbol];
+
   return (
     <AssetLine
-      symbol={pool.settleSymbol}
+      symbol={userSymbol}
       value={
         tokenBalance && tokenBalanceData?.[1].status === 'success'
-          ? (+formatUnits(tokenBalance, tokenBalanceData[1].result)).toFixed(numberDigits)
+          ? (+formatUnits(tokenBalance, tokenBalanceData[1].result) * userPrice).toFixed(numberDigits)
           : ''
       }
     />

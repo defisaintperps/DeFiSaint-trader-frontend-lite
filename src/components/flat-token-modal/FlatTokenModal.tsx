@@ -12,8 +12,8 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './FlatTokenModal.module.scss';
 import { FlatTokenSelect } from './elements/flat-token-selector/FlatTokenSelect';
-import { flatTokenAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
-import { Address } from 'viem';
+import { flatTokenAtom, poolsAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
+import { Address, zeroAddress } from 'viem';
 import { fetchFlatTokenInfo } from 'blockchain-api/contract-interactions/fetchFlatTokenInfo';
 import { registerFlatToken } from 'blockchain-api/contract-interactions/registerFlatToken';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -32,11 +32,13 @@ export const FlatTokenModal = () => {
   const [selectedStable, setSelectedStable] = useAtom(selectedStableAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
+  const pools = useAtomValue(poolsAtom);
 
   const [title] = useState('');
   const [txHash, setTxHash] = useState<Address | undefined>();
 
   const isBusyRef = useRef(false);
+  const flatTokenRef = useRef(flatToken);
 
   const handleOnClose = useCallback(() => {
     setFlatTokentModalOpen(false);
@@ -79,7 +81,7 @@ export const FlatTokenModal = () => {
     }
   };
 
-  const { isSuccess, isError } = useWaitForTransactionReceipt({
+  const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
     query: { enabled: !!txHash },
   });
@@ -120,35 +122,37 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (!isBusyRef.current) {
+    if (!isBusyRef.current && pools && proxyAddr && publicClient && (flatTokenRef.current === undefined || isFetched)) {
+      isBusyRef.current = true;
       setFlatToken(undefined);
-      setSelectedStable(undefined);
-      if (selectedPool?.settleTokenAddr && proxyAddr && publicClient && address) {
-        isBusyRef.current = true;
-        fetchFlatTokenInfo(publicClient, proxyAddr as Address, selectedPool.settleTokenAddr as Address, address)
+      pools.forEach((pool) => {
+        fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address ?? zeroAddress)
           .then((info) => {
-            setFlatToken(info);
-            if (info.isFlatToken && !info.registeredToken) {
-              setDepositModalOpen(false);
-              setFlatTokentModalOpen(true);
+            if (info.controller === proxyAddr) {
+              setFlatToken({ ...info, poolId: pool.poolId });
             }
           })
           .catch()
           .finally(() => {
             isBusyRef.current = false;
           });
-      }
+      });
     }
-  }, [
-    address,
-    proxyAddr,
-    publicClient,
-    selectedPool,
-    setFlatToken,
-    setDepositModalOpen,
-    setFlatTokentModalOpen,
-    setSelectedStable,
-  ]);
+  }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
+
+  useEffect(() => {
+    setSelectedStable(undefined);
+    if (flatToken?.isFlatToken && !flatToken?.registeredToken && selectedPool?.poolId === flatToken.poolId) {
+      setDepositModalOpen(false);
+      setFlatTokentModalOpen(true);
+    }
+  }, [flatToken, selectedPool, setDepositModalOpen, setFlatTokentModalOpen, setSelectedStable]);
+
+  useEffect(() => {
+    if (selectedPool && flatTokenRef.current) {
+      setFlatToken({ ...flatTokenRef.current, isFlatToken: flatTokenRef.current.poolId === selectedPool.poolId });
+    }
+  }, [selectedPool, setFlatToken]);
 
   if (!isEnabledChain(chainId)) {
     return null;

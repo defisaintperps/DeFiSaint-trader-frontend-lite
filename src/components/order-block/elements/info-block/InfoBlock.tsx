@@ -8,6 +8,7 @@ import { Typography } from '@mui/material';
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
   collateralToSettleConversionAtom,
+  flatTokenAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   positionsAtom,
@@ -37,6 +38,12 @@ export const InfoBlock = memo(() => {
   const positions = useAtomValue(positionsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
+
+  const [userPrice, userSymbol] =
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
+      : [1, selectedPool?.poolSymbol];
 
   const { chainId } = useAccount();
 
@@ -132,17 +139,14 @@ export const InfoBlock = memo(() => {
                 {baseFeeInCC === undefined || !selectedPool
                   ? '-'
                   : formatToCurrency(
-                      baseFeeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                      selectedPool.settleSymbol
+                      baseFeeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                      userSymbol
                     )}
               </span>
               <span>
                 {' '}
                 {selectedPool
-                  ? formatToCurrency(
-                      feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                      selectedPool.settleSymbol
-                    )
+                  ? formatToCurrency(feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice, userSymbol)
                   : '-'}
               </span>
             </>
@@ -151,8 +155,8 @@ export const InfoBlock = memo(() => {
               {feeInCC === undefined || !selectedPool
                 ? '-'
                 : formatToCurrency(
-                    feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                    selectedPool.settleSymbol
+                    feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                    userSymbol
                   )}{' '}
             </>
           )}
@@ -165,8 +169,8 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
           {perpetualStaticInfo && selectedPool
             ? formatToCurrency(
-                perpetualStaticInfo.referralRebate * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol
+                perpetualStaticInfo.referralRebate * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                userSymbol
               )
             : '-'}
         </Typography>
@@ -191,8 +195,8 @@ export const InfoBlock = memo(() => {
             {approxDepositFromWallet === undefined || !selectedPool
               ? '-'
               : formatToCurrency(
-                  approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                  selectedPool.settleSymbol
+                  approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                  userSymbol
                 )}
           </Typography>
         </div>
@@ -203,9 +207,7 @@ export const InfoBlock = memo(() => {
             {t('common.potential-return')}
           </Typography>
           <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
-            {approxDepositFromWallet === undefined || !selectedPool
-              ? '-'
-              : formatToCurrency(orderSize, selectedPool.settleSymbol)}
+            {approxDepositFromWallet === undefined || !userSymbol ? '-' : formatToCurrency(orderSize, userSymbol)}
           </Typography>
         </div>
       )}
