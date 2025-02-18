@@ -3,9 +3,10 @@ import { atom } from 'jotai';
 import { type Address, erc20Abi } from 'viem';
 
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
-import { collateralToSettleConversionAtom, poolsAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom, poolsAtom } from 'store/pools.store';
 
 import { poolUsdPriceAtom } from './fetchTotalReferralsRewards';
+import { flatTokenAbi } from 'blockchain-api/contract-interactions/flatTokenAbi';
 
 export const poolTokensUSDBalanceAtom = atom(0);
 
@@ -18,13 +19,14 @@ export const fetchPoolTokensUSDBalanceAtom = atom(null, async (get, set, userAdd
 
   const pools = get(poolsAtom);
   const c2s = get(collateralToSettleConversionAtom);
+  const flatToken = get(flatTokenAtom);
 
   const [poolTokensBalances, poolTokensDecimals] = await Promise.all([
     multicall(wagmiConfig, {
       contracts: pools.map((pool) => ({
         address: pool.settleTokenAddr as Address,
-        abi: erc20Abi,
-        functionName: 'balanceOf',
+        abi: flatTokenAbi,
+        functionName: flatToken?.poolId === pool.poolId ? 'effectiveBalanceOf' : 'balanceOf',
         args: [userAddress],
       })),
     }),
