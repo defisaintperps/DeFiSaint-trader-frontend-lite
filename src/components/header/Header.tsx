@@ -469,7 +469,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               )}
             </Toolbar>
             {isConnected && <DepositModal />}
-            {isConnected && <FlatTokenModal />}
+            <FlatTokenModal />
           </PageAppBar>
           <nav>
             <Drawer

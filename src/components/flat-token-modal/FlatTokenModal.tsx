@@ -13,7 +13,7 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 import styles from './FlatTokenModal.module.scss';
 import { FlatTokenSelect } from './elements/flat-token-selector/FlatTokenSelect';
 import { flatTokenAtom, poolsAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
-import { Address } from 'viem';
+import { Address, zeroAddress } from 'viem';
 import { fetchFlatTokenInfo } from 'blockchain-api/contract-interactions/fetchFlatTokenInfo';
 import { registerFlatToken } from 'blockchain-api/contract-interactions/registerFlatToken';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -122,18 +122,11 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (
-      !isBusyRef.current &&
-      pools &&
-      proxyAddr &&
-      publicClient &&
-      address &&
-      (flatTokenRef.current === undefined || isFetched)
-    ) {
+    if (!isBusyRef.current && pools && proxyAddr && publicClient && (flatTokenRef.current === undefined || isFetched)) {
       isBusyRef.current = true;
       setFlatToken(undefined);
       pools.forEach((pool) => {
-        fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address)
+        fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address ?? zeroAddress)
           .then((info) => {
             if (info.controller === proxyAddr) {
               setFlatToken({ ...info, poolId: pool.poolId });
