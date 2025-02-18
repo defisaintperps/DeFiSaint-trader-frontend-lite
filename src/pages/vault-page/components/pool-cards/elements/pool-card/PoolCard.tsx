@@ -187,7 +187,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     <div className={styles.root}>
       <div className={styles.header}>
         <div className={styles.logo}>
-          <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={80} height={80} />
+          <DynamicLogo logoName={userSymbol.toLowerCase()} width={80} height={80} />
         </div>
         <div className={styles.symbol}>
           {userSymbol} {t('pages.vault.pool-card.vault')}
