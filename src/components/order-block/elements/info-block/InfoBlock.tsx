@@ -41,8 +41,8 @@ export const InfoBlock = memo(() => {
   const flatToken = useAtomValue(flatTokenAtom);
 
   const [userPrice, userSymbol] =
-    !!flatToken && selectedPool?.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+    !!flatToken && selectedPool?.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
       : [1, selectedPool?.poolSymbol];
 
   const { chainId } = useAccount();
@@ -207,9 +207,7 @@ export const InfoBlock = memo(() => {
             {t('common.potential-return')}
           </Typography>
           <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
-            {approxDepositFromWallet === undefined || !selectedPool
-              ? '-'
-              : formatToCurrency(orderSize, selectedPool.settleSymbol)}
+            {approxDepositFromWallet === undefined || !userSymbol ? '-' : formatToCurrency(orderSize, userSymbol)}
           </Typography>
         </div>
       )}
