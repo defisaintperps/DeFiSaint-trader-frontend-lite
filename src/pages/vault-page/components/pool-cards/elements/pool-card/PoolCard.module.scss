@@ -4,7 +4,7 @@
   display: flex;
   height: 100%;
   flex-direction: column;
-  padding: 6 * $d8x-spacing;
+  padding: 6 * $d8x-spacing 16 * $d8x-spacing;
   border-radius: $d8x-border-radius;
   border: 1px solid var(--d8x-block-border-color);
   background-color: var(--d8x-color-background-items);

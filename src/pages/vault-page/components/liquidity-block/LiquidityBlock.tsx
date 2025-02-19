@@ -48,14 +48,16 @@ export const LiquidityBlock = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.infoBlock}>
-        <PersonalStats withdrawOn={withdrawOn} />
-      </Box>
       <Box className={styles.actionBlock}>
         <LiquidityTypeSelector />
         <Separator className={styles.separator} />
         {liquidityType === LiquidityTypeE.Add && <Add />}
         {liquidityType === LiquidityTypeE.Withdraw && <Withdraw withdrawOn={withdrawOn} />}
+        {liquidityType === LiquidityTypeE.Info && (
+          <Box className={styles.infoBlock}>
+            <PersonalStats withdrawOn={withdrawOn} />
+          </Box>
+        )}
       </Box>
     </Box>
   );

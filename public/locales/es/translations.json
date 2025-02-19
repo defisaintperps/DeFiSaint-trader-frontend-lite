@@ -547,7 +547,7 @@
         "yields": {
           "title": "Fuentes de rendimiento",
           "trading-api": "TAE de negociación ({{percent}}%)",
-          "weeth-yield": "weETH Staking Yield ({{weethAPY}}%)",
+          "weeth-yield": "weETH Yield ({{weethAPY}}%)",
           "stusd-yield": "stUSD Yield ({{stUsdAPY}}%)",
           "ether-fi-points": "Ether.fi Points",
           "eigen-layer-points": "EigenLayer Points",
