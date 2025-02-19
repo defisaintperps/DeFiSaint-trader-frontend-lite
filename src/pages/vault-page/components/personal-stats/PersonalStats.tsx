@@ -88,100 +88,103 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
   return (
     <Box className={styles.root}>
-      <Typography variant="h5" className={styles.heading}>
-        {t('pages.vault.personal-stats.title')}
-      </Typography>
-      <Box key="amount" className={styles.statContainer}>
-        <Box className={styles.statLabel}>
-          <InfoLabelBlock
-            title={t('pages.vault.personal-stats.amount.title')}
-            content={<Typography>{t('pages.vault.personal-stats.amount.info', { shareSymbol })}</Typography>}
-          />
+      <Box className={styles.leftColumn}>
+        <Box key="amount" className={styles.statContainer}>
+          <Box className={styles.statLabel}>
+            <InfoLabelBlock
+              title={t('pages.vault.personal-stats.amount.title')}
+              content={<Typography>{t('pages.vault.personal-stats.amount.info', { shareSymbol })}</Typography>}
+            />
+          </Box>
+          <Typography variant="bodyMedium" className={styles.statValue}>
+            {userAmount !== null
+              ? formatToCurrency(userAmount, shareSymbol, true, Math.min(valueToFractionDigits(userAmount), 5))
+              : '--'}
+          </Typography>
         </Box>
-        <Typography variant="bodyMedium" className={styles.statValue}>
-          {userAmount !== null
-            ? formatToCurrency(userAmount, shareSymbol, true, Math.min(valueToFractionDigits(userAmount), 5))
-            : '--'}
-        </Typography>
-      </Box>
-      <Box key="estimatedEarnings" className={styles.statContainer}>
-        <Box className={styles.statLabel}>
-          <InfoLabelBlock
-            title={t('pages.vault.personal-stats.earnings.title')}
-            content={
-              <>
-                <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
-                <Typography>
-                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol, shareSymbol })}
-                </Typography>
-              </>
-            }
-          />
-        </Box>
-        <Typography variant="bodyMedium" className={styles.statValue}>
-          {estimatedEarnings !== null && selectedPool
-            ? formatToCurrency(
-                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
-                userSymbol,
-                true,
-                Math.min(
-                  valueToFractionDigits(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice),
-                  5
+        <Box key="estimatedEarnings" className={styles.statContainer}>
+          <Box className={styles.statLabel}>
+            <InfoLabelBlock
+              title={t('pages.vault.personal-stats.earnings.title')}
+              content={
+                <>
+                  <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
+                  <Typography>
+                    {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: userSymbol, shareSymbol })}
+                  </Typography>
+                </>
+              }
+            />
+          </Box>
+          <Typography variant="bodyMedium" className={styles.statValue}>
+            {estimatedEarnings !== null && selectedPool
+              ? formatToCurrency(
+                  estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice,
+                  userSymbol,
+                  true,
+                  Math.min(
+                    valueToFractionDigits(
+                      estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1) * userPrice
+                    ),
+                    5
+                  )
                 )
-              )
-            : '--'}
-        </Typography>
-      </Box>
-      <Box key="withdrawalInitiated" className={styles.statContainer}>
-        <Box className={styles.statLabel}>
-          <InfoLabelBlock
-            title={t('pages.vault.personal-stats.initiated.title')}
-            content={
-              <Typography>{t('pages.vault.personal-stats.initiated.info1', { poolSymbol: userSymbol })}</Typography>
-            }
-          />
+              : '--'}
+          </Typography>
         </Box>
-        <Typography variant="bodyMedium" className={styles.statValue}>
-          {(withdrawals && withdrawals.length > 0) || hasOpenRequestOnChain ? 'Yes' : 'No'}
-        </Typography>
       </Box>
-      <Box key="withdrawalAmount" className={styles.statContainer}>
-        <Box className={styles.statLabel}>
-          <InfoLabelBlock
-            title={t('pages.vault.personal-stats.withdrawal-amount.title')}
-            content={
-              <>
-                <Typography>
-                  {t('pages.vault.personal-stats.withdrawal-amount.info1', {
-                    shareSymbol,
-                  })}
-                </Typography>
-                <Typography>{t('pages.vault.personal-stats.withdrawal-amount.info2')}</Typography>
-              </>
-            }
-          />
+      <Box className={styles.rightColumn}>
+        <Box key="withdrawalInitiated" className={styles.statContainer}>
+          <Box className={styles.statLabel}>
+            <InfoLabelBlock
+              title={t('pages.vault.personal-stats.initiated.title')}
+              content={
+                <Typography>{t('pages.vault.personal-stats.initiated.info1', { poolSymbol: userSymbol })}</Typography>
+              }
+            />
+          </Box>
+          <Typography variant="bodyMedium" className={styles.statValue}>
+            {(withdrawals && withdrawals.length > 0) || hasOpenRequestOnChain ? 'Yes' : 'No'}
+          </Typography>
         </Box>
-        <Typography variant="bodyMedium" className={styles.statValue}>
-          {withdrawals && withdrawals.length > 0
-            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, shareSymbol)
-            : 'N/A'}
-        </Typography>
-      </Box>
-      <Box key="withdrawalDate" className={styles.statContainer}>
-        <Box className={styles.statLabel}>
-          <InfoLabelBlock
-            title={t('pages.vault.personal-stats.date.title')}
-            content={
-              <>
-                <Typography>{t('pages.vault.personal-stats.date.info1')}</Typography>
-                <Typography>{t('pages.vault.personal-stats.date.info2')}</Typography>
-              </>
-            }
-          />
+        <Box key="withdrawalAmount" className={styles.statContainer}>
+          <Box className={styles.statLabel}>
+            <InfoLabelBlock
+              title={t('pages.vault.personal-stats.withdrawal-amount.title')}
+              content={
+                <>
+                  <Typography>
+                    {t('pages.vault.personal-stats.withdrawal-amount.info1', {
+                      shareSymbol,
+                    })}
+                  </Typography>
+                  <Typography>{t('pages.vault.personal-stats.withdrawal-amount.info2')}</Typography>
+                </>
+              }
+            />
+          </Box>
+          <Typography variant="bodyMedium" className={styles.statValue}>
+            {withdrawals && withdrawals.length > 0
+              ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, shareSymbol)
+              : 'N/A'}
+          </Typography>
         </Box>
-        <Typography variant="bodyMedium" className={styles.statValue}>
-          {withdrawOn}
-        </Typography>
+        <Box key="withdrawalDate" className={styles.statContainer}>
+          <Box className={styles.statLabel}>
+            <InfoLabelBlock
+              title={t('pages.vault.personal-stats.date.title')}
+              content={
+                <>
+                  <Typography>{t('pages.vault.personal-stats.date.info1')}</Typography>
+                  <Typography>{t('pages.vault.personal-stats.date.info2')}</Typography>
+                </>
+              }
+            />
+          </Box>
+          <Typography variant="bodyMedium" className={styles.statValue}>
+            {withdrawOn}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

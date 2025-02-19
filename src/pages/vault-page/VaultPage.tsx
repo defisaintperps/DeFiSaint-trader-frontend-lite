@@ -75,11 +75,6 @@ export const VaultPage = () => {
           )}
           <Container className={styles.container}>
             <div className={styles.statsHolder}>
-              {!isSmallScreen && (
-                <div className={styles.selectHolder}>
-                  <CollateralsSelect />
-                </div>
-              )}
               <GlobalStats />
             </div>
             <LiquidityBlock />

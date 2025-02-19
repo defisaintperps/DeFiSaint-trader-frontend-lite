@@ -27,7 +27,7 @@ export const PoolCards = () => {
         options={{
           perPage: 2,
           perMove: 1,
-          arrows: false,
+          arrows: selectItems.length > 2,
           gap: '12px',
           breakpoints: {
             967: {
