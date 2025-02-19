@@ -1,9 +1,26 @@
 @import '~styles/theme/theme.scss';
 
 .root {
-  display: block;
-}
+  display: grid;
+  gap: 1rem;
 
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4rem;
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+  }
+}
 
 .statContainer {
   margin-top: $d8x-spacing * 4;
