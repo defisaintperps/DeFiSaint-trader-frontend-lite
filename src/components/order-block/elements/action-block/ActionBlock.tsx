@@ -283,7 +283,7 @@ export const ActionBlock = memo(() => {
     if (poolTokenBalance === 0) {
       return ValidityCheckButtonE.NoFunds;
     }
-    if (!hasEnoughGasForFee(MethodE.Interact, 3n)) {
+    if (!hasEnoughGasForFee(MethodE.Interact, 1n)) {
       return ValidityCheckButtonE.NoEnoughGas;
     }
     if (orderInfo.size === 0) {
