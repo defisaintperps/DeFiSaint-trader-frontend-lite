@@ -410,8 +410,7 @@ export const ActionBlock = memo(() => {
       return;
     }
     setLatestOrderSentTimestamp(Date.now());
-    const splitSymbol = orderInfo?.symbol.split('-');
-    const symbol = `${splitSymbol?.[0]}-${splitSymbol?.[1]}-${flatToken?.isFlatToken ? flatToken.registeredSymbol : splitSymbol?.[2]}`;
+    const symbol = orderInfo?.symbol?.split('-')?.slice(0, -1)?.join('-');
     toast.success(
       <ToastContent
         title={t('pages.trade.action-block.toasts.order-submitted.title')}
@@ -436,7 +435,7 @@ export const ActionBlock = memo(() => {
         ]}
       />
     );
-  }, [isSuccess, txHash, chain, flatToken, orderInfo?.symbol, setLatestOrderSentTimestamp, t]);
+  }, [isSuccess, txHash, chain, orderInfo?.symbol, setLatestOrderSentTimestamp, t]);
 
   const splitSymbol = selectedPool?.settleSymbol?.split('-');
   const userSymbol = `${splitSymbol?.[0]}-${splitSymbol?.[1]}-${flatToken?.isFlatToken ? flatToken.registeredSymbol : splitSymbol?.[2]}`;

@@ -185,9 +185,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
             })
               .then(({ hash }) => {
                 setTxHash(hash);
-                const splitSymbol = selectedPosition.symbol.split('-');
-                const userSymbol = flatToken?.isFlatToken ? flatToken.registeredSymbol : splitSymbol[2];
-                setSymbolForTx(`${splitSymbol[0]}-${splitSymbol[1]}-${userSymbol}`);
+                setSymbolForTx(selectedPosition.symbol.split('-').slice(0, -1).join('-'));
                 orderSubmitted(walletClient.chain.id, data.data.orderIds).then().catch(console.error);
                 toast.success(
                   <ToastContent title={t('pages.trade.positions-table.toasts.submit-close.title')} bodyLines={[]} />
