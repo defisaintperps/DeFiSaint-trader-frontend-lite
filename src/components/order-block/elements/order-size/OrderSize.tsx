@@ -375,7 +375,7 @@ export const OrderSize = memo(() => {
               width={24}
               height={24}
               className={styles.currencyIcon}
-              onClick={() => setSelectedCurrency(selectedPool.settleSymbol)}
+              onClick={() => setSelectedCurrency(userSymbol ?? settleSymbol)}
             />
           )}
         </div>
