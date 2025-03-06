@@ -95,8 +95,8 @@ export const FlatTokenModal = () => {
           title={`Success`}
           bodyLines={[
             {
-              label: 'Token',
-              value: selectedStable,
+              label: 'You have registered your collateral token',
+              value: '',
             },
           ]}
         />

@@ -287,6 +287,13 @@ export const OrderSize = memo(() => {
       ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
       : [1, selectedPool?.poolSymbol];
 
+  const tooltipText = (() => {
+    if (!!flatToken && selectedPool?.poolId === flatToken.poolId) {
+      return flatToken.registeredToken || selectedPool?.settleTokenAddr?.toString() || '...';
+    }
+    return selectedPool?.settleTokenAddr?.toString() || '...';
+  })();
+
   return (
     <div className={styles.root}>
       <div className={styles.manualBlock}>
@@ -295,7 +302,7 @@ export const OrderSize = memo(() => {
             <Typography variant="bodySmallPopup" className={styles.infoText}>
               {t('pages.trade.order-block.info.balance')}:
             </Typography>
-            <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
+            <TooltipMobile tooltip={tooltipText}>
               <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
                 {poolTokenBalance === undefined ? '-' : formatToCurrency(poolTokenBalance * userPrice, userSymbol)}
               </Typography>
