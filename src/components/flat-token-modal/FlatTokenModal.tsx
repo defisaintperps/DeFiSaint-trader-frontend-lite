@@ -7,6 +7,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { depositModalOpenAtom, flatTokentModalOpenAtom } from 'store/global-modals.store';
+import { MethodE } from 'types/enums';
 
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -22,7 +23,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 
 export const FlatTokenModal = () => {
   const { address, chainId } = useAccount();
-  const { isMultisigAddress } = useUserWallet();
+  const { gasTokenBalance, hasEnoughGasForFee, isMultisigAddress } = useUserWallet();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -33,6 +34,7 @@ export const FlatTokenModal = () => {
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const pools = useAtomValue(poolsAtom);
+  const isDepositModalOpen = useAtomValue(depositModalOpenAtom);
 
   const [title] = useState('');
   const [txHash, setTxHash] = useState<Address | undefined>();
@@ -122,10 +124,10 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (flatToken?.registeredToken) {
+    if (flatToken?.registeredToken || !hasEnoughGasForFee(MethodE.Interact, 1n)) {
       setFlatTokentModalOpen(false);
     }
-  }, [flatToken, setFlatTokentModalOpen]);
+  }, [flatToken, setFlatTokentModalOpen, hasEnoughGasForFee]);
 
   useEffect(() => {
     if (!isBusyRef.current && pools && proxyAddr && publicClient && (flatTokenRef.current === undefined || isFetched)) {
@@ -155,6 +157,8 @@ export const FlatTokenModal = () => {
     }
   }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
 
+  console.log('gasTokenBalance', gasTokenBalance);
+
   useEffect(() => {
     setSelectedStable(undefined);
     if (
@@ -162,12 +166,34 @@ export const FlatTokenModal = () => {
       selectedPool &&
       flatToken.isFlatToken &&
       !flatToken.registeredToken &&
-      selectedPool.poolId === flatToken.poolId
+      selectedPool.poolId === flatToken.poolId &&
+      hasEnoughGasForFee(MethodE.Interact, 1n)
     ) {
       setDepositModalOpen(false);
       setFlatTokentModalOpen(true);
     }
-  }, [flatToken, selectedPool, setDepositModalOpen, setFlatTokentModalOpen, setSelectedStable]);
+  }, [
+    flatToken,
+    selectedPool,
+    setDepositModalOpen,
+    setFlatTokentModalOpen,
+    setSelectedStable,
+    hasEnoughGasForFee,
+    gasTokenBalance,
+  ]);
+
+  useEffect(() => {
+    if (
+      isDepositModalOpen &&
+      flatToken?.isFlatToken &&
+      !flatToken?.registeredToken &&
+      selectedPool?.poolId === flatToken.poolId &&
+      hasEnoughGasForFee(MethodE.Interact, 1n)
+    ) {
+      setFlatTokentModalOpen(true);
+      setDepositModalOpen(false);
+    }
+  }, [isDepositModalOpen, setDepositModalOpen, flatToken, setFlatTokentModalOpen, selectedPool, hasEnoughGasForFee]);
 
   useEffect(() => {
     if (selectedPool && flatTokenRef.current) {

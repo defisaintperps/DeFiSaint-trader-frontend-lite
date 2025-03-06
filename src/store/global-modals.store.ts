@@ -1,7 +1,6 @@
 import { atom } from 'jotai';
 
 import { CurrencyItemI } from '../components/currency-selector/types';
-import { flatTokenAtom, selectedPoolAtom } from './pools.store';
 
 export const accountModalOpenAtom = atom(false);
 export const modalSelectedCurrencyAtom = atom<CurrencyItemI | null>(null);
@@ -21,14 +20,7 @@ export const flatTokentModalOpenAtom = atom(false);
 const depositModalOpenPrimitiveAtom = atom(false);
 export const depositModalOpenAtom = atom(
   (get) => get(depositModalOpenPrimitiveAtom),
-  (get, set, value: boolean) => {
-    const flatToken = get(flatTokenAtom);
-    const selectedPool = get(selectedPoolAtom);
-    if (value && flatToken?.isFlatToken && !flatToken?.registeredToken && selectedPool?.poolId === flatToken.poolId) {
-      set(flatTokentModalOpenAtom, true);
-      set(depositModalOpenPrimitiveAtom, false);
-    } else {
-      set(depositModalOpenPrimitiveAtom, value);
-    }
+  (_, set, value: boolean) => {
+    set(depositModalOpenPrimitiveAtom, value);
   }
 );
