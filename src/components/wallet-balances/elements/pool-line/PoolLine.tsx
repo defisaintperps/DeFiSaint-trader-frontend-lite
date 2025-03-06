@@ -40,6 +40,11 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
         functionName: 'effectiveBalanceOf',
         args: [address as Address],
       },
+      {
+        address: pool.settleTokenAddr as Address,
+        abi: flatTokenAbi,
+        functionName: 'getSupportedTokens',
+      },
     ],
     query: {
       enabled: address && pool.settleTokenAddr !== undefined && !isPending && isConnected,
@@ -72,15 +77,15 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   const numberDigits = valueToFractionDigits(unroundedSCValue);
 
   const [userPrice, userSymbol] =
-    !!flatToken && pool.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+    !!flatToken && pool.poolId === flatToken.poolId
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
       : [1, pool.settleSymbol];
 
   return (
     <AssetLine
       symbol={userSymbol}
       value={
-        tokenBalance && tokenBalanceData?.[1].status === 'success'
+        tokenBalance !== undefined && tokenBalanceData?.[1].status === 'success'
           ? (+formatUnits(tokenBalance, tokenBalanceData[1].result) * userPrice).toFixed(numberDigits)
           : ''
       }
