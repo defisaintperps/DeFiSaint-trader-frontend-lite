@@ -46,12 +46,12 @@ export const Vault = () => {
           <div className={styles.assetsList}>
             {poolShareTokensShare.map((share) => {
               const userSymbol =
-                !!flatToken && share.poolId === flatToken.poolId && !!flatToken.registeredSymbol
-                  ? flatToken.registeredSymbol
-                  : share.settleSymbol;
-              return (
-                <AssetLine key={share.symbol} symbol={userSymbol} value={`${(share.percent * 100).toFixed(2)}%`} />
-              );
+                !!flatToken && share.poolId === flatToken.poolId ? flatToken.registeredSymbol : share.settleSymbol;
+              if (userSymbol) {
+                return (
+                  <AssetLine key={share.symbol} symbol={userSymbol} value={`${(share.percent * 100).toFixed(2)}%`} />
+                );
+              }
             })}
           </div>
         </div>
@@ -61,18 +61,20 @@ export const Vault = () => {
         <div className={styles.assetsList}>
           {earningsList.map((earning) => {
             const [userPrice, userSymbol] =
-              !!flatToken && earning.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+              !!flatToken && earning.poolId === flatToken.poolId
                 ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
                 : [1, earning.settleSymbol];
-            return (
-              <AssetLine
-                key={earning.symbol}
-                symbol={userSymbol}
-                value={(earning.value * (c2s.get(earning.symbol)?.value ?? 1) * userPrice).toFixed(
-                  Math.min(valueToFractionDigits(earning.value * (c2s.get(earning.symbol)?.value ?? 1)), 4)
-                )}
-              />
-            );
+            if (userSymbol) {
+              return (
+                <AssetLine
+                  key={earning.symbol}
+                  symbol={userSymbol}
+                  value={(earning.value * (c2s.get(earning.symbol)?.value ?? 1) * userPrice).toFixed(
+                    Math.min(valueToFractionDigits(earning.value * (c2s.get(earning.symbol)?.value ?? 1)), 4)
+                  )}
+                />
+              );
+            }
           })}
         </div>
       </div>
