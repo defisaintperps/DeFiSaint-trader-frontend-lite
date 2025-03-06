@@ -122,27 +122,48 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
+    if (flatToken?.registeredToken) {
+      setFlatTokentModalOpen(false);
+    }
+  }, [flatToken, setFlatTokentModalOpen]);
+
+  useEffect(() => {
     if (!isBusyRef.current && pools && proxyAddr && publicClient && (flatTokenRef.current === undefined || isFetched)) {
       isBusyRef.current = true;
       setFlatToken(undefined);
-      pools.forEach((pool) => {
-        fetchFlatTokenInfo(publicClient, proxyAddr as Address, pool.settleTokenAddr as Address, address ?? zeroAddress)
-          .then((info) => {
-            if (info.controller === proxyAddr) {
-              setFlatToken({ ...info, poolId: pool.poolId });
-            }
-          })
-          .catch()
-          .finally(() => {
-            isBusyRef.current = false;
-          });
+      Promise.allSettled(
+        pools.map((pool) =>
+          fetchFlatTokenInfo(
+            publicClient,
+            proxyAddr as Address,
+            pool.settleTokenAddr as Address,
+            address ?? zeroAddress
+          )
+            .then((info) => {
+              if (info.controller === proxyAddr) {
+                setFlatToken({ ...info, poolId: pool.poolId });
+                if (info.registeredToken) {
+                  setFlatTokentModalOpen(false);
+                }
+              }
+            })
+            .catch()
+        )
+      ).then(() => {
+        isBusyRef.current = false;
       });
     }
   }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
 
   useEffect(() => {
     setSelectedStable(undefined);
-    if (flatToken?.isFlatToken && !flatToken?.registeredToken && selectedPool?.poolId === flatToken.poolId) {
+    if (
+      flatToken &&
+      selectedPool &&
+      flatToken.isFlatToken &&
+      !flatToken.registeredToken &&
+      selectedPool.poolId === flatToken.poolId
+    ) {
       setDepositModalOpen(false);
       setFlatTokentModalOpen(true);
     }
