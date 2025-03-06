@@ -25,11 +25,9 @@ export const depositModalOpenAtom = atom(
     const flatToken = get(flatTokenAtom);
     const selectedPool = get(selectedPoolAtom);
     if (value && flatToken?.isFlatToken && !flatToken?.registeredToken && selectedPool?.poolId === flatToken.poolId) {
-      console.log({ value, flatToken, selectedPoolId: selectedPool?.poolId });
       set(flatTokentModalOpenAtom, true);
       set(depositModalOpenPrimitiveAtom, false);
     } else {
-      console.log({ value, flatToken, selectedPoolId: selectedPool?.poolId });
       set(depositModalOpenPrimitiveAtom, value);
     }
   }
