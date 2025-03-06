@@ -157,8 +157,6 @@ export const FlatTokenModal = () => {
     }
   }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
 
-  console.log('gasTokenBalance', gasTokenBalance);
-
   useEffect(() => {
     setSelectedStable(undefined);
     if (

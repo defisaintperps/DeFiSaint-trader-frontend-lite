@@ -47,7 +47,6 @@ export const Vault = () => {
             {poolShareTokensShare.map((share) => {
               const userSymbol =
                 !!flatToken && share.poolId === flatToken.poolId ? flatToken.registeredSymbol : share.settleSymbol;
-              console.log('vault', share.symbol, userSymbol);
               if (userSymbol) {
                 return (
                   <AssetLine key={share.symbol} symbol={userSymbol} value={`${(share.percent * 100).toFixed(2)}%`} />
