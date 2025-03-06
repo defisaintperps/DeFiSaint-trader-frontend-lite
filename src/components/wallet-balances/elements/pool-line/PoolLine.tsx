@@ -51,6 +51,27 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
     },
   });
 
+  const { data: composableBalances } = useReadContracts({
+    allowFailure: false, // should not run if this isn't a flat token
+    contracts: flatToken?.supportedTokens?.map((token) => ({
+      address: token.address,
+      abi: erc20Abi,
+      functionName: 'balanceOf',
+      args: [address as Address],
+    })),
+    query: { enabled: pool.poolId === flatToken?.poolId && address && isConnected && !flatToken?.registeredSymbol },
+  });
+
+  const { data: composableDecimals } = useReadContracts({
+    allowFailure: false,
+    contracts: flatToken?.supportedTokens?.map((token) => ({
+      address: token.address,
+      abi: erc20Abi,
+      functionName: 'decimals',
+    })),
+    query: { enabled: pool.poolId === flatToken?.poolId && address && isConnected && !flatToken?.registeredSymbol },
+  });
+
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -77,11 +98,27 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   const numberDigits = valueToFractionDigits(unroundedSCValue);
 
   const [userPrice, userSymbol] =
-    !!flatToken && pool.poolId === flatToken.poolId
-      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol ?? flatToken.supportedTokens[0].symbol]
+    !!flatToken && pool.poolId === flatToken.poolId && flatToken.registeredSymbol
+      ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
       : [1, pool.settleSymbol];
 
-  return (
+  return !!flatToken &&
+    pool.poolId === flatToken.poolId &&
+    !flatToken.registeredSymbol &&
+    composableBalances &&
+    composableDecimals ? (
+    <>
+      {flatToken.supportedTokens.map((token, idx) => (
+        <AssetLine
+          key={token.address}
+          symbol={token.symbol}
+          value={(+formatUnits(BigInt(composableBalances[idx]), Number(composableDecimals[idx])) * userPrice).toFixed(
+            numberDigits
+          )}
+        />
+      ))}
+    </>
+  ) : (
     <AssetLine
       symbol={userSymbol}
       value={
