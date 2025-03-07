@@ -376,7 +376,7 @@ export const OrderSize = memo(() => {
               onClick={() => setSelectedCurrency(selectedPerpetual.baseCurrency)}
             />
           )}
-          {selectedPool && selectedCurrency !== selectedPool.settleSymbol && (
+          {selectedPool && selectedCurrency !== selectedPool.settleSymbol && selectedCurrency !== userSymbol && (
             <DynamicLogo
               logoName={(userSymbol ?? settleSymbol).toLowerCase()}
               width={24}
