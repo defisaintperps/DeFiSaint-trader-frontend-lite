@@ -1,0 +1,51 @@
+.container {
+    background-color: var(--background-paper);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  
+  .title {
+    margin-bottom: 16px;
+  }
+  
+  .statItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--divider);
+  
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  .label {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  
+  .value {
+    font-weight: 500;
+  }
+  
+  .notConnected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    color: var(--text-secondary);
+  }
+  
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+  }
+  
+  .statsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }

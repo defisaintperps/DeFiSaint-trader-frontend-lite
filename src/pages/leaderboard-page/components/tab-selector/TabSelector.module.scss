@@ -1,0 +1,30 @@
+.root {
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  
+  .tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .active {
+    background-color: var(--primary-main);
+    color: var(--text-primary-inverted);
+  }
+  
+  .inactive {
+    background-color: var(--background-paper);
+    color: var(--text-primary);
+  
+    &:hover {
+      background-color: var(--background-select-hover);
+    }
+  }

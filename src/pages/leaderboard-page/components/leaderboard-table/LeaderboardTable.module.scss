@@ -1,0 +1,21 @@
+.tableContainer {
+    width: 100%;
+    box-shadow: none;
+  }
+  
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    width: 100%;
+  }
+  
+  .emptyContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    width: 100%;
+    color: var(--text-secondary);
+  }
