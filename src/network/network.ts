@@ -10,6 +10,8 @@ import type {
   CancelOrderResponseI,
   EtherFiApyI,
   ExchangeInfoI,
+  LeaderboardEntryI,
+  LeaderboardResponseI,
   MaintenanceStatusI,
   MarginAccountI,
   MaxOrderSizeResponseI,
@@ -18,6 +20,7 @@ import type {
   PerpetualOpenOrdersI,
   PerpetualPriceI,
   PerpetualStaticInfoI,
+  UserLeaderboardStatsI,
   ValidatedResponseI,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -413,6 +416,33 @@ export async function getBoostRank(traderAddr: string): Promise<BoostRankRespons
 
 export async function getBoostStationParameters(): Promise<BoostStationParamResponseI> {
   const data = await fetch(`https://drip.d8x.xyz/score-params`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
+}
+
+export async function getAllTimeLeaderboardEntries(): Promise<LeaderboardResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/leaderboard/alltime`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
+}
+
+export async function getWeeklyLeaderboardEntries(): Promise<LeaderboardResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/leaderboard/weekly`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
+}
+
+export async function getUserLeaderboardStats(traderAddr: string): Promise<UserLeaderboardStatsI> {
+  const data = await fetch(`https://drip.d8x.xyz/leaderboard/user?addr=${traderAddr}`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);
