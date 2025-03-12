@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 
 import { LeaderboardTabIdE } from 'pages/leaderboard-page/constants';
 
@@ -37,9 +37,9 @@ export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
   );
 
   return (
-    <div className={styles.root}>
+    <Box className={styles.root}>
       {tabItems.map((tab) => (
-        <div
+        <Box
           key={tab.tabId}
           onClick={() => onTabChange(tab.tabId)}
           className={classnames(styles.tab, {
@@ -47,9 +47,9 @@ export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
             [styles.inactive]: tab.tabId !== activeTab,
           })}
         >
-          <Typography variant="bodyMedium">{tab.label}</Typography>
-        </div>
+          <Typography variant="body2">{tab.label}</Typography>
+        </Box>
       ))}
-    </div>
+    </Box>
   );
 };

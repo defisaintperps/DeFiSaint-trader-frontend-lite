@@ -21,7 +21,7 @@ export const UserStats = ({ userStats, isConnected }: UserStatsPropsI) => {
       <Typography variant="h6" className={styles.title}>
         {t('leaderboard.yourStats')}
       </Typography>
-      
+
       {!isConnected ? (
         <div className={styles.notConnected}>
           <Typography variant="body2">{t('leaderboard.connectWalletToSeeStats')}</Typography>
@@ -33,23 +33,29 @@ export const UserStats = ({ userStats, isConnected }: UserStatsPropsI) => {
       ) : (
         <div className={styles.statsContent}>
           <div className={styles.statItem}>
-            <Typography variant="body2" className={styles.label}>{t('leaderboard.address')}:</Typography>
-            <Typography variant="body2" className={styles.value}>{shortenAddress(userStats.address)}</Typography>
+            <Typography variant="body2" className={styles.label}>
+              {t('leaderboard.address')}:
+            </Typography>
+            <Typography variant="body2" className={styles.value}>
+              {shortenAddress(userStats.trader)}
+            </Typography>
           </div>
           <div className={styles.statItem}>
-            <Typography variant="body2" className={styles.label}>{t('leaderboard.rank')}:</Typography>
-            <Typography variant="body2" className={styles.value}>{userStats.rank > 0 ? userStats.rank : '-'}</Typography>
+            <Typography variant="body2" className={styles.label}>
+              {t('leaderboard.rank')}:
+            </Typography>
+            <Typography variant="body2" className={styles.value}>
+              {userStats.rank > 0 ? userStats.rank : '-'}
+            </Typography>
           </div>
           <div className={styles.statItem}>
-            <Typography variant="body2" className={styles.label}>{t('leaderboard.d8xPoints')}:</Typography>
-            <Typography variant="body2" className={styles.value}>{userStats.points.toLocaleString()}</Typography>
+            <Typography variant="body2" className={styles.label}>
+              {t('leaderboard.pnl')}:
+            </Typography>
+            <Typography variant="body2" className={styles.value}>
+              {userStats.pnl.toFixed(2)}
+            </Typography>
           </div>
-          {userStats.pnl !== undefined && (
-            <div className={styles.statItem}>
-              <Typography variant="body2" className={styles.label}>{t('leaderboard.pnl')}:</Typography>
-              <Typography variant="body2" className={styles.value}>{userStats.pnl.toLocaleString()}</Typography>
-            </div>
-          )}
         </div>
       )}
     </div>

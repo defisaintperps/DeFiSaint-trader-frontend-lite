@@ -10,8 +10,9 @@ import type {
   CancelOrderResponseI,
   EtherFiApyI,
   ExchangeInfoI,
-  LeaderboardEntryI,
-  LeaderboardResponseI,
+  WeeklyLeaderboardResponseI,
+  AllTimeLeaderboardResponseI,
+  UserLeaderboardStatsI,
   MaintenanceStatusI,
   MarginAccountI,
   MaxOrderSizeResponseI,
@@ -20,7 +21,6 @@ import type {
   PerpetualOpenOrdersI,
   PerpetualPriceI,
   PerpetualStaticInfoI,
-  UserLeaderboardStatsI,
   ValidatedResponseI,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -423,8 +423,9 @@ export async function getBoostStationParameters(): Promise<BoostStationParamResp
   return data.json();
 }
 
-export async function getAllTimeLeaderboardEntries(): Promise<LeaderboardResponseI> {
-  const data = await fetch(`https://drip.d8x.xyz/leaderboard/alltime`, getRequestOptions());
+export async function getWeeklyLeaderboardEntries(limit = 50, page = 0): Promise<WeeklyLeaderboardResponseI> {
+  const offset = page * limit;
+  const data = await fetch(`https://drip.d8x.xyz/leader?limit=${limit}&offset=${offset}`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);
@@ -432,8 +433,9 @@ export async function getAllTimeLeaderboardEntries(): Promise<LeaderboardRespons
   return data.json();
 }
 
-export async function getWeeklyLeaderboardEntries(): Promise<LeaderboardResponseI> {
-  const data = await fetch(`https://drip.d8x.xyz/leaderboard/weekly`, getRequestOptions());
+export async function getAllTimeLeaderboardEntries(limit = 50, page = 0): Promise<AllTimeLeaderboardResponseI> {
+  const offset = page * limit;
+  const data = await fetch(`https://drip.d8x.xyz/all-time-leader?limit=${limit}&offset=${offset}`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);
@@ -442,7 +444,8 @@ export async function getWeeklyLeaderboardEntries(): Promise<LeaderboardResponse
 }
 
 export async function getUserLeaderboardStats(traderAddr: string): Promise<UserLeaderboardStatsI> {
-  const data = await fetch(`https://drip.d8x.xyz/leaderboard/user?addr=${traderAddr}`, getRequestOptions());
+  // This is a placeholder - you'll need to implement your actual user stats endpoint
+  const data = await fetch(`https://drip.d8x.xyz/leader/user?addr=${traderAddr}`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);

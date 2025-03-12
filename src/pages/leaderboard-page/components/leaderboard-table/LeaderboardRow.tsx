@@ -8,14 +8,22 @@ import styles from './LeaderboardRow.module.scss';
 
 interface LeaderboardRowPropsI {
   entry: LeaderboardEntryI;
+  showPoints?: boolean;
 }
 
-export const LeaderboardRow = ({ entry }: LeaderboardRowPropsI) => {
+export const LeaderboardRow = ({ entry, showPoints = false }: LeaderboardRowPropsI) => {
+  // Handle both formats: trader (weekly) or address (all-time)
+  const addressToDisplay = entry.trader || entry.address || '';
+
   return (
     <TableRow className={styles.row}>
       <TableCell>{entry.rank}</TableCell>
-      <TableCell>{shortenAddress(entry.address)}</TableCell>
-      <TableCell align="right">{entry.points.toLocaleString()}</TableCell>
+      <TableCell>{shortenAddress(addressToDisplay)}</TableCell>
+      {showPoints && entry.points ? (
+        <TableCell align="right">{entry.points.toLocaleString()}</TableCell>
+      ) : (
+        <TableCell align="right">{entry.pnl.toFixed(2)}</TableCell>
+      )}
     </TableRow>
   );
 };
