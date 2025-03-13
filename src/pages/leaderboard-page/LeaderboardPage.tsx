@@ -32,25 +32,16 @@ export const LeaderboardPage = () => {
   const [allTimePage, setAllTimePage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
+  console.log('address', address);
   // Fetch weekly leaderboard data
   const fetchWeeklyLeaderboardData = async (page = 0) => {
     setIsLoadingWeekly(true);
     try {
       const data = await getWeeklyLeaderboardEntries();
-
       // Handle API response format with 'leaderBoard' field (weekly endpoint specific)
       if (data && data.leaderBoard && Array.isArray(data.leaderBoard)) {
         setAllWeeklyEntries(data.leaderBoard);
         setWeeklyEntries(data.leaderBoard.slice(page * pageSize, (page + 1) * pageSize));
-      }
-      // Handle API response format with 'board' field (all-time endpoint format)
-      else if (data && data.board && Array.isArray(data.board)) {
-        setAllWeeklyEntries(data.board);
-        setWeeklyEntries(data.board.slice(page * pageSize, (page + 1) * pageSize));
-      } else if (data && data.entries && Array.isArray(data.entries)) {
-        // Fallback to original format if API changes
-        setAllWeeklyEntries(data.entries);
-        setWeeklyEntries(data.entries.slice(page * pageSize, (page + 1) * pageSize));
       } else {
         console.error('Weekly leaderboard API returned unexpected data format:', data);
         setAllWeeklyEntries([]);
@@ -70,23 +61,10 @@ export const LeaderboardPage = () => {
     setIsLoadingAllTime(true);
     try {
       const data = await getAllTimeLeaderboardEntries();
-
       // Handle API response format with 'board' field instead of 'entries'
       if (data && data.board && Array.isArray(data.board)) {
         // Sort by points (descending) and assign ranks
         const sortedEntries = [...data.board]
-          .sort((a, b) => (b.points || 0) - (a.points || 0))
-          .map((entry, index) => ({
-            ...entry,
-            rank: index + 1,
-          }));
-
-        setAllAllTimeEntries(sortedEntries);
-        setAllTimeEntries(sortedEntries.slice(page * pageSize, (page + 1) * pageSize));
-      } else if (data && data.entries && Array.isArray(data.entries)) {
-        // Fallback to original format if API changes
-        // Sort by points (descending) and assign ranks
-        const sortedEntries = [...data.entries]
           .sort((a, b) => (b.points || 0) - (a.points || 0))
           .map((entry, index) => ({
             ...entry,
