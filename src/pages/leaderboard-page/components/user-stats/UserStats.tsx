@@ -17,10 +17,8 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
 
   // Helper function to determine the PNL class
   const getPnlClass = (pnl?: number) => {
-    if (pnl === undefined || pnl === null) return '';
-    if (pnl > 0) return styles.positive;
-    if (pnl < 0) return styles.negative;
-    return '';
+    if (typeof pnl !== 'number') return styles.positive; // Handles undefined, null, and non-number values
+    return pnl >= 0 ? styles.positive : styles.negative; // Handles all number cases including 0
   };
 
   // Helper function to format PNL
@@ -111,7 +109,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
               <Typography variant="body2" className={styles.statItemLabel}>
                 PNL
               </Typography>
-              <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(allTimeStats?.pnl)}`}>
+              <Typography variant="h5" className={`${styles.statValueLarge}`}>
                 {allTimeStats?.points} Points
               </Typography>
             </div>

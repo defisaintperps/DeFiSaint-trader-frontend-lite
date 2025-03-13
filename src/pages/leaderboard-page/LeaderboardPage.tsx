@@ -129,6 +129,7 @@ export const LeaderboardPage = () => {
           trader: userEntry.address || address,
           points: userEntry.points || 0,
           numWeeks: userEntry.numWeeks,
+          pnl: userEntry.pnl || 0,
         });
       } else {
         setAllTimeUserStats({
@@ -136,6 +137,7 @@ export const LeaderboardPage = () => {
           trader: address,
           points: 0,
           numWeeks: 0,
+          pnl: 0,
         });
       }
     }

@@ -33,12 +33,12 @@ export const LeaderboardRow = ({ entry }: LeaderboardRowPropsI) => {
   const isUserRow = address && addressToDisplay && addressToDisplay.toLowerCase() === address.toLowerCase();
 
   // Determine PNL styling
-  const getPnlClass = () => {
-    if (typeof entry.pnl !== 'number') return '';
-    if (entry.pnl > 0) return styles.positive;
-    if (entry.pnl < 0) return styles.negative;
-    return '';
+  const getPnlClass = (pnl?: number) => {
+    if (typeof pnl !== 'number') return styles.positive; // Handles undefined, null, and non-number values
+    return pnl >= 0 ? styles.positive : styles.negative; // Handles all number cases including 0
   };
+
+  console.log('PNL class:', getPnlClass(-22));
 
   const isWeekly = isWeeklyEntry(entry);
 
@@ -67,7 +67,7 @@ export const LeaderboardRow = ({ entry }: LeaderboardRowPropsI) => {
 
       {isWeekly ? (
         <TableCell className={styles.pnlCell} align="right">
-          <Typography variant="body2" className={getPnlClass()}>
+          <Typography variant="body2" className={getPnlClass(entry.pnl)}>
             {formatPnl(entry.pnl)}
           </Typography>
         </TableCell>

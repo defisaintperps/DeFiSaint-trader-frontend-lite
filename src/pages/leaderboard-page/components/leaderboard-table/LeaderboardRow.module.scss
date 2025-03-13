@@ -42,15 +42,7 @@
   width: 100px;
 }
 
-.positive {
-  color: var(--d8x-color-success);
-  font-weight: 600;
-}
 
-.negative {
-  color: var(--d8x-color-error);
-  font-weight: 600;
-}
 
 .pointsCell {
   text-align: right;
@@ -60,4 +52,12 @@
 
 .userRow {
   background-color: var(--d8x-color-background-highlight) !important;
+}
+
+.positive {
+  color: var(--d8x-color-text-buy) !important;
+}
+
+.negative {
+  color: var(--d8x-color-text-sell) !important;
 }
