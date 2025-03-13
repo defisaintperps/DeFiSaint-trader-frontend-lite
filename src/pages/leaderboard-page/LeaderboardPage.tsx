@@ -187,7 +187,7 @@ export const LeaderboardPage = () => {
     <MaintenanceWrapper>
       <Helmet title={t('pages.leaderboard.title')} />
       <Container>
-        <div style={{ padding: '24px 0' }}>
+        <div>
           {address && (
             <UserStats weeklyStats={weeklyUserStats} allTimeStats={allTimeUserStats} isLoading={isUserStatsLoading} />
           )}

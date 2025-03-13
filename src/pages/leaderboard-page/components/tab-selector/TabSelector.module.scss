@@ -2,40 +2,33 @@
 
 .root {
   display: flex;
-  flex-direction: row;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 24px;
-  border: 1px solid var(--d8x-block-border-color);
-  background-color: var(--d8x-color-background-items);
+  margin-bottom: 20px;
 }
 
 .tab {
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 120px;
-  font-weight: 500;
-  
-  &:not(:last-child) {
-    border-right: 1px solid var(--d8x-block-border-color);
+  padding: 3 * $d8x-spacing 10 * $d8x-spacing;
+  border: 1px solid var(--d8x-block-border-color);
+
+  &:first-child {
+    border-radius: $d8x-border-radius 0 0 $d8x-border-radius;
   }
-}
 
-.active {
-  color: var(--d8x-color-action);
-  background-color: var(--d8x-color-action-secondary);
-  font-weight: 600;
-}
+  &:last-child {
+    border-radius: 0 $d8x-border-radius $d8x-border-radius 0;
+  }
 
-.inactive {
-  color: var(--d8x-color-text-primary);
-  background-color: var(--d8x-color-background-items);
+  span {
+    font-weight: 600;
+  }
 
-  &:hover {
-    background-color: var(--d8x-color-background-hover);
+  &.active {
+    background-color: var(--d8x-color-action);
+    color: var(--d8x-color-text-secondary);
+  }
+
+  &.inactive {
+    background-color: var(--d8x-color-background-items-inactive);
+    color: var(--d8x-color-text-primarytab-inactive);
+    cursor: pointer;
   }
 }

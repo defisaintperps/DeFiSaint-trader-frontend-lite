@@ -37,7 +37,7 @@ export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
   );
 
   return (
-    <Box className={styles.root}>
+    <div className={styles.root}>
       {tabItems.map((tab) => (
         <Box
           key={tab.tabId}
@@ -47,9 +47,9 @@ export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
             [styles.inactive]: tab.tabId !== activeTab,
           })}
         >
-          <Typography variant="body2">{tab.label}</Typography>
+          <Typography variant="bodyMedium">{tab.label}</Typography>
         </Box>
       ))}
-    </Box>
+    </div>
   );
 };
