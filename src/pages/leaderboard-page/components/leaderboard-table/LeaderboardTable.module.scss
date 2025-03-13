@@ -1,0 +1,207 @@
+@import '~styles/theme/theme.scss';
+
+.root {
+  width: 100%;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tableContainer {
+  width: 100%;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tableHead {
+  background-color: var(--d8x-color-background-table-header);
+  
+  th {
+    color: var(--d8x-color-text-table-header);
+    font-weight: 600;
+    padding: 14px 16px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--d8x-color-border);
+    white-space: nowrap;
+    
+    &:first-child {
+      padding-left: 24px;
+    }
+    
+    &:last-child {
+      padding-right: 24px;
+    }
+    
+    /* Styling for the sortable headers */
+    :global(.MuiTableSortLabel-root) {
+      color: var(--d8x-color-text-table-header);
+      
+      &:hover, &.Mui-active {
+        color: var(--d8x-color-text-active);
+      }
+      
+      .MuiTableSortLabel-icon {
+        opacity: 1;
+        color: var(--d8x-color-text-muted);
+      }
+    }
+  }
+}
+
+/* SortableHeaders styles needed for leaderboard */
+.headerLabel {
+  color: var(--d8x-color-text-table-header);
+  padding: 12px 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  :global(.MuiTypography-root) {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--d8x-color-text-table-header);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.sortIcon {
+  svg {
+    fill: var(--d8x-color-text-table-header);
+    opacity: 0.7;
+  }
+  
+  &:hover {
+    svg {
+      opacity: 1;
+    }
+  }
+  
+  &:global(.Mui-active) {
+    svg {
+      opacity: 1;
+      fill: var(--d8x-color-text-active);
+    }
+  }
+}
+
+.tooltip {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
+.tableBody {
+  background-color: var(--d8x-color-background-table);
+
+  :global(.MuiTypography-root) {
+    color: var(--d8x-color-text-table-cell);
+  }
+
+  tr {
+    background-color: var(--d8x-color-background-table-row-default);
+    border-bottom: 1px solid var(--d8x-color-border-light);
+    transition: background-color 0.2s;
+
+    &:nth-child(2n) {
+      background-color: var(--d8x-color-background-table-even-row);
+    }
+    
+    &:hover {
+      background-color: var(--d8x-color-background-hover);
+    }
+  }
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+.noData {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 24px;
+  text-align: center;
+}
+
+.noDataTitle {
+  margin-bottom: 8px;
+  color: var(--d8x-color-text-primary);
+}
+
+.noDataText {
+  margin-bottom: 16px;
+  color: var(--d8x-color-text-secondary);
+  max-width: 400px;
+}
+
+.refreshButton {
+  padding: 8px 16px;
+  background-color: var(--d8x-color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: var(--d8x-color-primary-dark);
+  }
+}
+
+.paginationHolder {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding: 0 16px;
+  
+  :global(.MuiTablePagination-root) {
+    color: var(--d8x-color-text-primary);
+    
+    .MuiTablePagination-select {
+      font-weight: 500;
+    }
+    
+    .MuiTablePagination-selectIcon {
+      color: var(--d8x-color-text-primary);
+    }
+    
+    .MuiTablePagination-displayedRows {
+      color: var(--d8x-color-text-primary);
+      font-weight: 500;
+    }
+    
+    .MuiIconButton-root {
+      color: var(--d8x-color-primary);
+      background-color: var(--d8x-color-background-paper);
+      margin: 0 4px;
+      border: 1px solid var(--d8x-color-border);
+      
+      &:hover {
+        background-color: var(--d8x-color-background-hover);
+      }
+      
+      &.Mui-disabled {
+        color: var(--d8x-color-text-disabled);
+        background-color: var(--d8x-color-background-disabled);
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
+.highlight {
+  background-color: var(--d8x-color-background-highlight) !important;
+}

@@ -1,0 +1,199 @@
+.container {
+  background-color: var(--d8x-color-background-paper);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid var(--d8x-color-border);
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--d8x-color-text-primary);
+}
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 24px;
+  align-items: stretch;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: var(--d8x-color-background-light);
+  border-radius: 8px;
+  border: 1px solid var(--d8x-color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.statIcon {
+  margin-right: 8px;
+  color: var(--d8x-color-primary);
+  font-size: 20px;
+}
+
+.statTitle {
+  font-weight: 500;
+  color: var(--d8x-color-text-primary);
+  flex: 1;
+}
+
+.statChip {
+  font-size: 0.7rem;
+  height: 24px;
+}
+
+.weeksChip {
+  font-size: 0.7rem;
+  height: 24px;
+  background-color: rgba(var(--d8x-color-secondary-rgb), 0.1);
+  color: var(--d8x-color-secondary);
+  margin-left: auto;
+  
+  svg {
+    font-size: 14px;
+    color: var(--d8x-color-secondary);
+  }
+}
+
+.statContent {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.statItemLabel {
+  color: var(--d8x-color-text-primary);
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+}
+
+.statValueLarge {
+  color: var(--d8x-color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.positive {
+  color: var(--d8x-color-text-buy);
+}
+
+.negative {
+  color: var(--d8x-color-text-sell);
+}
+
+.notConnected {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+  text-align: center;
+  padding: 24px;
+  background-color: var(--d8x-color-background-light);
+  border-radius: 8px;
+  border: 1px dashed var(--d8x-color-border);
+}
+
+.helperText {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  color: var(--d8x-color-text-secondary);
+  
+  svg {
+    margin-right: 4px;
+    font-size: 16px;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+}
+
+//Custom tooltip styles if needed
+.tooltip {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
+//Icon hover styles for better interactivity
+.activeIcon {
+  svg {
+    fill: var(--d8x-color-text-active);
+    opacity: 1;
+  }
+}
+
+.activeWeeks {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--d8x-color-border);
+  color: var(--d8x-color-text-secondary);
+  font-size: 0.9rem;
+  
+  .weekIcon {
+    color: var(--d8x-color-secondary);
+    margin-right: 8px;
+    font-size: 18px;
+  }
+}
+
+//Responsive design adjustments
+@media (max-width: 768px) {
+  .statsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .statContent {
+    flex-direction: row;
+  }
+}
+
+.lastUpdated {
+  margin-left: auto;
+  margin-right: 8px;
+  color: var(--d8x-color-text-secondary);
+  font-size: 12px;
+}
+
+.activeTabStat {
+  background-color: var(--d8x-color-background-items-selected);
+}
