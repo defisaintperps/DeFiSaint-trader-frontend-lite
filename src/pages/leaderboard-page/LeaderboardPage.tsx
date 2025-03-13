@@ -32,6 +32,7 @@ export const LeaderboardPage = () => {
   const [weeklyPage, setWeeklyPage] = useState(0);
   const [allTimePage, setAllTimePage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [allTimeAsOfDate, setAllTimeAsOfDate] = useState<string | null>(null);
 
   // Fetch weekly leaderboard data
   const fetchWeeklyLeaderboardData = async (page = 0) => {
@@ -72,6 +73,7 @@ export const LeaderboardPage = () => {
           }));
         setAllAllTimeEntries(sortedEntries);
         setAllTimeEntries(sortedEntries.slice(page * pageSize, (page + 1) * pageSize));
+        setAllTimeAsOfDate(data.asOfDate);
       } else {
         console.error('All-time leaderboard API returned unexpected data format:', data);
         setAllAllTimeEntries([]);
@@ -187,9 +189,8 @@ export const LeaderboardPage = () => {
   return (
     <MaintenanceWrapper>
       <Helmet title={t('pages.leaderboard.title')} />
-      <Container>
-        <div className={styles.container}>
-          {/* Banner with rocket image */}
+      <Container className={styles.container}>
+        <div>
           <div className={styles.imageBanner}>
             <img
               src="/images/boost-station/bannerTradingCompetition.png"
@@ -197,14 +198,19 @@ export const LeaderboardPage = () => {
               className={styles.bannerImage}
             />
           </div>
+
           <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
 
           <div className={styles.userStatsContainer}>
             {address && (
-              <UserStats weeklyStats={weeklyUserStats} allTimeStats={allTimeUserStats} isLoading={isUserStatsLoading} />
+              <UserStats
+                weeklyStats={weeklyUserStats}
+                allTimeStats={allTimeUserStats}
+                isLoading={isUserStatsLoading}
+                allTimeAsOfDate={allTimeAsOfDate}
+              />
             )}
           </div>
-
           {activeTab === LeaderboardTabIdE.Weekly ? (
             <LeaderboardTable
               entries={weeklyEntries}

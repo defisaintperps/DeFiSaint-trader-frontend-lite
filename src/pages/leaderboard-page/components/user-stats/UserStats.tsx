@@ -10,9 +10,17 @@ interface UserStatsPropsI {
   weeklyStats: UserLeaderboardStatsI | null;
   allTimeStats: UserLeaderboardStatsI | null;
   isLoading?: boolean;
+  allTimeAsOfDate?: string | null;
 }
 
-export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: UserStatsPropsI) => {
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + 7);
+  return date.toISOString().split('T')[0];
+};
+
+export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTimeAsOfDate }: UserStatsPropsI) => {
   const isConnected = !!weeklyStats || !!allTimeStats;
 
   // Helper function to determine the PNL class
@@ -72,7 +80,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
               <Typography variant="body2" className={styles.statItemLabel}>
                 PNL
               </Typography>
-              <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(weeklyStats?.pnl)}`}>
+              <Typography variant="h5" className={`${styles.statValueLarge} ${formatPnl(weeklyStats?.pnl)}`}>
                 {formatPnl(weeklyStats?.pnl)}
               </Typography>
             </div>
@@ -86,10 +94,11 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
               All-Time Performance
             </Typography>
             <Chip label="All Time" color="secondary" variant="outlined" size="small" className={styles.statChip} />
-            {allTimeStats?.numWeeks !== undefined && allTimeStats.numWeeks > 0 && (
+            {allTimeAsOfDate !== undefined && (
               <Chip
                 icon={<CalendarMonth fontSize="small" />}
-                label={`${allTimeStats.numWeeks} ${allTimeStats.numWeeks === 1 ? 'week' : 'weeks'}`}
+                label={`Next update:  ${formatDate(allTimeAsOfDate)}`}
+                color="primary"
                 variant="outlined"
                 size="small"
                 className={styles.weeksChip}
@@ -109,7 +118,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
               <Typography variant="body2" className={styles.statItemLabel}>
                 PNL
               </Typography>
-              <Typography variant="h5" className={`${styles.statValueLarge}`}>
+              <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(allTimeStats?.pnl)}`}>
                 {allTimeStats?.points} Points
               </Typography>
             </div>

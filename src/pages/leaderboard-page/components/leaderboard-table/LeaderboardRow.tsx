@@ -38,8 +38,6 @@ export const LeaderboardRow = ({ entry }: LeaderboardRowPropsI) => {
     return pnl >= 0 ? styles.positive : styles.negative; // Handles all number cases including 0
   };
 
-  console.log('PNL class:', getPnlClass(-22));
-
   const isWeekly = isWeeklyEntry(entry);
 
   return (
