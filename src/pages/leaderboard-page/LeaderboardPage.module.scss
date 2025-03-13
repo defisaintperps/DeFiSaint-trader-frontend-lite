@@ -1,4 +1,5 @@
-//src/pages/leaderboard-page/LeaderboardPage.module.scss
+@import '~styles/theme/theme.scss';
+
 .root {
   width: 100%;
 }
@@ -7,4 +8,42 @@
   margin-bottom: 24px;
   font-size: 24px;
   font-weight: 600;
+}
+
+.imageBanner {
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--d8x-color-background-secondary);
+}
+
+.bannerImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $d8x-spacing * 5;
+  flex: 1;
+  overflow-x: auto;
+  margin: 0 auto;
+  max-width: 1450px;
+  width: 100%;
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+  .container {
+    gap: $d8x-spacing * 4;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+  .container {
+    margin-top: 12px;
+  }
 }

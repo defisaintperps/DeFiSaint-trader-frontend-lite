@@ -14,6 +14,7 @@ import { LeaderboardTable } from './components/leaderboard-table/LeaderboardTabl
 import { LeaderboardTabIdE } from './constants';
 import { TabSelector } from './components/tab-selector/TabSelector';
 import { UserStats } from './components/user-stats/UserStats';
+import styles from './LeaderboardPage.module.scss';
 
 export const LeaderboardPage = () => {
   const { t } = useTranslation();
@@ -187,11 +188,23 @@ export const LeaderboardPage = () => {
     <MaintenanceWrapper>
       <Helmet title={t('pages.leaderboard.title')} />
       <Container>
-        <div>
-          {address && (
-            <UserStats weeklyStats={weeklyUserStats} allTimeStats={allTimeUserStats} isLoading={isUserStatsLoading} />
-          )}
+        <div className={styles.container}>
+          {/* Banner with rocket image */}
+          <div className={styles.imageBanner}>
+            <img
+              src="/images/boost-station/bannerTradingCompetition.png"
+              alt="Competition"
+              className={styles.bannerImage}
+            />
+          </div>
           <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
+
+          <div className={styles.userStatsContainer}>
+            {address && (
+              <UserStats weeklyStats={weeklyUserStats} allTimeStats={allTimeUserStats} isLoading={isUserStatsLoading} />
+            )}
+          </div>
+
           {activeTab === LeaderboardTabIdE.Weekly ? (
             <LeaderboardTable
               entries={weeklyEntries}
