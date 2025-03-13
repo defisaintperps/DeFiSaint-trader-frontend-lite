@@ -5,7 +5,8 @@
     "refer": "Refer",
     "vault": "Earn",
     "strategies": "Strategies",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "leaderboard": "Leaderboard"
   },
   "pages": {
     "geolocation": {
@@ -393,6 +394,20 @@
         "value-placeholder": "value to filter",
         "clear": "Clear Filter"
       }
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "rank": "Rank",
+      "address": "Address",
+      "pnl": "PnL",
+      "points": "Points",
+      "noDataTitle": "No leaderboard data available",
+      "noData": "We couldn't load the leaderboard data at this time. Please try again later.",
+      "refresh": "Refresh Data",
+      "weekly": "Weekly",
+      "allTime": "All Time",
+      "yourStats": "Your Stats",
+      "connectWalletToSeeStats": "Connect wallet to see your stats"
     },
     "boost-station": {
       "title": "Trade and provide liquidity to BOOST your $D8X Airdrop",

@@ -559,20 +559,26 @@ export interface FlatTokenI {
 
 // Leaderboard interfaces
 export interface WeeklyLeaderboardEntryI {
-  rank: number;
-  trader: string; // Address of the trader
+  rank?: number;
+  trader?: string; // Address of the trader (in old format)
+  address?: string; // Address of the trader (in new format)
   pnl: number;
+  numWeeks?: number;
+  points?: number;
 }
 
 export interface WeeklyLeaderboardResponseI {
   timestamp: string;
-  from: string;
-  to: string;
-  entries: WeeklyLeaderboardEntryI[];
+  from?: string;
+  to?: string;
+  entries?: WeeklyLeaderboardEntryI[];
+  board?: LeaderboardEntryI[];
+  leaderBoard?: WeeklyLeaderboardEntryI[];
   metadata?: PaginationMetadataI;
 }
 
 export interface AllTimeLeaderboardEntryI {
+  rank?: number;
   address: string; // Note: different field name than weekly
   pnl: number;
   numWeeks: number;
@@ -582,7 +588,8 @@ export interface AllTimeLeaderboardEntryI {
 export interface AllTimeLeaderboardResponseI {
   asOfDate: string;
   timestamp: string;
-  entries: AllTimeLeaderboardEntryI[];
+  entries?: AllTimeLeaderboardEntryI[];
+  board?: AllTimeLeaderboardEntryI[];
   metadata?: PaginationMetadataI;
 }
 
@@ -590,6 +597,7 @@ export interface UserLeaderboardStatsI {
   rank: number;
   trader: string;
   pnl: number;
+  numWeeks?: number;
 }
 
 // Generic interface to handle both types of entries

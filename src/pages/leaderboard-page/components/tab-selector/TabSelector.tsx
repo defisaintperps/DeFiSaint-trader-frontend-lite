@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Typography, Box } from '@mui/material';
 
-import { LeaderboardTabIdE } from 'pages/leaderboard-page/constants';
+import { LeaderboardTabIdE } from '../../constants';
 
 import styles from './TabSelector.module.scss';
 
@@ -26,11 +26,11 @@ export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
     () => [
       {
         tabId: LeaderboardTabIdE.Weekly,
-        label: t('leaderboard.weekly'),
+        label: t('pages.leaderboard.weekly'),
       },
       {
         tabId: LeaderboardTabIdE.AllTime,
-        label: t('leaderboard.allTime'),
+        label: t('pages.leaderboard.allTime'),
       },
     ],
     [t]

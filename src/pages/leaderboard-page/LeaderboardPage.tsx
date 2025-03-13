@@ -3,166 +3,280 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { Container } from 'components/container/Container';
+import { Container } from '@mui/material';
+
 import { Helmet } from 'components/helmet/Helmet';
 import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
-import { getAllTimeLeaderboardEntries, getWeeklyLeaderboardEntries, getUserLeaderboardStats } from 'network/network';
-import {
-  WeeklyLeaderboardEntryI,
-  AllTimeLeaderboardEntryI,
-  PaginationMetadataI,
-  UserLeaderboardStatsI,
-} from 'types/types';
-import { LeaderboardTabIdE } from './constants';
+import { getAllTimeLeaderboardEntries, getWeeklyLeaderboardEntries } from 'network/network';
+import { AllTimeLeaderboardEntryI, UserLeaderboardStatsI, WeeklyLeaderboardEntryI } from 'types/types';
 
 import { LeaderboardTable } from './components/leaderboard-table/LeaderboardTable';
+import { LeaderboardTabIdE } from './constants';
 import { TabSelector } from './components/tab-selector/TabSelector';
 import { UserStats } from './components/user-stats/UserStats';
-
-import styles from './LeaderboardPage.module.scss';
-
-// Default pagination settings
-const DEFAULT_PAGE_SIZE = 25;
-const DEFAULT_PAGE = 1;
 
 export const LeaderboardPage = () => {
   const { t } = useTranslation();
   const { address } = useAccount();
-
-  // Separate state for weekly and all-time entries
+  const [activeTab, setActiveTab] = useState<LeaderboardTabIdE>(LeaderboardTabIdE.Weekly);
   const [weeklyEntries, setWeeklyEntries] = useState<WeeklyLeaderboardEntryI[]>([]);
   const [allTimeEntries, setAllTimeEntries] = useState<AllTimeLeaderboardEntryI[]>([]);
-  const [userStats, setUserStats] = useState<UserLeaderboardStatsI | null>(null);
-
-  // Loading states
-  const [isLoadingWeekly, setIsLoadingWeekly] = useState(true);
-  const [isLoadingAllTime, setIsLoadingAllTime] = useState(true);
-
-  // Pagination states
-  const [weeklyPage, setWeeklyPage] = useState(DEFAULT_PAGE);
-  const [allTimePage, setAllTimePage] = useState(DEFAULT_PAGE);
-  const [weeklyPageSize, setWeeklyPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [allTimePageSize, setAllTimePageSize] = useState(DEFAULT_PAGE_SIZE);
-
-  // Pagination metadata
-  const [weeklyPaginationMetadata, setWeeklyPaginationMetadata] = useState<PaginationMetadataI | undefined>();
-  const [allTimePaginationMetadata, setAllTimePaginationMetadata] = useState<PaginationMetadataI | undefined>();
-
-  // Tab selection state
-  const [activeTab, setActiveTab] = useState<LeaderboardTabIdE>(LeaderboardTabIdE.Weekly);
+  const [weeklyUserStats, setWeeklyUserStats] = useState<UserLeaderboardStatsI | null>(null);
+  const [allTimeUserStats, setAllTimeUserStats] = useState<UserLeaderboardStatsI | null>(null);
+  const [isLoadingWeekly, setIsLoadingWeekly] = useState(false);
+  const [isLoadingAllTime, setIsLoadingAllTime] = useState(false);
+  const [isUserStatsLoading, setIsUserStatsLoading] = useState(true);
+  const [allWeeklyEntries, setAllWeeklyEntries] = useState<WeeklyLeaderboardEntryI[]>([]);
+  const [allAllTimeEntries, setAllAllTimeEntries] = useState<AllTimeLeaderboardEntryI[]>([]);
+  const [weeklyPage, setWeeklyPage] = useState(0);
+  const [allTimePage, setAllTimePage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   // Fetch weekly leaderboard data
-  useEffect(() => {
-    const fetchWeeklyLeaderboardData = async () => {
-      setIsLoadingWeekly(true);
-      try {
-        const weeklyData = await getWeeklyLeaderboardEntries(weeklyPageSize, weeklyPage);
-        setWeeklyEntries(weeklyData.entries || []);
-        setWeeklyPaginationMetadata(weeklyData.metadata);
-      } catch (error) {
-        console.error('Error fetching weekly leaderboard data:', error);
-      } finally {
-        setIsLoadingWeekly(false);
-      }
-    };
+  const fetchWeeklyLeaderboardData = async (page = 0) => {
+    setIsLoadingWeekly(true);
+    try {
+      console.log('Fetching weekly leaderboard data for page:', page);
+      const data = await getWeeklyLeaderboardEntries(pageSize, page);
+      console.log('Weekly leaderboard data response:', data);
 
-    fetchWeeklyLeaderboardData();
-  }, [weeklyPage, weeklyPageSize]);
+      // Handle API response format with 'leaderBoard' field (weekly endpoint specific)
+      if (data && data.leaderBoard && Array.isArray(data.leaderBoard)) {
+        setAllWeeklyEntries(data.leaderBoard);
+        setWeeklyEntries(data.leaderBoard.slice(page * pageSize, (page + 1) * pageSize));
+      }
+      // Handle API response format with 'board' field (all-time endpoint format)
+      else if (data && data.board && Array.isArray(data.board)) {
+        setAllWeeklyEntries(data.board);
+        setWeeklyEntries(data.board.slice(page * pageSize, (page + 1) * pageSize));
+      } else if (data && data.entries && Array.isArray(data.entries)) {
+        // Fallback to original format if API changes
+        setAllWeeklyEntries(data.entries);
+        setWeeklyEntries(data.entries.slice(page * pageSize, (page + 1) * pageSize));
+      } else {
+        console.error('Weekly leaderboard API returned unexpected data format:', data);
+        setAllWeeklyEntries([]);
+        setWeeklyEntries([]);
+      }
+    } catch (error) {
+      console.error('Error fetching weekly leaderboard data:', error);
+      setAllWeeklyEntries([]);
+      setWeeklyEntries([]);
+    } finally {
+      setIsLoadingWeekly(false);
+    }
+  };
 
   // Fetch all-time leaderboard data
+  const fetchAllTimeLeaderboardData = async (page = 0) => {
+    setIsLoadingAllTime(true);
+    try {
+      console.log('Fetching all-time leaderboard data for page:', page);
+      const data = await getAllTimeLeaderboardEntries(pageSize, page);
+      console.log('All-time leaderboard data response:', data);
+
+      // Handle API response format with 'board' field instead of 'entries'
+      if (data && data.board && Array.isArray(data.board)) {
+        // Sort by points (descending) and assign ranks
+        const sortedEntries = [...data.board]
+          .sort((a, b) => (b.points || 0) - (a.points || 0))
+          .map((entry, index) => ({
+            ...entry,
+            rank: index + 1,
+          }));
+
+        setAllAllTimeEntries(sortedEntries);
+        setAllTimeEntries(sortedEntries.slice(page * pageSize, (page + 1) * pageSize));
+      } else if (data && data.entries && Array.isArray(data.entries)) {
+        // Fallback to original format if API changes
+        // Sort by points (descending) and assign ranks
+        const sortedEntries = [...data.entries]
+          .sort((a, b) => (b.points || 0) - (a.points || 0))
+          .map((entry, index) => ({
+            ...entry,
+            rank: index + 1,
+          }));
+
+        setAllAllTimeEntries(sortedEntries);
+        setAllTimeEntries(sortedEntries.slice(page * pageSize, (page + 1) * pageSize));
+      } else {
+        console.error('All-time leaderboard API returned unexpected data format:', data);
+        setAllAllTimeEntries([]);
+        setAllTimeEntries([]);
+      }
+    } catch (error) {
+      console.error('Error fetching all-time leaderboard data:', error);
+      setAllAllTimeEntries([]);
+      setAllTimeEntries([]);
+    } finally {
+      setIsLoadingAllTime(false);
+    }
+  };
+
+  // Fetch user leaderboard stats - now empty as we get stats from entries directly
+  const fetchUserLeaderboardStats = async () => {
+    if (!address) {
+      setWeeklyUserStats(null);
+      setAllTimeUserStats(null);
+      setIsUserStatsLoading(false);
+      return;
+    }
+
+    setIsUserStatsLoading(true);
+    try {
+      // Placeholder for any potential direct API calls in the future
+      console.log('User stats will be extracted from leaderboard entries');
+    } catch (error) {
+      console.error('Error fetching user leaderboard stats:', error);
+      setWeeklyUserStats(null);
+      setAllTimeUserStats(null);
+    } finally {
+      setIsUserStatsLoading(false);
+    }
+  };
+
+  // Effect to extract user stats from leaderboard data when user is connected
   useEffect(() => {
-    const fetchAllTimeLeaderboardData = async () => {
-      setIsLoadingAllTime(true);
-      try {
-        const allTimeData = await getAllTimeLeaderboardEntries(allTimePageSize, allTimePage);
-        setAllTimeEntries(allTimeData.entries || []);
-        setAllTimePaginationMetadata(allTimeData.metadata);
-      } catch (error) {
-        console.error('Error fetching all-time leaderboard data:', error);
-      } finally {
-        setIsLoadingAllTime(false);
+    if (!address) {
+      setWeeklyUserStats(null);
+      setAllTimeUserStats(null);
+      setIsUserStatsLoading(false);
+      return;
+    }
+
+    setIsUserStatsLoading(true);
+
+    // Find weekly stats
+    if (allWeeklyEntries.length > 0) {
+      const userEntry = allWeeklyEntries.find(
+        (entry) =>
+          entry.trader?.toLowerCase() === address.toLowerCase() ||
+          entry.address?.toLowerCase() === address.toLowerCase()
+      );
+
+      if (userEntry) {
+        setWeeklyUserStats({
+          rank: userEntry.rank || 0,
+          trader: userEntry.trader || userEntry.address || address,
+          pnl: userEntry.pnl || 0,
+        });
+      } else {
+        setWeeklyUserStats({
+          rank: 0,
+          trader: address,
+          pnl: 0,
+        });
       }
-    };
+    }
 
-    fetchAllTimeLeaderboardData();
-  }, [allTimePage, allTimePageSize]);
+    // Find all-time stats
+    if (allAllTimeEntries.length > 0) {
+      const userEntry = allAllTimeEntries.find((entry) => entry.address?.toLowerCase() === address.toLowerCase());
 
-  // Fetch user stats if address is available
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      if (!address) {
-        setUserStats(null);
-        return;
+      if (userEntry) {
+        setAllTimeUserStats({
+          rank: userEntry.rank || 0,
+          trader: userEntry.address || address,
+          pnl: userEntry.pnl || 0,
+          numWeeks: userEntry.numWeeks,
+        });
+      } else {
+        setAllTimeUserStats({
+          rank: 0,
+          trader: address,
+          pnl: 0,
+          numWeeks: 0,
+        });
       }
+    }
 
-      try {
-        const stats = await getUserLeaderboardStats(address);
-        setUserStats(stats);
-      } catch (error) {
-        console.error('Error fetching user leaderboard stats:', error);
-        setUserStats(null);
-      }
-    };
-
-    fetchUserStats();
-  }, [address]);
+    setIsUserStatsLoading(false);
+  }, [address, allWeeklyEntries, allAllTimeEntries]);
 
   // Handle tab change
   const handleTabChange = (tab: LeaderboardTabIdE) => {
     setActiveTab(tab);
   };
 
-  // Handle page change for active tab
-  const handlePageChange = (page: number) => {
-    if (activeTab === LeaderboardTabIdE.Weekly) {
-      setWeeklyPage(page);
-    } else {
-      setAllTimePage(page);
-    }
+  // Handle page change for weekly leaderboard
+  const handleWeeklyPageChange = (page: number) => {
+    setWeeklyPage(page);
+    setWeeklyEntries(allWeeklyEntries.slice(page * pageSize, (page + 1) * pageSize));
   };
 
-  // Handle page size change for active tab
-  const handlePageSizeChange = (pageSize: number) => {
-    if (activeTab === LeaderboardTabIdE.Weekly) {
-      setWeeklyPageSize(pageSize);
-      setWeeklyPage(1); // Reset to first page when changing page size
-    } else {
-      setAllTimePageSize(pageSize);
-      setAllTimePage(1); // Reset to first page when changing page size
-    }
+  // Handle page change for all-time leaderboard
+  const handleAllTimePageChange = (page: number) => {
+    setAllTimePage(page);
+    setAllTimeEntries(allAllTimeEntries.slice(page * pageSize, (page + 1) * pageSize));
   };
+
+  // Handle page size change for weekly leaderboard
+  const handleWeeklyPageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setWeeklyPage(0); // Reset to first page
+    setWeeklyEntries(allWeeklyEntries.slice(0, newPageSize));
+  };
+
+  // Handle page size change for all-time leaderboard
+  const handleAllTimePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setAllTimePage(0); // Reset to first page
+    setAllTimeEntries(allAllTimeEntries.slice(0, newPageSize));
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchWeeklyLeaderboardData();
+    fetchAllTimeLeaderboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch user stats when address changes
+  useEffect(() => {
+    fetchUserLeaderboardStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   return (
     <MaintenanceWrapper>
-      <Helmet title={t('leaderboard.title')} />
+      <Helmet title={t('pages.leaderboard.title')} />
       <Container>
-        <div className={styles.container}>
-          <h1 className={styles.title}>{t('leaderboard.title')}</h1>
-
-          {/* User stats section */}
-          {address && <UserStats stats={userStats} isWeekly={activeTab === LeaderboardTabIdE.Weekly} />}
-
-          {/* Tab selector */}
+        <div style={{ padding: '24px 0' }}>
+          {address && (
+            <UserStats weeklyStats={weeklyUserStats} allTimeStats={allTimeUserStats} isLoading={isUserStatsLoading} />
+          )}
           <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
-
-          {/* Leaderboard table */}
           {activeTab === LeaderboardTabIdE.Weekly ? (
             <LeaderboardTable
               entries={weeklyEntries}
               isLoading={isLoadingWeekly}
               isWeekly={true}
-              paginationMetadata={weeklyPaginationMetadata}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
+              paginationMetadata={{
+                totalEntries: allWeeklyEntries.length,
+                totalPages: Math.ceil(allWeeklyEntries.length / pageSize),
+                currentPage: weeklyPage,
+                pageSize,
+                hasNextPage: weeklyPage < Math.ceil(allWeeklyEntries.length / pageSize) - 1,
+                hasPreviousPage: weeklyPage > 0,
+              }}
+              onPageChange={handleWeeklyPageChange}
+              onPageSizeChange={handleWeeklyPageSizeChange}
             />
           ) : (
             <LeaderboardTable
               entries={allTimeEntries}
               isLoading={isLoadingAllTime}
               isWeekly={false}
-              paginationMetadata={allTimePaginationMetadata}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
+              paginationMetadata={{
+                totalEntries: allAllTimeEntries.length,
+                totalPages: Math.ceil(allAllTimeEntries.length / pageSize),
+                currentPage: allTimePage,
+                pageSize,
+                hasNextPage: allTimePage < Math.ceil(allAllTimeEntries.length / pageSize) - 1,
+                hasPreviousPage: allTimePage > 0,
+              }}
+              onPageChange={handleAllTimePageChange}
+              onPageSizeChange={handleAllTimePageSizeChange}
             />
           )}
         </div>

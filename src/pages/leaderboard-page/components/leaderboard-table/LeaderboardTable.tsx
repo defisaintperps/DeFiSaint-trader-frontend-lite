@@ -1,49 +1,44 @@
 // src/pages/leaderboard-page/components/leaderboard-table/LeaderboardTable.tsx
-import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useMemo, useState } from 'react';
 
 import {
+  Box,
+  CircularProgress,
   Table as MuiTable,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
-  CircularProgress,
-  TablePagination,
-  Box,
 } from '@mui/material';
 
-import { EmptyRow } from 'components/table/empty-row/EmptyRow';
-import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
-import { getComparator, stableSort } from 'helpers/tableSort';
-import { AllTimeLeaderboardEntryI, PaginationMetadataI, WeeklyLeaderboardEntryI } from 'types/types';
-import { AlignE, FieldTypeE, SortOrderE } from 'types/enums';
-import { shortenAddress } from 'utils/shortenAddress';
+import { AllTimeLeaderboardEntryI, PaginationMetadataI, WeeklyLeaderboardEntryI } from '../../../../types/types';
+import { SortableHeaders } from '../../../../components/table/sortable-header/SortableHeaders';
+import { getComparator, stableSort } from '../../../../helpers/tableSort';
+import { AlignE, FieldTypeE, SortOrderE } from '../../../../types/enums';
 
 import { LeaderboardRow } from './LeaderboardRow';
 
 import styles from './LeaderboardTable.module.scss';
 
 // Using a more specific prop type for the entries based on whether it's weekly or all-time
-type LeaderboardEntry = WeeklyLeaderboardEntryI | AllTimeLeaderboardEntryI;
+type LeaderboardEntryT = WeeklyLeaderboardEntryI | AllTimeLeaderboardEntryI;
 
 interface LeaderboardTablePropsI {
-  entries: LeaderboardEntry[];
+  entries: LeaderboardEntryT[];
   isLoading: boolean;
   isWeekly: boolean;
   paginationMetadata?: PaginationMetadataI;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
-// Define a type for column headers to avoid TypeScript errors
 interface ColumnHeaderI {
-  field: string;
+  id: keyof WeeklyLeaderboardEntryI | keyof AllTimeLeaderboardEntryI;
   label: string;
   align: AlignE;
-  type: FieldTypeE;
+  fieldType: FieldTypeE;
 }
 
 export const LeaderboardTable = ({
@@ -54,114 +49,126 @@ export const LeaderboardTable = ({
   onPageChange,
   onPageSizeChange,
 }: LeaderboardTablePropsI) => {
-  const { t } = useTranslation();
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Asc);
-  const [orderBy, setOrderBy] = useState<keyof LeaderboardEntry>('rank');
+  const [orderBy, setOrderBy] = useState<string | number>('rank');
 
   const headers = useMemo(() => {
     const baseHeaders: ColumnHeaderI[] = [
       {
-        field: 'rank',
-        label: t('leaderboard.rank'),
-        align: AlignE.Left,
-        type: FieldTypeE.Number,
+        id: 'rank',
+        label: 'Rank',
+        align: AlignE.Center,
+        fieldType: FieldTypeE.Number,
       },
       {
-        // Use a generic field name for the address column since the API uses different field names
-        field: isWeekly ? 'trader' : 'address',
-        label: t('leaderboard.address'),
+        id: isWeekly ? 'trader' : 'address',
+        label: 'Address',
         align: AlignE.Left,
-        type: FieldTypeE.String,
+        fieldType: FieldTypeE.String,
+      },
+      {
+        id: 'pnl',
+        label: 'PNL',
+        align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
     ];
 
-    // Add the appropriate value column based on whether we're showing weekly or all-time data
-    if (isWeekly) {
+    if (!isWeekly) {
       baseHeaders.push({
-        field: 'pnl',
-        label: t('leaderboard.pnl'),
+        id: 'points',
+        label: 'Points',
         align: AlignE.Right,
-        type: FieldTypeE.Number,
-      });
-    } else {
-      // All-time view shows both PNL and points
-      baseHeaders.push({
-        field: 'pnl',
-        label: t('leaderboard.pnl'),
-        align: AlignE.Right,
-        type: FieldTypeE.Number,
-      });
-      baseHeaders.push({
-        field: 'points',
-        label: t('leaderboard.points'),
-        align: AlignE.Right,
-        type: FieldTypeE.Number,
+        fieldType: FieldTypeE.Number,
       });
     }
 
     return baseHeaders;
-  }, [t, isWeekly]);
+  }, [isWeekly]);
 
-  if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <CircularProgress />
-      </div>
-    );
-  }
+  // Derived state
+  const sortedEntries = useMemo(() => {
+    if (!entries?.length) return [];
 
-  if (!entries.length) {
-    return (
-      <div className={styles.emptyContainer}>
-        <Typography variant="body1">{t('leaderboard.noEntries')}</Typography>
-      </div>
-    );
-  }
+    return stableSort(entries, getComparator(order, orderBy));
+  }, [entries, order, orderBy]);
 
-  const sortedEntries = stableSort(entries, getComparator(order, orderBy));
+  // Style for the table container to make it more readable
+  const tableContainerStyles = {
+    borderRadius: '8px',
+    border: '1px solid var(--d8x-color-border)',
+    overflow: 'hidden',
+    mb: 3,
+  };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <TableContainer className={styles.tableContainer}>
-        <MuiTable>
-          <TableHead>
-            <TableRow>
-              <SortableHeaders
-                headers={headers}
-                order={order}
-                orderBy={orderBy as string}
-                setOrder={setOrder}
-                setOrderBy={setOrderBy as (property: string) => void}
+    <Box className={styles.root}>
+      {isLoading && (
+        <div className={styles.loadingWrapper}>
+          <CircularProgress />
+        </div>
+      )}
+
+      {!isLoading && sortedEntries?.length === 0 && (
+        <div className={styles.noData}>
+          <Typography variant="h6" className={styles.noDataTitle}>
+            No Data Available
+          </Typography>
+          <Typography variant="body1" className={styles.noDataText}>
+            There is no leaderboard data to display at this time.
+          </Typography>
+          <button className={styles.refreshButton} onClick={() => window.location.reload()}>
+            Refresh
+          </button>
+        </div>
+      )}
+
+      {!isLoading && sortedEntries?.length > 0 && (
+        <>
+          <TableContainer sx={tableContainerStyles} className={styles.tableContainer}>
+            <MuiTable>
+              <TableHead className={styles.tableHead}>
+                <TableRow>
+                  <SortableHeaders
+                    headers={headers}
+                    order={order}
+                    orderBy={orderBy}
+                    setOrder={setOrder}
+                    setOrderBy={setOrderBy}
+                  />
+                </TableRow>
+              </TableHead>
+              <TableBody className={styles.tableBody}>
+                {sortedEntries.map((entry: LeaderboardEntryT) => {
+                  const entryKey = isWeekly
+                    ? `${(entry as WeeklyLeaderboardEntryI).trader}-${entry.rank}`
+                    : `${(entry as AllTimeLeaderboardEntryI).address}-${entry.rank}`;
+
+                  return <LeaderboardRow key={entryKey} entry={entry} showPoints={!isWeekly} />;
+                })}
+              </TableBody>
+            </MuiTable>
+          </TableContainer>
+
+          {paginationMetadata && onPageChange && (
+            <div className={styles.paginationHolder}>
+              <TablePagination
+                component="div"
+                count={paginationMetadata.totalEntries}
+                page={paginationMetadata.currentPage}
+                onPageChange={(_: React.MouseEvent<HTMLButtonElement> | null, page: number) => onPageChange(page)}
+                rowsPerPage={paginationMetadata.pageSize}
+                rowsPerPageOptions={[10, 25, 50, 100]}
+                onRowsPerPageChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (onPageSizeChange) {
+                    onPageSizeChange(parseInt(event.target.value, 10));
+                  }
+                }}
+                labelRowsPerPage={'Rows per page'}
               />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedEntries.length ? (
-              sortedEntries.map((entry, index) => (
-                <LeaderboardRow
-                  key={`${index}-${isWeekly ? (entry as WeeklyLeaderboardEntryI).trader : (entry as AllTimeLeaderboardEntryI).address}`}
-                  entry={entry}
-                  showPoints={!isWeekly}
-                />
-              ))
-            ) : (
-              <EmptyRow colSpan={headers.length} text={t('leaderboard.noEntries')} />
-            )}
-          </TableBody>
-        </MuiTable>
-      </TableContainer>
-      {paginationMetadata && (
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component="div"
-          count={paginationMetadata.totalEntries}
-          rowsPerPage={paginationMetadata.pageSize}
-          page={paginationMetadata.currentPage - 1}
-          onPageChange={(_: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => onPageChange(newPage + 1)}
-          onRowsPerPageChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onPageSizeChange(parseInt(event.target.value, 10))
-          }
-        />
+            </div>
+          )}
+        </>
       )}
     </Box>
   );
