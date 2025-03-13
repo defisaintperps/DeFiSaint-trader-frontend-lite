@@ -423,9 +423,8 @@ export async function getBoostStationParameters(): Promise<BoostStationParamResp
   return data.json();
 }
 
-export async function getWeeklyLeaderboardEntries(limit = 50, page = 0): Promise<WeeklyLeaderboardResponseI> {
-  const offset = page * limit;
-  const data = await fetch(`https://drip.d8x.xyz/leader?limit=${limit}&offset=${offset}`, getRequestOptions());
+export async function getWeeklyLeaderboardEntries(): Promise<WeeklyLeaderboardResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/leader`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);
@@ -433,9 +432,8 @@ export async function getWeeklyLeaderboardEntries(limit = 50, page = 0): Promise
   return data.json();
 }
 
-export async function getAllTimeLeaderboardEntries(limit = 50, page = 0): Promise<AllTimeLeaderboardResponseI> {
-  const offset = page * limit;
-  const data = await fetch(`https://drip.d8x.xyz/all-time-leader?limit=${limit}&offset=${offset}`, getRequestOptions());
+export async function getAllTimeLeaderboardEntries(): Promise<AllTimeLeaderboardResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/all-time-leader`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);

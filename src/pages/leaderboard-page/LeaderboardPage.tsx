@@ -36,9 +36,7 @@ export const LeaderboardPage = () => {
   const fetchWeeklyLeaderboardData = async (page = 0) => {
     setIsLoadingWeekly(true);
     try {
-      console.log('Fetching weekly leaderboard data for page:', page);
-      const data = await getWeeklyLeaderboardEntries(pageSize, page);
-      console.log('Weekly leaderboard data response:', data);
+      const data = await getWeeklyLeaderboardEntries();
 
       // Handle API response format with 'leaderBoard' field (weekly endpoint specific)
       if (data && data.leaderBoard && Array.isArray(data.leaderBoard)) {
@@ -71,9 +69,7 @@ export const LeaderboardPage = () => {
   const fetchAllTimeLeaderboardData = async (page = 0) => {
     setIsLoadingAllTime(true);
     try {
-      console.log('Fetching all-time leaderboard data for page:', page);
-      const data = await getAllTimeLeaderboardEntries(pageSize, page);
-      console.log('All-time leaderboard data response:', data);
+      const data = await getAllTimeLeaderboardEntries();
 
       // Handle API response format with 'board' field instead of 'entries'
       if (data && data.board && Array.isArray(data.board)) {
