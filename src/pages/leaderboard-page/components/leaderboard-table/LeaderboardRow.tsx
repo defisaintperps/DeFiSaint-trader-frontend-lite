@@ -10,16 +10,10 @@ import styles from './LeaderboardRow.module.scss';
 function isWeeklyEntry(entry: LeaderboardEntryT): entry is WeeklyLeaderboardEntryI {
   return 'trader' in entry;
 }
-
-function isAllTimeEntry(entry: LeaderboardEntryT): entry is AllTimeLeaderboardEntryI {
-  return 'points' in entry && 'address' in entry;
-}
-
 // Format PNL with appropriate sign and percentage
 const formatPnl = (pnl: number | undefined): string => {
   if (typeof pnl !== 'number') return '-';
-  const formattedValue = pnl.toFixed(2);
-  return pnl > 0 ? `+${formattedValue}%` : `${formattedValue}%`;
+  return pnl > 0 ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`;
 };
 
 type LeaderboardEntryT = WeeklyLeaderboardEntryI | AllTimeLeaderboardEntryI;
@@ -29,7 +23,7 @@ interface LeaderboardRowPropsI {
   showPoints?: boolean;
 }
 
-export const LeaderboardRow = ({ entry, showPoints = false }: LeaderboardRowPropsI) => {
+export const LeaderboardRow = ({ entry }: LeaderboardRowPropsI) => {
   const { address } = useAccount();
 
   // Handle both formats: trader (weekly) or address (all-time)
@@ -45,6 +39,8 @@ export const LeaderboardRow = ({ entry, showPoints = false }: LeaderboardRowProp
     if (entry.pnl < 0) return styles.negative;
     return '';
   };
+
+  const isWeekly = isWeeklyEntry(entry);
 
   return (
     <TableRow className={`${styles.row} ${isUserRow ? styles.userRow : ''}`}>
@@ -69,13 +65,13 @@ export const LeaderboardRow = ({ entry, showPoints = false }: LeaderboardRowProp
         </Typography>
       </TableCell>
 
-      <TableCell className={styles.pnlCell} align="right">
-        <Typography variant="body2" className={getPnlClass()}>
-          {formatPnl(entry.pnl)}
-        </Typography>
-      </TableCell>
-
-      {showPoints && isAllTimeEntry(entry) && (
+      {isWeekly ? (
+        <TableCell className={styles.pnlCell} align="right">
+          <Typography variant="body2" className={getPnlClass()}>
+            {formatPnl(entry.pnl)}
+          </Typography>
+        </TableCell>
+      ) : (
         <TableCell className={styles.pointsCell} align="right">
           <Typography variant="body2">{entry.points !== undefined ? entry.points.toLocaleString() : '-'}</Typography>
         </TableCell>

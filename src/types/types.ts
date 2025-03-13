@@ -596,8 +596,9 @@ export interface AllTimeLeaderboardResponseI {
 export interface UserLeaderboardStatsI {
   rank: number;
   trader: string;
-  pnl: number;
+  pnl?: number;
   numWeeks?: number;
+  points?: number;
 }
 
 // Generic interface to handle both types of entries

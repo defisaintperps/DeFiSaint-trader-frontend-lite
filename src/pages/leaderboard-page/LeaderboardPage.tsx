@@ -32,7 +32,6 @@ export const LeaderboardPage = () => {
   const [allTimePage, setAllTimePage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  console.log('address', address);
   // Fetch weekly leaderboard data
   const fetchWeeklyLeaderboardData = async (page = 0) => {
     setIsLoadingWeekly(true);
@@ -70,7 +69,6 @@ export const LeaderboardPage = () => {
             ...entry,
             rank: index + 1,
           }));
-
         setAllAllTimeEntries(sortedEntries);
         setAllTimeEntries(sortedEntries.slice(page * pageSize, (page + 1) * pageSize));
       } else {
@@ -129,14 +127,14 @@ export const LeaderboardPage = () => {
         setAllTimeUserStats({
           rank: userEntry.rank || 0,
           trader: userEntry.address || address,
-          pnl: userEntry.pnl || 0,
+          points: userEntry.points || 0,
           numWeeks: userEntry.numWeeks,
         });
       } else {
         setAllTimeUserStats({
           rank: 0,
           trader: address,
-          pnl: 0,
+          points: 0,
           numWeeks: 0,
         });
       }

@@ -26,8 +26,8 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
   // Helper function to format PNL
   const formatPnl = (pnl?: number) => {
     if (pnl === undefined || pnl === null) return 'N/A';
-    const prefix = pnl > 0 ? '+' : '';
-    return `${prefix}${pnl.toFixed(2)}%`;
+    const prefix = pnl > 0 ? '+' : '-';
+    return `${prefix}$${Math.abs(pnl).toFixed(2)}`;
   };
 
   // Render content based on loading and connection state
@@ -112,7 +112,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false }: User
                 PNL
               </Typography>
               <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(allTimeStats?.pnl)}`}>
-                {formatPnl(allTimeStats?.pnl)}
+                {allTimeStats?.points} Points
               </Typography>
             </div>
           </div>

@@ -66,15 +66,16 @@ export const LeaderboardTable = ({
         align: AlignE.Left,
         fieldType: FieldTypeE.String,
       },
-      {
+    ];
+
+    if (isWeekly) {
+      baseHeaders.push({
         id: 'pnl',
         label: 'PNL',
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
-      },
-    ];
-
-    if (!isWeekly) {
+      });
+    } else {
       baseHeaders.push({
         id: 'points',
         label: 'Points',
