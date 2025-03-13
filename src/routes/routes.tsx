@@ -75,6 +75,17 @@ const PortfolioPage = lazy(async () => {
   }
 });
 
+const LeaderboardPage = lazy(async () => {
+  try {
+    const lazyPage = await import('pages/leaderboard-page/LeaderboardPage');
+    return {
+      default: lazyPage.LeaderboardPage,
+    };
+  } catch {
+    return { default: () => <AppReload /> };
+  }
+});
+
 export const AppRoutes = () => {
   const { chainId } = useAccount();
 
@@ -85,6 +96,7 @@ export const AppRoutes = () => {
       )}
       {pagesConfig.enabledVaultPage && <Route key="vault-page" path={RoutesE.Vault} element={<VaultPage />} />}
       {pagesConfig.enabledReferPage && <Route key="refer-page" path={RoutesE.Refer} element={<ReferPage />} />}
+      <Route key="leaderboard-page" path={RoutesE.Leaderboard} element={<LeaderboardPage />} />
       {(pagesConfig.enabledStrategiesPage || pagesConfig.enabledPortfolioPage) && isEnabledChain(chainId) && (
         <Route element={<PrivateRoutes />}>
           {pagesConfig.enabledStrategiesPage && pagesConfig.enabledStrategiesPageByChains.includes(chainId) && (

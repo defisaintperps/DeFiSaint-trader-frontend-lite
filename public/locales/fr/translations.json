@@ -5,7 +5,8 @@
     "refer": "Parrainage",
     "vault": "Coffre-fort",
     "strategies": "Stratégies",
-    "portfolio": "Portefeuille"
+    "portfolio": "Portefeuille",
+    "leaderboard": "Classement"
   },
   "pages": {
     "geolocation": {
@@ -393,6 +394,20 @@
         "value-placeholder": "Valeur à filter",
         "clear": "Effacer le Filtre"
       }
+    },
+    "leaderboard": {
+      "title": "Classement",
+      "rank": "Rang",
+      "address": "Adresse",
+      "pnl": "PnL",
+      "points": "Points",
+      "noDataTitle": "Pas de données de classement disponibles",
+      "noData": "Nous n'avons pas pu charger les données du classement à ce moment. Veuillez réessayer plus tard.",
+      "refresh": "Actualiser les données",
+      "weekly": "Classement hebdomadaire",
+      "allTime": "Classement général",
+      "yourStats": "Vos statistiques",
+      "connectWalletToSeeStats": "Connectez votre portefeuille pour voir vos statistiques"
     },
     "boost-station": {
       "title": "Tradez et ajoutez de la liquidité pour BOOSTER votre Airdrop de $D8X",
