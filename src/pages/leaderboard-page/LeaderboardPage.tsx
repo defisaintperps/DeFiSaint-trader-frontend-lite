@@ -109,28 +109,6 @@ export const LeaderboardPage = () => {
     }
   };
 
-  // Fetch user leaderboard stats - now empty as we get stats from entries directly
-  const fetchUserLeaderboardStats = async () => {
-    if (!address) {
-      setWeeklyUserStats(null);
-      setAllTimeUserStats(null);
-      setIsUserStatsLoading(false);
-      return;
-    }
-
-    setIsUserStatsLoading(true);
-    try {
-      // Placeholder for any potential direct API calls in the future
-      console.log('User stats will be extracted from leaderboard entries');
-    } catch (error) {
-      console.error('Error fetching user leaderboard stats:', error);
-      setWeeklyUserStats(null);
-      setAllTimeUserStats(null);
-    } finally {
-      setIsUserStatsLoading(false);
-    }
-  };
-
   // Effect to extract user stats from leaderboard data when user is connected
   useEffect(() => {
     if (!address) {
@@ -226,12 +204,6 @@ export const LeaderboardPage = () => {
     fetchAllTimeLeaderboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Fetch user stats when address changes
-  useEffect(() => {
-    fetchUserLeaderboardStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
 
   return (
     <MaintenanceWrapper>

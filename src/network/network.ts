@@ -12,7 +12,6 @@ import type {
   ExchangeInfoI,
   WeeklyLeaderboardResponseI,
   AllTimeLeaderboardResponseI,
-  UserLeaderboardStatsI,
   MaintenanceStatusI,
   MarginAccountI,
   MaxOrderSizeResponseI,
