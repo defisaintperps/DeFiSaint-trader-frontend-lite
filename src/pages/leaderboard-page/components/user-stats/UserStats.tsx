@@ -80,7 +80,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTim
               <Typography variant="body2" className={styles.statItemLabel}>
                 PNL
               </Typography>
-              <Typography variant="h5" className={`${styles.statValueLarge} ${formatPnl(weeklyStats?.pnl)}`}>
+              <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(weeklyStats?.pnl)}`}>
                 {formatPnl(weeklyStats?.pnl)}
               </Typography>
             </div>
@@ -118,7 +118,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTim
               <Typography variant="body2" className={styles.statItemLabel}>
                 PNL
               </Typography>
-              <Typography variant="h5" className={`${styles.statValueLarge} ${getPnlClass(allTimeStats?.pnl)}`}>
+              <Typography variant="h5" className={`${styles.statValueLarge}`}>
                 {allTimeStats?.points} Points
               </Typography>
             </div>
