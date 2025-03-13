@@ -440,13 +440,3 @@ export async function getAllTimeLeaderboardEntries(): Promise<AllTimeLeaderboard
   }
   return data.json();
 }
-
-export async function getUserLeaderboardStats(traderAddr: string): Promise<UserLeaderboardStatsI> {
-  // This is a placeholder - you'll need to implement your actual user stats endpoint
-  const data = await fetch(`https://drip.d8x.xyz/leader/user?addr=${traderAddr}`, getRequestOptions());
-  if (!data.ok) {
-    console.error({ data });
-    throw new Error(data.statusText);
-  }
-  return data.json();
-}
