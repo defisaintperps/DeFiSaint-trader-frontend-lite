@@ -52,7 +52,7 @@
 
 .statTitle {
   font-weight: 500;
-  color: var(--d8x-color-text-secondary);
+  color: var(--d8x-color-text-primary);
   flex: 1;
 }
 
@@ -89,16 +89,16 @@
   text-align: center;
   padding: 8px;
   border-radius: 4px;
-  background-color: var(--d8x-color-background-paper);
 }
 
 .statItemLabel {
-  color: var(--d8x-color-text-secondary);
+  color: var(--d8x-color-text-primary);
   margin-bottom: 4px;
   font-size: 0.8rem;
 }
 
 .statValueLarge {
+  color: var(--d8x-color-text-primary);
   font-size: 24px;
   font-weight: 700;
   margin-top: 4px;
@@ -192,4 +192,8 @@
   margin-right: 8px;
   color: var(--d8x-color-text-secondary);
   font-size: 12px;
+}
+
+.activeTabStat {
+  background-color: var(--d8x-color-background-items-selected);
 }

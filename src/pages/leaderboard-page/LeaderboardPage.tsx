@@ -208,6 +208,7 @@ export const LeaderboardPage = () => {
                 allTimeStats={allTimeUserStats}
                 isLoading={isUserStatsLoading}
                 allTimeAsOfDate={allTimeAsOfDate}
+                activeTab={activeTab}
               />
             )}
           </div>

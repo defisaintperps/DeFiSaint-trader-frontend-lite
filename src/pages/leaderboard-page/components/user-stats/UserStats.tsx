@@ -3,6 +3,7 @@ import { Typography, CircularProgress, Box, Chip } from '@mui/material';
 import { InfoOutlined, AccessTime, AllInclusive, CalendarMonth } from '@mui/icons-material';
 
 import { UserLeaderboardStatsI } from 'types/types';
+import { LeaderboardTabIdE } from '../../constants';
 
 import styles from './UserStats.module.scss';
 
@@ -11,6 +12,7 @@ interface UserStatsPropsI {
   allTimeStats: UserLeaderboardStatsI | null;
   isLoading?: boolean;
   allTimeAsOfDate?: string | null;
+  activeTab?: LeaderboardTabIdE;
 }
 
 const formatDate = (dateString: string | null) => {
@@ -20,7 +22,13 @@ const formatDate = (dateString: string | null) => {
   return date.toISOString().split('T')[0];
 };
 
-export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTimeAsOfDate }: UserStatsPropsI) => {
+export const UserStats = ({
+  weeklyStats,
+  allTimeStats,
+  isLoading = false,
+  allTimeAsOfDate,
+  activeTab,
+}: UserStatsPropsI) => {
   const isConnected = !!weeklyStats || !!allTimeStats;
 
   // Helper function to determine the PNL class
@@ -57,9 +65,10 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTim
       );
     }
 
+    console.log('activeTab', activeTab);
     return (
       <div className={styles.statsContainer}>
-        <div className={styles.stat}>
+        <div className={`${styles.stat} ${activeTab === LeaderboardTabIdE.Weekly ? styles.activeTabStat : ''}`}>
           <div className={styles.statHeader}>
             <AccessTime className={styles.statIcon} />
             <Typography variant="body1" className={styles.statTitle}>
@@ -87,7 +96,7 @@ export const UserStats = ({ weeklyStats, allTimeStats, isLoading = false, allTim
           </div>
         </div>
 
-        <div className={styles.stat}>
+        <div className={`${styles.stat} ${activeTab === LeaderboardTabIdE.AllTime ? styles.activeTabStat : ''}`}>
           <div className={styles.statHeader}>
             <AllInclusive className={styles.statIcon} />
             <Typography variant="body1" className={styles.statTitle}>
