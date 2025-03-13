@@ -5,7 +5,8 @@
     "refer": "Referir",
     "vault": "Bóveda",
     "strategies": "Estrategias",
-    "portfolio": "Cartera"
+    "portfolio": "Cartera",
+    "leaderboard": "Clasificación"
   },
   "pages": {
     "geolocation": {
@@ -393,6 +394,20 @@
         "value-placeholder": "valor a filtrar",
         "clear": "Filtro Removido"
       }
+    },
+    "leaderboard": {
+      "title": "Clasificación",
+      "rank": "Rango",
+      "address": "Cartera",
+      "pnl": "PnL",
+      "points": "Puntos",
+      "noDataTitle": "No clasificación data available",
+      "noData": "No pudimos cargar los datos de la clasificación en este momento. Por favor, inténtelo de nuevo más tarde.",
+      "refresh": "Actualizar datos",
+      "weekly": "Clasificación Semanal",
+      "allTime": "Clasificacion General",
+      "yourStats": "Sus estadísticas",
+      "connectWalletToSeeStats": "Conecte su cartera para ver sus estadísticas"
     },
     "boost-station": {
       "title": "Participa en el comercio y añade liquidez para IMPULSAR tu bolsa de Airdrop de $D8X",

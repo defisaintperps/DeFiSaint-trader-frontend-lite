@@ -5,7 +5,8 @@
     "refer": "Empfehlen",
     "vault": "Liquidität",
     "strategies": "Strategien",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "leaderboard": "Leaderboard"
   },
   "pages": {
     "geolocation": {
@@ -393,6 +394,20 @@
         "value-placeholder": "Wert, der gefiltert werden soll",
         "clear": "Filter Löschen"
       }
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "rank": "Rang",
+      "address": "Addresse",
+      "pnl": "PnL",
+      "points": "Punkte",
+      "noDataTitle": "Keine Leaderboard Daten verfügbar",
+      "noData": "Wir konnten die Leaderboard Daten zu diesem Zeitpunkt nicht laden. Bitte versuchen Sie es später erneut.",
+      "refresh": "Daten aktualisieren",
+      "weekly": "Wochen",
+      "allTime": "Gesamt",
+      "yourStats": "Ihre Statistiken",
+      "connectWalletToSeeStats": "Wallet verbinden um Ihre Statistiken zu sehen"
     },
     "boost-station": {
       "title": "Handle und füge Liquidität hinzu um deinen $D8X Airdrop Bag zu BOOSTEN",

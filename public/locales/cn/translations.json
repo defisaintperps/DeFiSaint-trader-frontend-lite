@@ -5,7 +5,8 @@
     "refer": "邀请返佣",
     "vault": "金库",
     "strategies": "策略",
-    "portfolio": "投资组合"
+    "portfolio": "投资组合",
+    "leaderboard": "排行榜"
   },
   "pages": {
     "geolocation": {
@@ -393,6 +394,20 @@
         "value-placeholder": "要过滤的值",
         "clear": "清除过滤器"
       }
+    },
+    "leaderboard": {
+      "title": "排行榜",
+      "rank": "排名",
+      "address": "地址",
+      "pnl": "PnL",
+      "points": "积分",
+      "noDataTitle": "无排行榜数据",
+      "noData": "我们无法在此时间加载排行榜数据。请稍后再试。",
+      "refresh": "刷新数据",
+      "weekly": "每周",
+      "allTime": "全部时间",
+      "yourStats": "您的统计数据",
+      "connectWalletToSeeStats": "连接钱包以查看您的统计数据"
     },
     "boost-station": {
       "title": "交易并提供流动性以加速您的 $D8X 空投",
