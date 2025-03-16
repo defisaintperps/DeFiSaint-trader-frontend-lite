@@ -57,13 +57,21 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
         <SidesRow
           leftSide={headers[2].label}
           leftSideTooltip={headers[2].tooltip}
-          rightSide={
-            tradeHistory.side.indexOf('BUY') > -1
-              ? t('pages.trade.positions-table.table-content.buy')
-              : t('pages.trade.positions-table.table-content.sell')
-          }
+          rightSide={(() => {
+            if (tradeHistory.side.indexOf('LIQUIDATE_SELL') > -1) {
+              return t('pages.trade.positions-table.table-content.liquidate-sell');
+            } else if (tradeHistory.side.indexOf('LIQUIDATE_BUY') > -1) {
+              return t('pages.trade.positions-table.table-content.liquidate-buy');
+            } else if (tradeHistory.side.indexOf('BUY') > -1) {
+              return t('pages.trade.positions-table.table-content.buy');
+            } else {
+              return t('pages.trade.positions-table.table-content.sell');
+            }
+          })()}
           leftSideStyles={styles.dataLabel}
           rightSideStyles={classnames(styles.dataValue, {
+            [styles.buy]: tradeHistory.side.indexOf('LIQUIDATE_BUY') > -1,
+            [styles.sell]: tradeHistory.side.indexOf('LIQUIDATE_SELL') > -1,
             [styles.buy]: tradeHistory.side.indexOf('BUY') > -1,
             [styles.sell]: tradeHistory.side.indexOf('SELL') > -1,
           })}
