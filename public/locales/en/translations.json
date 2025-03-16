@@ -47,6 +47,8 @@
         "table-content": {
           "buy": "BUY",
           "sell": "SELL",
+          "liquidate-sell": "LIQUIDATE_SELL",
+          "liquidate-buy": "LIQUIDATE_BUY",
           "modify": "Modify",
           "connect": "Please connect your wallet",
           "no-open": "No open positions",

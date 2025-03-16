@@ -1,5 +1,15 @@
 @import '~styles/theme/theme.scss';
 
+.dialogRoot {
+  &:global(.MuiDialog-root) {
+    :global(.MuiDialog-container) {
+      :global(.MuiPaper-root) {
+        max-width: 800px;
+      }
+    }
+  }
+}
+
 .dialogContent {
   display: flex;
   flex-direction: column;

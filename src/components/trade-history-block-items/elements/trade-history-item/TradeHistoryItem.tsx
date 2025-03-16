@@ -43,13 +43,23 @@ export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
           </span>
           <span
             className={classnames(styles.side, {
+              [styles.buy]: tradeHistory.side.indexOf('LIQUIDATE_BUY') > -1,
+              [styles.sell]: tradeHistory.side.indexOf('LIQUIDATE_SELL') > -1,
               [styles.buy]: tradeHistory.side.indexOf('BUY') > -1,
               [styles.sell]: tradeHistory.side.indexOf('SELL') > -1,
             })}
           >
-            {tradeHistory.side.indexOf('BUY') > -1
-              ? t('pages.trade.positions-table.table-content.buy')
-              : t('pages.trade.positions-table.table-content.sell')}
+            {(() => {
+              if (tradeHistory.side.indexOf('LIQUIDATE_SELL') > -1) {
+                return t('pages.trade.positions-table.table-content.liquidate-sell');
+              } else if (tradeHistory.side.indexOf('LIQUIDATE_BUY') > -1) {
+                return t('pages.trade.positions-table.table-content.liquidate-buy');
+              } else if (tradeHistory.side.indexOf('BUY') > -1) {
+                return t('pages.trade.positions-table.table-content.buy');
+              } else {
+                return t('pages.trade.positions-table.table-content.sell');
+              }
+            })()}
           </span>
           <span></span>
         </div>
