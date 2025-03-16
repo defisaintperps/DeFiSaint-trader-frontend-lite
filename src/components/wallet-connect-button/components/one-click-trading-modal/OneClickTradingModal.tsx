@@ -266,6 +266,7 @@ export const OneClickTradingModal = () => {
         onCloseClick={handleClose}
         dialogTitle={t('common.settings.one-click-modal.title')}
         dialogContentClassName={styles.dialogContent}
+        className={styles.dialogRoot}
         footerActions={
           <>
             {!isLoading && isDelegated === false && (
