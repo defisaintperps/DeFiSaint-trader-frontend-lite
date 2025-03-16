@@ -28,6 +28,8 @@ import { CedeWidgetButton } from './elements/cede-widget-button/CedeWidgetButton
 import { OKXConvertor } from './elements/okx-convertor/OKXConvertor';
 import { OwltoButton } from './elements/owlto-button/OwltoButton';
 import { MockSwap } from './elements/mock-swap/MockSwap';
+import { web3AuthIdTokenAtom } from 'store/web3-auth.store';
+import { web3AuthConfig } from 'config';
 
 import styles from './DepositModal.module.scss';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -50,6 +52,8 @@ export const DepositModal = () => {
   const isCedeEnabled = isCedeWidgetEnabled(chainId);
   const isMockTokenSwapEnabled = isMockSwapEnabled(chainId);
   const { gasTokenBalance, hasEnoughGasForFee } = useUserWallet();
+  const web3authIdToken = useAtomValue(web3AuthIdTokenAtom);
+  const isSignedInSocially = web3AuthConfig.isEnabled && web3authIdToken != '';
 
   const [title, setTitle] = useState('');
 
@@ -90,72 +94,83 @@ export const DepositModal = () => {
       className={styles.dialog}
       dialogTitle={title}
     >
-      <div className={styles.section}>
-        <CurrencySelect />
-      </div>
-      <Separator separatorType={SeparatorTypeE.Modal} />
-      <OKXConvertor />
-      {!isMockSwapEnabled(chainId) ? (
-        <div className={styles.section}>
-          {activatedOneClickTrading ? (
-            <Typography variant="bodyMedium" className={styles.noteText}>
-              {t('common.deposit-modal.important-notice.0')}
-            </Typography>
-          ) : (
-            <div>{/* empty block */}</div>
-          )}
-          <Typography variant="bodySmall" className={styles.noteText}>
-            <Translate
-              i18nKey="common.deposit-modal.important-notice.1"
-              values={{ currencyName: selectedCurrency?.settleToken }}
-            />{' '}
-            {poolTokenAddress && (
-              <>
-                {t('common.deposit-modal.important-notice.2')}
-                <CopyLink
-                  elementToShow={cutAddress(poolTokenAddress)}
-                  textToCopy={poolTokenAddress}
-                  classname={styles.copyText}
-                />
-                {t('common.deposit-modal.important-notice.3')}{' '}
-              </>
-            )}
-            {t('common.deposit-modal.important-notice.4')}{' '}
-            <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
-          </Typography>
+      {isSignedInSocially || activatedOneClickTrading || isMockSwapEnabled(chainId) ? (
+        <>
           <div className={styles.section}>
-            <CopyInput id="address" textToCopy={targetAddress || ''} />
+            <CurrencySelect />
           </div>
-        </div>
-      ) : (
-        <div className={styles.section}>
-          <Typography variant="bodyMedium" className={styles.noteText}>
-            {`You need test tokens to trade`}
-          </Typography>
-        </div>
-      )}
-
-      {(isCedeEnabled || isOwltoEnabled) && (
-        <div className={classnames(styles.section, styles.widgetButtons)}>
-          {isBridgeShownOnPage && isOwltoEnabled ? (
-            <div>{isOwltoEnabled && <OwltoButton />}</div>
+          <Separator separatorType={SeparatorTypeE.Modal} />
+          <OKXConvertor />
+          {!isMockSwapEnabled(chainId) ? (
+            <div className={styles.section}>
+              {activatedOneClickTrading ? (
+                <Typography variant="bodyMedium" className={styles.noteText}>
+                  {t('common.deposit-modal.important-notice.0')}
+                </Typography>
+              ) : (
+                <div>{/* empty block */}</div>
+              )}
+              <Typography variant="bodySmall" className={styles.noteText}>
+                <Translate
+                  i18nKey="common.deposit-modal.important-notice.1"
+                  values={{ currencyName: selectedCurrency?.settleToken }}
+                />{' '}
+                {poolTokenAddress && (
+                  <>
+                    {t('common.deposit-modal.important-notice.2')}
+                    <CopyLink
+                      elementToShow={cutAddress(poolTokenAddress)}
+                      textToCopy={poolTokenAddress}
+                      classname={styles.copyText}
+                    />
+                    {t('common.deposit-modal.important-notice.3')}{' '}
+                  </>
+                )}
+                {t('common.deposit-modal.important-notice.4')}{' '}
+                <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
+              </Typography>
+              <div className={styles.section}>
+                <CopyInput id="address" textToCopy={targetAddress || ''} />
+              </div>
+            </div>
           ) : (
-            <div>{/* empty block */}</div>
+            <div className={styles.section}>
+              <Typography variant="bodyMedium" className={styles.noteText}>
+                {`You need test tokens to trade`}
+              </Typography>
+            </div>
           )}
-          {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
-        </div>
+
+          {(isCedeEnabled || isOwltoEnabled) && (
+            <div className={classnames(styles.section, styles.widgetButtons)}>
+              {isBridgeShownOnPage && isOwltoEnabled ? (
+                <div>{isOwltoEnabled && <OwltoButton />}</div>
+              ) : (
+                <div>{/* empty block */}</div>
+              )}
+              {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
+            </div>
+          )}
+          {isMockTokenSwapEnabled && (
+            <div>
+              <MockSwap />
+            </div>
+          )}
+          <Separator separatorType={SeparatorTypeE.Modal} />
+        </>
+      ) : (
+        <>
+          <Typography variant="bodyMedium" className={styles.noteText}>
+            <Translate i18nKey="common.deposit-modal.deposit-note" values={{ currencyName: gasTokenSymbol }} />
+          </Typography>
+          <Separator separatorType={SeparatorTypeE.Modal} />
+        </>
       )}
-      {isMockTokenSwapEnabled && (
-        <div>
-          <MockSwap />
-        </div>
-      )}
-      <Separator separatorType={SeparatorTypeE.Modal} />
       <div className={styles.section}>
-        <WalletBalances />
-        <Typography variant="bodyTiny" className={styles.noteText}>
-          <Translate i18nKey="common.deposit-modal.deposit-note" values={{ currencyName: gasTokenSymbol }} />
+        <Typography variant="bodyMedium">
+          <Translate i18nKey="pages.trade.order-block.info.balance" values={{ currencyName: gasTokenSymbol }} />:
         </Typography>
+        <WalletBalances />
       </div>
     </Dialog>
   );

@@ -5,4 +5,5 @@ export enum RoutesE {
   Vault = '/vault',
   Strategies = '/strategies',
   Portfolio = '/portfolio',
+  Leaderboard = '/leaderboard',
 }

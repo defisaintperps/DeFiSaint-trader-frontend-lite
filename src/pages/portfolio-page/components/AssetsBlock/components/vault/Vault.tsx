@@ -6,7 +6,7 @@ import { PieChart } from 'react-minimal-pie-chart';
 import { AssetLine } from 'components/asset-line/AssetLine';
 import { earningsListAtom } from 'pages/portfolio-page/store/fetchEarnings';
 import { poolShareTokensShareAtom } from 'pages/portfolio-page/store/fetchPoolShare';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, flatTokenAtom } from 'store/pools.store';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 
 import styles from './Vault.module.scss';
@@ -17,6 +17,7 @@ export const Vault = () => {
   const { t } = useTranslation();
 
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const poolShareTokensShare = useAtomValue(poolShareTokensShareAtom);
   const earningsList = useAtomValue(earningsListAtom);
   const totalPoolShare = useMemo(
@@ -43,28 +44,38 @@ export const Vault = () => {
             />
           )}
           <div className={styles.assetsList}>
-            {poolShareTokensShare.map((share) => (
-              <AssetLine
-                key={share.symbol}
-                symbol={share.settleSymbol}
-                value={`${(share.percent * 100).toFixed(2)}%`}
-              />
-            ))}
+            {poolShareTokensShare.map((share) => {
+              const userSymbol =
+                !!flatToken && share.poolId === flatToken.poolId ? flatToken.registeredSymbol : share.settleSymbol;
+              if (userSymbol) {
+                return (
+                  <AssetLine key={share.symbol} symbol={userSymbol} value={`${(share.percent * 100).toFixed(2)}%`} />
+                );
+              }
+            })}
           </div>
         </div>
       </div>
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.vault.earnings-pool')}</div>
         <div className={styles.assetsList}>
-          {earningsList.map((earning) => (
-            <AssetLine
-              key={earning.symbol}
-              symbol={earning.settleSymbol}
-              value={(earning.value * (c2s.get(earning.symbol)?.value ?? 1)).toFixed(
-                Math.min(valueToFractionDigits(earning.value * (c2s.get(earning.symbol)?.value ?? 1)), 4)
-              )}
-            />
-          ))}
+          {earningsList.map((earning) => {
+            const [userPrice, userSymbol] =
+              !!flatToken && earning.poolId === flatToken.poolId
+                ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+                : [1, earning.settleSymbol];
+            if (userSymbol) {
+              return (
+                <AssetLine
+                  key={earning.symbol}
+                  symbol={userSymbol}
+                  value={(earning.value * (c2s.get(earning.symbol)?.value ?? 1) * userPrice).toFixed(
+                    Math.min(valueToFractionDigits(earning.value * (c2s.get(earning.symbol)?.value ?? 1)), 4)
+                  )}
+                />
+              );
+            }
+          })}
         </div>
       </div>
     </>

@@ -1,0 +1,63 @@
+@import '~styles/theme/theme.scss';
+
+.row {
+  transition: background-color 0.2s ease-in-out;
+  
+  &:hover {
+    background-color: var(--d8x-color-background-hover) !important;
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+    
+    &:first-child {
+      padding-left: 24px;
+    }
+    
+    &:last-child {
+      padding-right: 24px;
+    }
+  }
+}
+
+.rankCell {
+  width: 80px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.addressCell {
+  font-family: var(--d8x-font-monospace);
+  min-width: 150px;
+  max-width: 200px;
+  width: 30%;
+  padding-right: 16px !important;
+}
+
+.pnlCell {
+  text-align: right;
+  font-weight: 500;
+  width: 100px;
+}
+
+
+
+.pointsCell {
+  text-align: right;
+  font-weight: 500;
+  width: 120px;
+}
+
+.userRow {
+  background-color: var(--d8x-color-background-highlight) !important;
+}
+
+.positive {
+  color: var(--d8x-color-text-buy) !important;
+}
+
+.negative {
+  color: var(--d8x-color-text-sell) !important;
+}

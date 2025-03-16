@@ -4,7 +4,7 @@ import { CurrencyItemI } from '../components/currency-selector/types';
 
 export const accountModalOpenAtom = atom(false);
 export const modalSelectedCurrencyAtom = atom<CurrencyItemI | null>(null);
-export const depositModalOpenAtom = atom(false);
+
 export const oneClickModalOpenAtom = atom(false);
 export const connectModalOpenAtom = atom(false);
 export const cedeModalOpenAtom = atom(false);
@@ -16,3 +16,11 @@ export const takeProfitModalOpenAtom = atom(false);
 export const marketSelectModalOpenAtom = atom(false);
 export const tradeHistoryModalOpenAtom = atom(false);
 export const flatTokentModalOpenAtom = atom(false);
+
+const depositModalOpenPrimitiveAtom = atom(false);
+export const depositModalOpenAtom = atom(
+  (get) => get(depositModalOpenPrimitiveAtom),
+  (_, set, value: boolean) => {
+    set(depositModalOpenPrimitiveAtom, value);
+  }
+);

@@ -5,7 +5,8 @@
     "refer": "Empfehlen",
     "vault": "Liquidität",
     "strategies": "Strategien",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "leaderboard": "Leaderboard"
   },
   "pages": {
     "geolocation": {
@@ -394,6 +395,20 @@
         "clear": "Filter Löschen"
       }
     },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "rank": "Rang",
+      "address": "Addresse",
+      "pnl": "PnL",
+      "points": "Punkte",
+      "noDataTitle": "Keine Leaderboard Daten verfügbar",
+      "noData": "Wir konnten die Leaderboard Daten zu diesem Zeitpunkt nicht laden. Bitte versuchen Sie es später erneut.",
+      "refresh": "Daten aktualisieren",
+      "weekly": "Wochen",
+      "allTime": "Gesamt",
+      "yourStats": "Ihre Statistiken",
+      "connectWalletToSeeStats": "Wallet verbinden um Ihre Statistiken zu sehen"
+    },
     "boost-station": {
       "title": "Handle und füge Liquidität hinzu um deinen $D8X Airdrop Bag zu BOOSTEN",
       "invite-friends": "Empfehlen",
@@ -520,12 +535,12 @@
         "title": "Ihre Statistiken",
         "amount": {
           "title": "Anzahl",
-          "info": "Anzahl d{{poolSymbol}} die Sie besitzen."
+          "info": "Anzahl {{shareSymbol}} die Sie besitzen."
         },
         "earnings": {
           "title": "Geschätzter Verdienst",
           "info1": "Der geschätzte Verdienst ist ein Näherungswert dafür, wie viel Sie verdient haben.",
-          "info2": "Geschätzter Verdienst = d{{poolSymbol}} Saldo zum Marktwert + Gesammtbetrag an ausbezahlten {{poolSymbol}} - Gesammtbetrag an einbezahlten {{poolSymbol}}"
+          "info2": "Geschätzter Verdienst = {{shareSymbol}} Saldo zum Marktwert + Gesammtbetrag an ausbezahlten {{poolSymbol}} - Gesammtbetrag an einbezahlten {{poolSymbol}}"
         },
         "initiated": {
           "title": "Auszahlung eingeleitet?",
@@ -533,7 +548,7 @@
         },
         "withdrawal-amount": {
           "title": "Auszahlungsbetrag",
-          "info1": "Der Betrag von d{{poolSymbol}}, für den sie eine Auszahlung eingeleitet haben.",
+          "info1": "Der Betrag von {{shareSymbol}}, für den sie eine Auszahlung eingeleitet haben.",
           "info2": "Ihre Liquidität partizipiert weiterhin an den PnL- und Gebühreneinnahmen des Pools, bis Sie die Auszahlung abschliessen."
         },
         "date": {
@@ -547,7 +562,7 @@
         "yields": {
           "title": "Ertragsquellen",
           "trading-api": "Trading APY ({{percent}}%)",
-          "weeth-yield": "weETH Staking Yield ({{weethAPY}}%)",
+          "weeth-yield": "weETH Yield ({{weethAPY}}%)",
           "stusd-yield": "stUSD Yield ({{stUsdAPY}}%)",
           "ether-fi-points": "Ether.fi Punkte",
           "eigen-layer-points": "EigenLayer Punkte",
@@ -563,18 +578,18 @@
       "global-stats": {
         "apy": "Trading-APY",
         "tvl": "TVL",
-        "price": "d{{poolSymbol}} Preis",
-        "supply": "d{{poolSymbol}} Angebot"
+        "price": "{{shareSymbol}} Preis",
+        "supply": "{{shareSymbol}} Angebot"
       },
       "add": {
         "title": "Liquidität hinzufügen",
-        "info1": "Fügen Sie dem Pool {{poolSymbol}}-Liquidität hinzu und erhalten Sie d{{poolSymbol}}, einen ERC-20-Token, der Ihren Eigentumsanteil am Liquiditätspool darstellt.",
-        "info2": "Als Liquiditätsanbieter erhalten Sie Handelsgebühren und Fundingratezahlungen für alle in der Sicherungswährung besicherten Trades. Sie nehmen auch am Gewinn- und Verlust des Pools teil. d{{poolSymbol}} sammelt Gebühren, Fundingratezahlungen und PnL in Echtzeit.",
+        "info1": "Fügen Sie dem Pool {{poolSymbol}}-Liquidität hinzu und erhalten Sie {{shareSymbol}}, einen ERC-20-Token, der Ihren Eigentumsanteil am Liquiditätspool darstellt.",
+        "info2": "Als Liquiditätsanbieter erhalten Sie Handelsgebühren und Fundingratezahlungen für alle in der Sicherungswährung besicherten Trades. Sie nehmen auch am Gewinn- und Verlust des Pools teil. {{shareSymbol}} sammelt Gebühren, Fundingratezahlungen und PnL in Echtzeit.",
         "amount": {
           "title": "Menge an {{poolSymbol}}",
           "info1": "Geben Sie die Menge an {{poolSymbol}} an, die Sie dem Pool hinzufügen möchten."
         },
-        "receive": "Sie erhalten d{{poolSymbol}}",
+        "receive": "Sie erhalten {{shareSymbol}}",
         "button": "Hinzufügen",
         "approve-button": "Genehmigen",
         "validity-empty": "-",
@@ -587,10 +602,10 @@
       "withdraw": {
         "title": "Liquidität abheben",
         "info1": "Um Liquidität abzuheben, initialisieren Sie zunächst Ihre Auszahlung. Beachten Sie, dass die Initialisierung 24 Stunden dauert und Sie jeweils nur eine offene Initialisierung haben können.",
-        "info2": "Nach 24 Stunden kann ein auszahlbarer Betrag von d{{poolSymbol}} zum d{{poolSymbol}}-Preis gegen {{poolSymbol}} eingetauscht werden.",
+        "info2": "Nach 24 Stunden kann ein auszahlbarer Betrag von {{shareSymbol}} zum {{shareSymbol}}-Preis gegen {{poolSymbol}} eingetauscht werden.",
         "initiate": {
           "title": "1. Auszahlung von {{poolSymbol}} einleiten",
-          "info1": "Geben Sie die Menge an d{{poolSymbol}} an, die Sie gegen {{poolSymbol}} eintauschen möchten.",
+          "info1": "Geben Sie die Menge an {{shareSymbol}} an, die Sie gegen {{poolSymbol}} eintauschen möchten.",
           "info2": "Nach 24 Stunden kann dieser Betrag in {{poolSymbol}} umgewandelt und aus dem Pool abgehoben werden.",
           "button": "Auszahlung initialisieren",
           "validity-empty": "-",

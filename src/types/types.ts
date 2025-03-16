@@ -550,6 +550,72 @@ export interface SupportedTokenI {
 export interface FlatTokenI {
   isFlatToken: boolean;
   symbol: string;
+  poolId: number;
   registeredToken: Address | undefined;
   supportedTokens: SupportedTokenI[];
+  compositePrice: number | undefined; // price in user-registered token
+  registeredSymbol: string | undefined;
+}
+
+// Leaderboard interfaces
+export interface WeeklyLeaderboardEntryI {
+  rank?: number;
+  trader?: string; // Address of the trader (in old format)
+  address?: string; // Address of the trader (in new format)
+  pnl: number;
+  numWeeks?: number;
+  points?: number;
+}
+
+export interface WeeklyLeaderboardResponseI {
+  timestamp: string;
+  from?: string;
+  to?: string;
+  entries?: WeeklyLeaderboardEntryI[];
+  board?: LeaderboardEntryI[];
+  leaderBoard?: WeeklyLeaderboardEntryI[];
+  metadata?: PaginationMetadataI;
+}
+
+export interface AllTimeLeaderboardEntryI {
+  rank?: number;
+  address: string; // Note: different field name than weekly
+  pnl: number;
+  numWeeks: number;
+  points: number;
+}
+
+export interface AllTimeLeaderboardResponseI {
+  asOfDate: string;
+  timestamp: string;
+  entries?: AllTimeLeaderboardEntryI[];
+  board?: AllTimeLeaderboardEntryI[];
+  metadata?: PaginationMetadataI;
+}
+
+export interface UserLeaderboardStatsI {
+  rank: number;
+  trader: string;
+  pnl: number;
+  numWeeks?: number;
+  points?: number;
+}
+
+// Generic interface to handle both types of entries
+export interface LeaderboardEntryI {
+  rank?: number;
+  trader?: string;
+  address?: string;
+  pnl: number;
+  points?: number;
+  numWeeks?: number;
+}
+
+export interface PaginationMetadataI {
+  totalEntries: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }

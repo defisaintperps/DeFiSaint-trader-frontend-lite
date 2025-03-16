@@ -40,6 +40,12 @@ export const pages: PageI[] = [
     translationKey: 'navigation.vault',
     enabled: pagesConfig.enabledVaultPage,
   },
+  {
+    id: 'leaderboard',
+    path: RoutesE.Leaderboard,
+    translationKey: 'navigation.leaderboard',
+    enabled: true,
+  },
 ];
 
 export const authPages: PageI[] = [

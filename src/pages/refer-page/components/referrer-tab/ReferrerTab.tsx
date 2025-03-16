@@ -3,7 +3,7 @@ import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { poolsAtom } from 'store/pools.store';
+import { flatTokenAtom, poolsAtom } from 'store/pools.store';
 import { commissionRateAtom } from 'store/refer.store';
 import type { OverviewItemI, OverviewPoolItemI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -20,6 +20,7 @@ export const ReferrerTab = memo(() => {
 
   const pools = useAtomValue(poolsAtom);
   const commissionRate = useAtomValue(commissionRateAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
 
   const { address, chainId } = useAccount();
 
@@ -38,9 +39,14 @@ export const ReferrerTab = memo(() => {
         .filter((rebate) => !rebate.asTrader && rebate.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
+      const [userPrice, userSymbol] =
+        !!flatToken && pool.poolId === flatToken.poolId && !!flatToken.registeredSymbol
+          ? [flatToken.compositePrice ?? 1, flatToken.registeredSymbol]
+          : [1, pool.poolSymbol];
+
       totalEarnedCommission.push({
-        symbol: pool.poolSymbol,
-        value: earnedCommissionAmount,
+        symbol: userSymbol,
+        value: earnedCommissionAmount * userPrice,
       });
     });
 
@@ -62,7 +68,7 @@ export const ReferrerTab = memo(() => {
             : [],
       },
     ];
-  }, [pools, commissionRate, earnedRebates, address, chainId, t]);
+  }, [flatToken, pools, commissionRate, earnedRebates, address, chainId, t]);
 
   return (
     <div className={styles.root}>

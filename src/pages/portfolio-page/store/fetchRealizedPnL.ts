@@ -19,7 +19,7 @@ export const fetchRealizedPnLAtom = atom(null, async (get, set, userAddress: Add
     if (acc[settleSymbol] && settleSymbol !== '') {
       acc[settleSymbol].value += current.realizedPnl;
     } else if (settleSymbol !== '') {
-      acc[settleSymbol] = { value: current.realizedPnl, poolSymbol: pool?.poolSymbol || '' };
+      acc[settleSymbol] = { value: current.realizedPnl, poolSymbol: pool?.poolSymbol || '', poolId: pool?.poolId ?? 1 };
     }
     return acc;
   }, {});
@@ -30,6 +30,7 @@ export const fetchRealizedPnLAtom = atom(null, async (get, set, userAddress: Add
       symbol: realizedPnLReduced[key].poolSymbol,
       settleSymbol: key,
       value: realizedPnLReduced[key].value,
+      poolId: realizedPnLReduced[key].poolId,
     }))
   );
 });

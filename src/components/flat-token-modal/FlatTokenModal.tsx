@@ -7,13 +7,14 @@ import { Dialog } from 'components/dialog/Dialog';
 import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { depositModalOpenAtom, flatTokentModalOpenAtom } from 'store/global-modals.store';
+import { MethodE } from 'types/enums';
 
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './FlatTokenModal.module.scss';
 import { FlatTokenSelect } from './elements/flat-token-selector/FlatTokenSelect';
-import { flatTokenAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
-import { Address } from 'viem';
+import { flatTokenAtom, poolsAtom, proxyAddrAtom, selectedPoolAtom, selectedStableAtom } from 'store/pools.store';
+import { Address, zeroAddress } from 'viem';
 import { fetchFlatTokenInfo } from 'blockchain-api/contract-interactions/fetchFlatTokenInfo';
 import { registerFlatToken } from 'blockchain-api/contract-interactions/registerFlatToken';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -22,7 +23,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 
 export const FlatTokenModal = () => {
   const { address, chainId } = useAccount();
-  const { isMultisigAddress } = useUserWallet();
+  const { gasTokenBalance, hasEnoughGasForFee, isMultisigAddress } = useUserWallet();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
@@ -32,11 +33,14 @@ export const FlatTokenModal = () => {
   const [selectedStable, setSelectedStable] = useAtom(selectedStableAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
+  const pools = useAtomValue(poolsAtom);
+  const isDepositModalOpen = useAtomValue(depositModalOpenAtom);
 
   const [title] = useState('');
   const [txHash, setTxHash] = useState<Address | undefined>();
 
   const isBusyRef = useRef(false);
+  const flatTokenRef = useRef(flatToken);
 
   const handleOnClose = useCallback(() => {
     setFlatTokentModalOpen(false);
@@ -79,7 +83,7 @@ export const FlatTokenModal = () => {
     }
   };
 
-  const { isSuccess, isError } = useWaitForTransactionReceipt({
+  const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
     query: { enabled: !!txHash },
   });
@@ -91,8 +95,8 @@ export const FlatTokenModal = () => {
           title={`Success`}
           bodyLines={[
             {
-              label: 'Token',
-              value: selectedStable,
+              label: 'You have registered your collateral token',
+              value: '',
             },
           ]}
         />
@@ -120,35 +124,80 @@ export const FlatTokenModal = () => {
   }, [isError, txHash]);
 
   useEffect(() => {
-    if (!isBusyRef.current) {
+    if (flatToken?.registeredToken || !hasEnoughGasForFee(MethodE.Interact, 1n)) {
+      setFlatTokentModalOpen(false);
+    }
+  }, [flatToken, setFlatTokentModalOpen, hasEnoughGasForFee]);
+
+  useEffect(() => {
+    if (!isBusyRef.current && pools && proxyAddr && publicClient && (flatTokenRef.current === undefined || isFetched)) {
+      isBusyRef.current = true;
       setFlatToken(undefined);
-      setSelectedStable(undefined);
-      if (selectedPool?.settleTokenAddr && proxyAddr && publicClient && address) {
-        isBusyRef.current = true;
-        fetchFlatTokenInfo(publicClient, proxyAddr as Address, selectedPool.settleTokenAddr as Address, address)
-          .then((info) => {
-            setFlatToken(info);
-            if (info.isFlatToken && !info.registeredToken) {
-              setDepositModalOpen(false);
-              setFlatTokentModalOpen(true);
-            }
-          })
-          .catch()
-          .finally(() => {
-            isBusyRef.current = false;
-          });
-      }
+      Promise.allSettled(
+        pools.map((pool) =>
+          fetchFlatTokenInfo(
+            publicClient,
+            proxyAddr as Address,
+            pool.settleTokenAddr as Address,
+            address ?? zeroAddress
+          )
+            .then((info) => {
+              if (info.controller === proxyAddr) {
+                setFlatToken({ ...info, poolId: pool.poolId });
+                if (info.registeredToken) {
+                  setFlatTokentModalOpen(false);
+                }
+              }
+            })
+            .catch()
+        )
+      ).then(() => {
+        isBusyRef.current = false;
+      });
+    }
+  }, [address, isFetched, proxyAddr, publicClient, pools, setFlatToken, setDepositModalOpen, setFlatTokentModalOpen]);
+
+  useEffect(() => {
+    setSelectedStable(undefined);
+    if (
+      flatToken &&
+      selectedPool &&
+      flatToken.isFlatToken &&
+      !flatToken.registeredToken &&
+      selectedPool.poolId === flatToken.poolId &&
+      hasEnoughGasForFee(MethodE.Interact, 1n)
+    ) {
+      setDepositModalOpen(false);
+      setFlatTokentModalOpen(true);
     }
   }, [
-    address,
-    proxyAddr,
-    publicClient,
+    flatToken,
     selectedPool,
-    setFlatToken,
     setDepositModalOpen,
     setFlatTokentModalOpen,
     setSelectedStable,
+    hasEnoughGasForFee,
+    gasTokenBalance,
   ]);
+
+  useEffect(() => {
+    if (
+      isDepositModalOpen &&
+      flatToken?.isFlatToken &&
+      !flatToken?.registeredToken &&
+      selectedPool?.poolId === flatToken.poolId &&
+      hasEnoughGasForFee(MethodE.Interact, 1n)
+    ) {
+      setFlatTokentModalOpen(true);
+      setDepositModalOpen(false);
+    }
+  }, [isDepositModalOpen, setDepositModalOpen, flatToken, setFlatTokentModalOpen, selectedPool, hasEnoughGasForFee]);
+
+  useEffect(() => {
+    if (selectedPool && flatTokenRef.current) {
+      setFlatToken({ ...flatTokenRef.current, isFlatToken: flatTokenRef.current.poolId === selectedPool.poolId });
+    }
+  }, [selectedPool, setFlatToken]);
 
   if (!isEnabledChain(chainId)) {
     return null;

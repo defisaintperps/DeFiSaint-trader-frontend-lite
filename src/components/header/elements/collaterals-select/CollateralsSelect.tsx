@@ -9,7 +9,7 @@ import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { clearInputsDataAtom } from 'store/order-block.store';
-import { poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { flatTokenAtom, poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import type { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -30,14 +30,15 @@ const OptionsHeader = () => {
 
 interface MenuOptionPropsI {
   pool: PoolI;
+  userSymbol: string;
 }
 
-const MenuOption = ({ pool }: MenuOptionPropsI) => {
+const MenuOption = ({ pool, userSymbol }: MenuOptionPropsI) => {
   return (
     <Box className={styles.optionHolder}>
       <Box className={styles.label}>
-        <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={16} height={16} />
-        <span>{pool.settleSymbol}</span>
+        <DynamicLogo logoName={userSymbol.toLowerCase()} width={16} height={16} />
+        <span>{userSymbol}</span>
       </Box>
       <Box className={styles.value}>{pool.perpetuals.filter(({ state }) => state === 'NORMAL').length}</Box>
     </Box>
@@ -55,6 +56,7 @@ export const CollateralsSelect = memo(() => {
   const { isConnected, send } = useWebSocketContext();
 
   const pools = useAtomValue(poolsAtom);
+  const flatToken = useAtomValue(flatTokenAtom);
   const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
@@ -89,10 +91,14 @@ export const CollateralsSelect = memo(() => {
     return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
+  const userSymbol =
+    flatToken?.registeredSymbol ??
+    (flatToken?.supportedTokens && flatToken?.supportedTokens.length > 0 ? flatToken?.supportedTokens[0].symbol : '');
+
   return (
     <Box className={styles.holderRoot}>
       <Box className={styles.iconsWrapper}>
-        <DynamicLogo logoName={selectedPool?.settleSymbol.toLowerCase() ?? ''} width={52} height={52} />
+        <DynamicLogo logoName={userSymbol.toLowerCase() ?? ''} width={52} height={52} />
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
@@ -103,15 +109,28 @@ export const CollateralsSelect = memo(() => {
         value={selectedPool?.poolSymbol}
         handleChange={handleChange}
         OptionsHeader={OptionsHeader}
-        renderLabel={(value) => value.settleSymbol}
+        renderLabel={(value) =>
+          value.perpetuals.length > 0 && Math.floor(value.perpetuals[0].id / 100_000) === flatToken?.poolId
+            ? userSymbol
+            : value.settleSymbol
+        }
         renderOption={(option) =>
           isMobileScreen ? (
             <option key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
-              {option.item.settleSymbol}
+              {Math.floor(option.item.perpetuals[0].id / 100_000) === flatToken?.poolId
+                ? userSymbol
+                : option.item.settleSymbol}
             </option>
           ) : (
             <MenuItem key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
-              <MenuOption pool={option.item} />
+              <MenuOption
+                pool={option.item}
+                userSymbol={
+                  Math.floor(option.item.perpetuals[0].id / 100_000) === flatToken?.poolId
+                    ? userSymbol
+                    : option.item.settleSymbol
+                }
+              />
             </MenuItem>
           )
         }
